@@ -409,7 +409,39 @@ const ProcessChartsGuide = () => {
         {/* Formula */}
         <div className="bg-gray-100 p-5 rounded-lg mb-6">
           <h3 className="font-bold text-lg text-gray-800 mb-2">Control Limit Formula</h3>
-          <code className="text-sm text-gray-700 bg-white p-3 rounded block">{info.formula}</code>
+          {typeof info.formula === 'string' ? (
+            <code className="text-sm text-gray-700 bg-white p-3 rounded block">{info.formula}</code>
+          ) : (
+            <div className="space-y-4">
+              <code className="text-sm text-gray-700 bg-white p-3 rounded block">{info.formula.equation}</code>
+
+              <div className="space-y-3 mt-4">
+                <h4 className="font-semibold text-gray-800">Variable Definitions:</h4>
+                {Object.entries(info.formula.variables).map(([key, variable]: [string, any]) => (
+                  <div key={key} className="bg-white p-3 rounded border-l-2 border-gray-400">
+                    <p className="font-semibold text-gray-800">{key}: {variable.name}</p>
+                    <p className="text-sm text-gray-600 mt-1">{variable.meaning}</p>
+                    <p className="text-sm text-gray-700 mt-1"><strong>How to calculate:</strong> {variable.calculation}</p>
+                    <p className="text-sm text-blue-700 mt-1"><strong>Example:</strong> {variable.example}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg mt-4 border-l-4 border-blue-600">
+                <h4 className="font-semibold text-blue-900 mb-2">Step-by-Step Example</h4>
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-700"><strong>Setup:</strong> {info.formula.quickExample.setup}</p>
+                  <p className="text-gray-700"><strong>Data:</strong></p>
+                  <pre className="bg-white p-2 rounded text-xs">{info.formula.quickExample.data}</pre>
+                  <p className="text-gray-700"><strong>Calculations:</strong></p>
+                  <pre className="bg-white p-2 rounded text-xs">{info.formula.quickExample.calculations}</pre>
+                  <p className="text-gray-700"><strong>Control Limits:</strong></p>
+                  <pre className="bg-white p-2 rounded text-xs">{info.formula.quickExample.limits}</pre>
+                  <p className="text-green-700 bg-white p-2 rounded mt-2"><strong>Interpretation:</strong> {info.formula.quickExample.interpretation}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* What to Look For */}
