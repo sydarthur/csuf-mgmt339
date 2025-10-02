@@ -262,7 +262,7 @@ const ProcessChartsGuide = () => {
             <LineChart data={xbarData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="sample" label={{ value: 'Sample Number', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'Mean Value', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[30, 60]} label={{ value: 'Mean Value', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
               <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
               <Line type="monotone" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="Lower Control Limit" />
