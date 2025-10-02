@@ -64,7 +64,36 @@ const ProcessChartsGuide = () => {
         measurements: 'Shot volumes: 28ml, 30ml, 29ml, 31ml, 27ml → Average = 29ml',
         insight: 'If the average shifts from 29ml to 33ml, the machine may need recalibration'
       },
-      formula: 'UCL = X̄̄ + A₂R̄  |  LCL = X̄̄ - A₂R̄',
+      formula: {
+        equation: 'UCL = X̄̄ + A₂R̄  |  LCL = X̄̄ - A₂R̄',
+        variables: {
+          'X̄̄': {
+            name: 'X-double-bar (Grand Mean)',
+            meaning: 'The average of all sample averages',
+            calculation: 'Add up all your sample means, then divide by number of samples',
+            example: 'If Day 1 avg = 29ml, Day 2 avg = 30ml, Day 3 avg = 28ml → X̄̄ = (29+30+28)/3 = 29ml'
+          },
+          'A₂': {
+            name: 'Control Chart Constant',
+            meaning: 'Adjusts control limits based on sample size',
+            calculation: 'Look up in table based on your sample size (n)',
+            example: 'For n=5 measurements per sample, A₂ = 0.577 (from table)'
+          },
+          'R̄': {
+            name: 'R-bar (Average Range)',
+            meaning: 'The average spread within samples',
+            calculation: 'For each sample, find range (max-min), then average all ranges',
+            example: 'Day 1 range = 4ml, Day 2 range = 5ml, Day 3 range = 3ml → R̄ = (4+5+3)/3 = 4ml'
+          }
+        },
+        quickExample: {
+          setup: 'You have 3 days of data, 5 measurements per day',
+          data: 'Day 1: [28,30,29,31,27] avg=29, range=4\nDay 2: [29,32,30,31,28] avg=30, range=4\nDay 3: [27,29,28,30,26] avg=28, range=4',
+          calculations: 'X̄̄ = (29+30+28)/3 = 29ml\nR̄ = (4+4+4)/3 = 4ml\nA₂ = 0.577 (for n=5)',
+          limits: 'UCL = 29 + (0.577)(4) = 31.3ml\nLCL = 29 - (0.577)(4) = 26.7ml',
+          interpretation: 'Any daily average above 31.3ml or below 26.7ml signals process has shifted'
+        }
+      },
       lookingFor: 'Points outside control limits indicate the process average has shifted'
     },
     r: {
@@ -87,7 +116,36 @@ const ProcessChartsGuide = () => {
         measurements: 'Shots: 28, 30, 29, 31, 27ml → Range = 31 - 27 = 4ml',
         insight: 'If range suddenly increases to 10ml, the machine is becoming inconsistent'
       },
-      formula: 'UCL = D₄R̄  |  LCL = D₃R̄',
+      formula: {
+        equation: 'UCL = D₄R̄  |  LCL = D₃R̄',
+        variables: {
+          'R̄': {
+            name: 'R-bar (Average Range)',
+            meaning: 'The typical spread within your samples',
+            calculation: 'Calculate range for each sample (max-min), then average them',
+            example: 'Day 1 range = 4ml, Day 2 range = 5ml, Day 3 range = 3ml → R̄ = (4+5+3)/3 = 4ml'
+          },
+          'D₄': {
+            name: 'Upper Control Chart Constant',
+            meaning: 'Sets the upper limit for acceptable variation',
+            calculation: 'Look up in table based on sample size (n)',
+            example: 'For n=5, D₄ = 2.115 (from table)'
+          },
+          'D₃': {
+            name: 'Lower Control Chart Constant',
+            meaning: 'Sets the lower limit (often zero for small samples)',
+            calculation: 'Look up in table based on sample size (n)',
+            example: 'For n=5, D₃ = 0 (ranges cannot be negative, so LCL = 0)'
+          }
+        },
+        quickExample: {
+          setup: 'Same 3 days of espresso data',
+          data: 'Day 1: range = 31-27 = 4ml\nDay 2: range = 32-28 = 4ml\nDay 3: range = 30-26 = 4ml',
+          calculations: 'R̄ = (4+4+4)/3 = 4ml\nD₄ = 2.115, D₃ = 0 (for n=5)',
+          limits: 'UCL = (2.115)(4) = 8.46ml\nLCL = (0)(4) = 0ml',
+          interpretation: 'Any daily range above 8.46ml means variability has increased—process becoming inconsistent'
+        }
+      },
       lookingFor: 'Increasing ranges mean the process is becoming less consistent'
     },
     p: {
@@ -110,7 +168,36 @@ const ProcessChartsGuide = () => {
         measurements: 'Monday: 5 wrong items out of 200 orders = 5/200 = 2.5% defective',
         insight: 'If Friday shows 16/200 = 8% defective (above control limit), investigate what happened'
       },
-      formula: 'UCL = p̄ + 3√(p̄(1-p̄)/n)  |  LCL = p̄ - 3√(p̄(1-p̄)/n)',
+      formula: {
+        equation: 'UCL = p̄ + 3√(p̄(1-p̄)/n)  |  LCL = p̄ - 3√(p̄(1-p̄)/n)',
+        variables: {
+          'p̄': {
+            name: 'p-bar (Average Proportion Defective)',
+            meaning: 'Your overall defect rate across all samples',
+            calculation: 'Total defectives from all samples ÷ Total items inspected',
+            example: 'Week 1: 5 defects in 200, Week 2: 8 in 250 → p̄ = (5+8)/(200+250) = 13/450 = 0.029 or 2.9%'
+          },
+          'n': {
+            name: 'Sample Size',
+            meaning: 'Number of items inspected in that specific sample',
+            calculation: 'Count how many items you checked',
+            example: 'Monday inspected 200 orders, so n=200 (note: can vary day to day)'
+          },
+          '3': {
+            name: 'Z-score (3-sigma)',
+            meaning: 'Standard multiplier for control limits (captures 99.7% of variation)',
+            calculation: 'Fixed at 3 for standard control charts',
+            example: 'Always use 3 unless specified otherwise'
+          }
+        },
+        quickExample: {
+          setup: '3 days of order inspection data',
+          data: 'Mon: 6 defects in 200 orders = 6/200 = 0.03\nTue: 5 defects in 150 orders = 5/150 = 0.033\nWed: 12 defects in 250 orders = 12/250 = 0.048',
+          calculations: 'p̄ = (6+5+12)/(200+150+250) = 23/600 = 0.0383 or 3.83%\n\nFor Monday (n=200):\nσ = √(0.0383(1-0.0383)/200) = √(0.000184) = 0.0136',
+          limits: 'UCL = 0.0383 + 3(0.0136) = 0.079 or 7.9%\nLCL = 0.0383 - 3(0.0136) = -0.003 → set to 0%\n(Proportions cannot be negative)',
+          interpretation: 'Monday 3% is in control. If a day shows 9% defective, it exceeds UCL—special cause event'
+        }
+      },
       lookingFor: 'Spikes in proportion indicate specific periods with quality issues'
     },
     c: {
@@ -133,7 +220,36 @@ const ProcessChartsGuide = () => {
         measurements: 'Monday: 5 defects, Tuesday: 7 defects, Friday: 15 defects',
         insight: 'Friday spike of 15 defects (above UCL of 12) suggests a problem occurred that day'
       },
-      formula: 'UCL = c̄ + 3√c̄  |  LCL = c̄ - 3√c̄',
+      formula: {
+        equation: 'UCL = c̄ + 3√c̄  |  LCL = c̄ - 3√c̄',
+        variables: {
+          'c̄': {
+            name: 'c-bar (Average Defect Count)',
+            meaning: 'Typical number of defects found per inspection unit',
+            calculation: 'Sum all defect counts, then divide by number of samples',
+            example: 'Day 1: 5 defects, Day 2: 7 defects, Day 3: 4 defects → c̄ = (5+7+4)/3 = 5.33 defects'
+          },
+          '√c̄': {
+            name: 'Square Root of c-bar',
+            meaning: 'Standard deviation estimate for count data',
+            calculation: 'Take the square root of your average count',
+            example: 'If c̄ = 16, then √c̄ = √16 = 4'
+          },
+          '3': {
+            name: 'Z-score (3-sigma)',
+            meaning: 'Standard multiplier for control limits',
+            calculation: 'Fixed at 3 for standard control charts',
+            example: 'Always use 3 unless specified otherwise'
+          }
+        },
+        quickExample: {
+          setup: 'Inspect 100 packages daily for defects (tears, dents, scratches, missing labels)',
+          data: 'Mon: 12 defects\nTue: 15 defects\nWed: 18 defects\nThu: 14 defects\nFri: 35 defects',
+          calculations: 'c̄ = (12+15+18+14+35)/5 = 94/5 = 18.8 defects\n√c̄ = √18.8 = 4.34',
+          limits: 'UCL = 18.8 + 3(4.34) = 18.8 + 13.02 = 31.8 defects\nLCL = 18.8 - 3(4.34) = 18.8 - 13.02 = 5.78 defects',
+          interpretation: 'Friday with 35 defects exceeds UCL of 31.8—special cause event. Investigate what happened Friday.'
+        }
+      },
       lookingFor: 'Unusual counts indicate special causes affecting quality'
     }
   };
