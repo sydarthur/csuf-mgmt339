@@ -192,8 +192,8 @@ const ProcessChartsGuide = () => {
         },
         quickExample: {
           setup: '3 days of order inspection data',
-          data: 'Mon: 6 defects in 200 orders = 6/200 = 0.03\nTue: 5 defects in 150 orders = 5/150 = 0.033\nWed: 12 defects in 250 orders = 12/250 = 0.048',
-          calculations: 'p̄ = (6+5+12)/(200+150+250) = 23/600 = 0.0383 or 3.83%\n\nFor Monday (n=200):\nσ = √(0.0383(1-0.0383)/200) = √(0.000184) = 0.0136',
+          data: 'Mon: 6 defects in 200 orders = 6/200 = 0.03\nTue: 5 defects in 200 orders = 5/200 = 0.025\nWed: 12 defects in 200 orders = 12/200 = 0.06',
+          calculations: 'p̄ = (6+5+12)/(200+200+200) = 23/600 = 0.0383 or 3.83%\n\nFor Monday (n=200):\nσ = √(0.0383(1-0.0383)/200) = √(0.000184) = 0.0136',
           limits: 'UCL = 0.0383 + 3(0.0136) = 0.079 or 7.9%\nLCL = 0.0383 - 3(0.0136) = -0.003 → set to 0%\n(Proportions cannot be negative)',
           interpretation: 'Monday 3% is in control. If a day shows 9% defective, it exceeds UCL—special cause event'
         }
