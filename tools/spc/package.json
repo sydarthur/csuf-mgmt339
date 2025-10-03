@@ -1,13 +1,13 @@
 {
-  "name": "csuf-mgmt339",
+  "name": "csuf-mgmt339-spc",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cd tools/spc && npm run dev",
-    "build": "cd tools/spc && npm run build",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "cd tools/spc && npm run preview",
+    "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
