@@ -51,6 +51,15 @@ function App() {
 
       {/* Content */}
       {currentView === 'guide' ? <ProcessChartsGuide /> : currentView === 'playground' ? <Playground /> : <VideoSummary />}
+
+      {/* Footer */}
+      <footer className="bg-gray-100 border-t border-gray-200 py-3">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-xs text-gray-500">
+            Built using generative AI. AI can make mistakes, so please double-check important information.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
