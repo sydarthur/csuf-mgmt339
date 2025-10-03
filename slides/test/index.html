@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="../reveal.js/dist/reset.css">
+		<link rel="stylesheet" href="../reveal.js/dist/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="../reveal.js/plugin/highlight/monokai.css">
+
+		<!-- Chart.js for graphs -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+		<!-- Museo Sans font -->
+		<link rel="stylesheet" href="https://use.typekit.net/wnq4vkz.css">
+
+		<style>
+			.reveal {
+				font-family: 'museo-sans', 'Museo Sans', 'Trebuchet MS', sans-serif;
+				color: #00244E;
+			}
+		/* Content margins without shrinking the stage */
+		.reveal .slides {
+			padding: 20px 0px 40px 0px;
+			max-width: 1200px;
+			margin: 0 auto;
+			height: 100%;
+			overflow-y: auto;
+			scrollbar-gutter: stable;
+			scrollbar-color: #00244E rgba(0, 36, 78, 0.1);
+		}
+		.reveal .slides > section,
+		.reveal .slides > section > section {
+			box-sizing: border-box;
+			padding: 0px;
+		}
+		.reveal .slides > section.stack {
+			padding: 0;
+		}
+			.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+				text-align: left;
+				margin-left: 25px;
+				margin-top: 100px;
+				color: #00244E;
+			}
+			.reveal ul {
+				text-align: left;
+			}
+			.reveal li {
+				color: #00244E;
+			}
+			.reveal p {
+				color: #00244E;
+			}
+			/* Accent color for emphasis */
+			.reveal strong,
+			.reveal em,
+			.reveal .accent {
+				color: #FF7900;
+			}
+			/* Title slide styling */
+			.reveal .title-slide h1,
+			.reveal .title-slide h2,
+			.reveal .title-slide h3,
+			.reveal .title-slide p,
+			.reveal .title-slide li {
+				color: white !important;
+			}
+			/* Body slide styling */
+			.reveal .body-slide h1,
+			.reveal .body-slide h2,
+			.reveal .body-slide h3,
+			.reveal .body-slide p,
+			.reveal .body-slide li {
+				color: #00244E !important;
+			}
+			/* Two column layout */
+			.reveal .two-columns {
+				display: flex;
+				gap: 40px;
+				align-items: flex-start;
+			}
+			.reveal .column {
+				flex: 1;
+			}
+			.reveal .column img {
+				max-width: 100%;
+				max-height: 450px;
+				height: auto;
+				object-fit: contain;
+			}
+			/* General image sizing */
+			.reveal img {
+				max-width: 90%;
+				max-height: 350px;
+				margin: 20px auto;
+				display: block;
+			}
+			/* Text boxes layout */
+			.reveal .text-boxes {
+				display: flex;
+				gap: 20px;
+				justify-content: space-around;
+				margin-top: 30px;
+			}
+			.reveal .text-box {
+				background: rgba(255, 255, 255, 0.9);
+				border: 2px solid #00244E;
+				border-radius: 10px;
+				padding: 20px;
+				flex: 1;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+			.reveal .text-box h3 {
+				margin-top: 0;
+				margin-left: 0;
+				text-align: center;
+				color: #00244E !important;
+			}
+			.reveal .text-box ul {
+				margin: 10px 0 0 20px;
+			}
+			.reveal .text-box p {
+				margin: 10px 0;
+				text-align: center;
+			}
+			/* Grid layout for text boxes */
+			.reveal .text-boxes-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 20px;
+				margin-top: 30px;
+			}
+			/* Table styling */
+			.reveal table {
+				margin: 20px auto;
+				border: 2px solid #00244E;
+				border-collapse: separate;
+				background: rgba(255, 255, 255, 0.9);
+				max-width: 60%;
+				font-size: 0.5em;
+			}
+			.reveal table th,
+			.reveal table td {
+				padding: 12px 15px;
+				border: 2px solid #00244E;
+				color: #00244E !important;
+			}
+			.reveal table th {
+				background: rgba(0, 36, 78, 0.2);
+				font-weight: bold;
+			}
+			.reveal table tr:nth-child(even) {
+				background: rgba(0, 36, 78, 0.05);
+			}
+			.reveal table strong {
+				color: #FF7900 !important;
+			}
+			/* Canvas sizing for charts */
+			.reveal canvas {
+				max-width: 90%;
+				max-height: 400px;
+				margin: 0 auto;
+				display: block;
+			}
+			/* iframe sizing */
+			.reveal iframe {
+				max-width: 90%;
+				max-height: 500px;
+				margin: 0 auto;
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown="slides.md" data-separator="^\n---\n$" data-separator-vertical="^\n--\n$">
+				</section>
+			</div>
+		</div>
+
+		<script src="../reveal.js/dist/reveal.js"></script>
+		<script src="../reveal.js/plugin/notes/notes.js"></script>
+		<script src="../reveal.js/plugin/markdown/markdown.js"></script>
+		<script src="../reveal.js/plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+
+			// Chart.js setup
+			let dynamicChartInstance = null;
+
+			// Static chart
+			Reveal.on('slidechanged', event => {
+				if (event.currentSlide.querySelector('#staticChart')) {
+					const ctx = document.getElementById('staticChart').getContext('2d');
+					new Chart(ctx, {
+						type: 'bar',
+						data: {
+							labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+							datasets: [{
+								label: 'Product A',
+								data: [10000, 12000, 15000, 18000],
+								backgroundColor: 'rgba(0, 36, 78, 0.8)',
+							}, {
+								label: 'Product B',
+								data: [8000, 9500, 11000, 13500],
+								backgroundColor: 'rgba(255, 121, 0, 0.8)',
+							}, {
+								label: 'Product C',
+								data: [5000, 6200, 7800, 9000],
+								backgroundColor: 'rgba(0, 36, 78, 0.5)',
+							}]
+						},
+						options: {
+							responsive: false,
+							plugins: {
+								title: {
+									display: true,
+									text: 'Quarterly Sales Data'
+								}
+							},
+							scales: {
+								y: {
+									beginAtZero: true
+								}
+							}
+						}
+					});
+				}
+			});
+
+			// Dynamic chart switcher
+			function showChart(type) {
+				const ctx = document.getElementById('dynamicChart').getContext('2d');
+
+				if (dynamicChartInstance) {
+					dynamicChartInstance.destroy();
+				}
+
+				const data = {
+					labels: ['Product A', 'Product B', 'Product C'],
+					datasets: [{
+						label: 'Total Sales',
+						data: [55000, 42000, 28000],
+						backgroundColor: [
+							'rgba(0, 36, 78, 0.8)',
+							'rgba(255, 121, 0, 0.8)',
+							'rgba(0, 36, 78, 0.5)'
+						],
+						borderColor: [
+							'rgba(0, 36, 78, 1)',
+							'rgba(255, 121, 0, 1)',
+							'rgba(0, 36, 78, 0.7)'
+						],
+						borderWidth: 2
+					}]
+				};
+
+				dynamicChartInstance = new Chart(ctx, {
+					type: type,
+					data: data,
+					options: {
+						responsive: false,
+						plugins: {
+							title: {
+								display: true,
+								text: 'Annual Product Sales'
+							},
+							legend: {
+								display: type === 'pie'
+							}
+						},
+						scales: type !== 'pie' ? {
+							y: {
+								beginAtZero: true
+							}
+						} : {}
+					}
+				});
+			}
+
+			// Initialize dynamic chart when slide appears
+			Reveal.on('slidechanged', event => {
+				if (event.currentSlide.querySelector('#dynamicChart')) {
+					setTimeout(() => showChart('bar'), 100);
+				}
+			});
+		</script>
+	</body>
+</html>

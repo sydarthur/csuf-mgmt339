@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MGMT339 Slides</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    h1 {
+      color: white;
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 3rem;
+    }
+    .section {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    .slides-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .slide-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border: 2px solid #667eea;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: #333;
+      transition: all 0.3s ease;
+      display: block;
+    }
+    .slide-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      border-color: #764ba2;
+    }
+    .slide-card h3 {
+      color: #667eea;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .slide-card p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 MGMT339 Slides</h1>
+
+    <div class="section">
+      <h2>Course Presentations</h2>
+      <div class="slides-grid">
+        <a href="./test/index.html" class="slide-card">
+          <h3>Test Presentation</h3>
+          <p>Custom course slides with Chart.js integration</p>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Reveal.js Examples</h2>
+      <div class="slides-grid">
+        <a href="./reveal.js/demo.html" class="slide-card">
+          <h3>Demo</h3>
+          <p>Full feature demonstration</p>
+        </a>
+        <a href="./reveal.js/examples/auto-animate.html" class="slide-card">
+          <h3>Auto-Animate</h3>
+          <p>Automatic slide animations</p>
+        </a>
+        <a href="./reveal.js/examples/backgrounds.html" class="slide-card">
+          <h3>Backgrounds</h3>
+          <p>Image and video backgrounds</p>
+        </a>
+        <a href="./reveal.js/examples/layout-helpers.html" class="slide-card">
+          <h3>Layout Helpers</h3>
+          <p>Grid and flex layouts</p>
+        </a>
+        <a href="./reveal.js/examples/markdown.html" class="slide-card">
+          <h3>Markdown</h3>
+          <p>Write slides in Markdown</p>
+        </a>
+        <a href="./reveal.js/examples/math.html" class="slide-card">
+          <h3>Math</h3>
+          <p>LaTeX math typesetting</p>
+        </a>
+        <a href="./reveal.js/examples/media.html" class="slide-card">
+          <h3>Media</h3>
+          <p>Audio and video embedding</p>
+        </a>
+        <a href="./reveal.js/examples/transitions.html" class="slide-card">
+          <h3>Transitions</h3>
+          <p>Different transition effects</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

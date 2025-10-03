@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "cd tools/spc && npm run dev",
-    "build": "cd tools/spc && npm run build",
+    "dev:slides": "cd slides && npm run dev",
+    "build": "npm run build:spc && npm run build:slides && cp index-root.html dist/index.html",
+    "build:spc": "cd tools/spc && npm run build",
+    "build:slides": "cd slides && npm run build",
     "lint": "eslint .",
     "preview": "cd tools/spc && npm run preview",
     "predeploy": "npm run build",

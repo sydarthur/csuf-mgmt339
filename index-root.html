@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSUF MGMT339 Learning Platform</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      text-align: center;
+      color: white;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .modules {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .module-card {
+      background: white;
+      color: #333;
+      padding: 2rem;
+      border-radius: 1rem;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      min-width: 200px;
+    }
+    .module-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .module-card h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+    }
+    .module-card p {
+      margin: 0;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CSUF MGMT339 Learning Platform</h1>
+    <div class="modules">
+      <a href="./spc/" class="module-card">
+        <h2>📊 SPC Tools</h2>
+        <p>Statistical Process Control Charts & Playground</p>
+      </a>
+      <a href="./slides/" class="module-card">
+        <h2>📽️ Slides</h2>
+        <p>Course Presentations & Examples</p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
