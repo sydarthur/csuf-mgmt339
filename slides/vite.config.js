@@ -27,6 +27,8 @@ export default defineConfig({
       const revealDest = resolve(outDir, 'reveal.js')
       const testAssetsSrc = resolve(__dirname, 'test/assets')
       const testAssetsDest = resolve(outDir, 'test/assets')
+      const testSlidesMdSrc = resolve(__dirname, 'test/slides.md')
+      const testSlidesMdDest = resolve(outDir, 'test/slides.md')
 
       // Copy entire reveal.js directory to dist
       if (!existsSync(revealDest)) {
@@ -42,6 +44,12 @@ export default defineConfig({
         }
         cpSync(testAssetsSrc, testAssetsDest, { recursive: true })
         console.log('✓ Copied test/assets to dist/slides/test/assets')
+      }
+
+      // Copy test slides.md
+      if (existsSync(testSlidesMdSrc)) {
+        copyFileSync(testSlidesMdSrc, testSlidesMdDest)
+        console.log('✓ Copied test/slides.md to dist/slides/test/slides.md')
       }
     }
   }]
