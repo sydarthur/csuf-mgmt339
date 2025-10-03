@@ -12,7 +12,7 @@ const VideoSummary = () => {
             className="absolute top-0 left-0 w-full h-full"
             preload="metadata"
           >
-            <source src="/assets/Listening_to_Your_Process.mp4" type="video/mp4" />
+            <source src="./assets/Listening_to_Your_Process.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
