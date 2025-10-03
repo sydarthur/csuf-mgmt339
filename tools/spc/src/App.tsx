@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import ProcessChartsGuide from './ProcessChartsGuide_v2'
 import Playground from './Playground'
+import VideoSummary from './VideoSummary'
 
 function App() {
-  const [currentView, setCurrentView] = useState<'guide' | 'playground'>('guide')
+  const [currentView, setCurrentView] = useState<'guide' | 'playground' | 'video'>('guide')
 
   return (
     <div>
@@ -33,13 +34,23 @@ function App() {
               >
                 🎮 Playground
               </button>
+              <button
+                onClick={() => setCurrentView('video')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                  currentView === 'video'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                🎥 Video Summary
+              </button>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Content */}
-      {currentView === 'guide' ? <ProcessChartsGuide /> : <Playground />}
+      {currentView === 'guide' ? <ProcessChartsGuide /> : currentView === 'playground' ? <Playground /> : <VideoSummary />}
     </div>
   )
 }
