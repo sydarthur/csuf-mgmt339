@@ -3,9 +3,9 @@ import { Company } from '../data/companies'
 const colorMap: Record<string, { bg: string; border: string; text: string; headerBg: string; badge: string }> = {
   blue: { bg: 'bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-400', headerBg: 'bg-blue-900/50', badge: 'bg-blue-500' },
   green: { bg: 'bg-green-900/30', border: 'border-green-500', text: 'text-green-400', headerBg: 'bg-green-900/50', badge: 'bg-green-500' },
-  amber: { bg: 'bg-amber-900/30', border: 'border-amber-500', text: 'text-amber-400', headerBg: 'bg-amber-900/50', badge: 'bg-amber-500' },
+  yellow: { bg: 'bg-yellow-900/30', border: 'border-yellow-500', text: 'text-yellow-400', headerBg: 'bg-yellow-900/50', badge: 'bg-yellow-500' },
   purple: { bg: 'bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-400', headerBg: 'bg-purple-900/50', badge: 'bg-purple-500' },
-  teal: { bg: 'bg-teal-900/30', border: 'border-teal-500', text: 'text-teal-400', headerBg: 'bg-teal-900/50', badge: 'bg-teal-500' },
+  gray: { bg: 'bg-gray-800/30', border: 'border-gray-500', text: 'text-gray-400', headerBg: 'bg-gray-800/50', badge: 'bg-gray-500' },
   red: { bg: 'bg-red-900/30', border: 'border-red-500', text: 'text-red-400', headerBg: 'bg-red-900/50', badge: 'bg-red-500' },
 }
 

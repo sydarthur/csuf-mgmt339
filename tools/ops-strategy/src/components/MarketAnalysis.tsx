@@ -10,12 +10,12 @@ export default function MarketAnalysis() {
           <h2 className="text-2xl font-semibold mb-4 text-white">Ecosystem Map</h2>
           <div className="grid md:grid-cols-2 gap-3">
             {[
-              { name: 'PearCom', desc: 'Premium consumer devices, security reputation, strong brand lock-in.', color: 'text-blue-400' },
-              { name: 'SoftCom', desc: 'Enterprise software + AI lead, weak consumer hardware track record.', color: 'text-green-400' },
-              { name: 'Silicore', desc: 'Sole trusted secure chip supplier; capacity is the main bottleneck.', color: 'text-red-400' },
-              { name: 'OpenAIco', desc: 'AI brain trust; distribution depends on partners.', color: 'text-teal-400' },
-              { name: 'AmeriShop', desc: 'Dominant consumer retailer; controls demand visibility.', color: 'text-amber-400' },
-              { name: 'CorpSolutions', desc: 'Enterprise integration gatekeeper; controls enterprise access.', color: 'text-purple-400' },
+              { name: 'PearCom', desc: 'Premium consumer devices, security reputation, strong brand lock-in.', color: 'text-purple-400' },
+              { name: 'SoftCom', desc: 'Enterprise software + AI lead, weak consumer hardware track record.', color: 'text-red-400' },
+              { name: 'Silicore', desc: 'Sole trusted secure chip supplier; capacity is the main bottleneck.', color: 'text-blue-400' },
+              { name: 'OpenAIco', desc: 'AI brain trust; distribution depends on partners.', color: 'text-green-400' },
+              { name: 'AmeriShop', desc: 'Dominant consumer retailer; controls demand visibility.', color: 'text-yellow-400' },
+              { name: 'CorpSolutions', desc: 'Enterprise integration gatekeeper; controls enterprise access.', color: 'text-gray-400' },
             ].map((p) => (
               <div key={p.name} className="bg-gray-800 rounded-lg p-4">
                 <h3 className={`font-semibold ${p.color}`}>{p.name}</h3>
@@ -29,27 +29,27 @@ export default function MarketAnalysis() {
         <div className="bg-gray-900 rounded-xl p-6 mb-6 border border-gray-800">
           <h2 className="text-2xl font-semibold mb-4 text-white">Critical Dependencies</h2>
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-blue-500">
-              <h3 className="font-semibold text-blue-400 mb-2">PearCom Enterprise Pivot requires:</h3>
+            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-purple-500">
+              <h3 className="font-semibold text-purple-400 mb-2">PearCom Enterprise Pivot requires:</h3>
               <ul className="text-gray-300 text-sm space-y-1">
                 <li>CorpSolutions Integrator for enterprise access</li>
                 <li>AI access from SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration</li>
                 <li>At least 15 chips (50% of 30)</li>
               </ul>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-green-500">
-              <h3 className="font-semibold text-green-400 mb-2">SoftCom Hardware Blitz requires:</h3>
+            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-red-500">
+              <h3 className="font-semibold text-red-400 mb-2">SoftCom Hardware Blitz requires:</h3>
               <ul className="text-gray-300 text-sm space-y-1">
                 <li>AmeriShop Premium Partner (retailer access)</li>
                 <li>At least 20 chips (50% of 40)</li>
               </ul>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-red-500">
-              <h3 className="font-semibold text-red-400 mb-2">Silicore Split Fab:</h3>
+            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-blue-500">
+              <h3 className="font-semibold text-blue-400 mb-2">Silicore Split Fab:</h3>
               <p className="text-gray-300 text-sm">Yield roll can cut capacity to 60 in a round</p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-teal-500">
-              <h3 className="font-semibold text-teal-400 mb-2">OpenAIco Hardware Integration:</h3>
+            <div className="bg-gray-800 rounded-lg p-4 border-l-4 border-green-500">
+              <h3 className="font-semibold text-green-400 mb-2">OpenAIco Hardware Integration:</h3>
               <p className="text-gray-300 text-sm">Requires PearCom Enterprise Pivot</p>
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function MarketAnalysis() {
           <h2 className="text-2xl font-semibold mb-4 text-white">Retail Leverage</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-amber-400 mb-3">AmeriShop</h3>
+              <h3 className="font-semibold text-yellow-400 mb-3">AmeriShop</h3>
               <div className="space-y-3">
                 <div className="bg-gray-800 rounded-lg p-3">
                   <div className="text-sm font-medium text-white">Premium Partner</div>
@@ -92,7 +92,7 @@ export default function MarketAnalysis() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-purple-400 mb-3">CorpSolutions</h3>
+              <h3 className="font-semibold text-gray-400 mb-3">CorpSolutions</h3>
               <div className="space-y-3">
                 <div className="bg-gray-800 rounded-lg p-3">
                   <div className="text-sm font-medium text-white">Integrator</div>
@@ -144,10 +144,10 @@ export default function MarketAnalysis() {
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
           <h2 className="text-2xl font-semibold mb-4 text-white">Incentive Patterns</h2>
           <ul className="space-y-3">
-            <li className="text-gray-300"><strong className="text-blue-400">PearCom</strong> does best when it controls chips and keeps enterprise access aligned.</li>
-            <li className="text-gray-300"><strong className="text-green-400">SoftCom</strong> needs a retailer + chips; otherwise Hardware Blitz collapses.</li>
-            <li className="text-gray-300"><strong className="text-red-400">Silicore</strong> profits are stable and high across most scenarios.</li>
-            <li className="text-gray-300"><strong className="text-amber-400 / text-purple-400">Retailers and enterprise gatekeepers</strong> can extract revenue by choosing sides.</li>
+            <li className="text-gray-300"><strong className="text-purple-400">PearCom</strong> does best when it controls chips and keeps enterprise access aligned.</li>
+            <li className="text-gray-300"><strong className="text-red-400">SoftCom</strong> needs a retailer + chips; otherwise Hardware Blitz collapses.</li>
+            <li className="text-gray-300"><strong className="text-blue-400">Silicore</strong> profits are stable and high across most scenarios.</li>
+            <li className="text-gray-300"><strong className="text-yellow-400">Retailers</strong> and <strong className="text-gray-400">enterprise gatekeepers</strong> can extract revenue by choosing sides.</li>
           </ul>
         </div>
       </div>

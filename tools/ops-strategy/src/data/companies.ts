@@ -81,7 +81,7 @@ export const companies: Company[] = [
       'Fortress is steady but chip-hungry; it becomes vulnerable under capacity shocks.',
       'Partnership is stable but forces you to share upside with SoftCom.',
     ],
-    accentColor: 'blue',
+    accentColor: 'purple',
   },
   {
     id: 'softcom',
@@ -139,7 +139,7 @@ export const companies: Company[] = [
       'Arms Dealer creates leverage over PearCom but requires a buyer.',
       'Staying pure software is safest early, but decays over time.',
     ],
-    accentColor: 'green',
+    accentColor: 'red',
   },
   {
     id: 'amerishop',
@@ -193,7 +193,7 @@ export const companies: Company[] = [
       'You can profit most by extracting a revenue share.',
       'You can punish a manufacturer with Private Label, but that can destabilize the ecosystem.',
     ],
-    accentColor: 'amber',
+    accentColor: 'yellow',
   },
   {
     id: 'corpsolutions',
@@ -247,7 +247,7 @@ export const companies: Company[] = [
       'Integrator is the key gate for enterprise pivots.',
       'Migration Agent is a powerful disruption tool that can swing outcomes.',
     ],
-    accentColor: 'purple',
+    accentColor: 'gray',
   },
   {
     id: 'openai',
@@ -301,7 +301,7 @@ export const companies: Company[] = [
       'Hardware Integration is boom or bust and depends on PearCom\'s pivot.',
       'Staying exclusive to SoftCom becomes less valuable over time.',
     ],
-    accentColor: 'teal',
+    accentColor: 'green',
   },
   {
     id: 'silicore',
@@ -359,6 +359,6 @@ export const companies: Company[] = [
       'Your allocation can make or break both giants.',
       'Under capacity shocks, your power spikes dramatically.',
     ],
-    accentColor: 'red',
+    accentColor: 'blue',
   },
 ]

@@ -3,18 +3,18 @@ import { companies } from '../data/companies'
 const colorMap: Record<string, string> = {
   blue: 'border-blue-500 hover:bg-blue-900/30',
   green: 'border-green-500 hover:bg-green-900/30',
-  amber: 'border-amber-500 hover:bg-amber-900/30',
+  yellow: 'border-yellow-500 hover:bg-yellow-900/30',
   purple: 'border-purple-500 hover:bg-purple-900/30',
-  teal: 'border-teal-500 hover:bg-teal-900/30',
+  gray: 'border-gray-500 hover:bg-gray-800/30',
   red: 'border-red-500 hover:bg-red-900/30',
 }
 
 const textColorMap: Record<string, string> = {
   blue: 'text-blue-400',
   green: 'text-green-400',
-  amber: 'text-amber-400',
+  yellow: 'text-yellow-400',
   purple: 'text-purple-400',
-  teal: 'text-teal-400',
+  gray: 'text-gray-400',
   red: 'text-red-400',
 }
 
@@ -38,15 +38,15 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
             It is 2025. Two American giants sit at the center of a shifting tech landscape:
           </p>
           <ul className="space-y-2 mb-4">
-            <li className="text-gray-300"><strong className="text-blue-400">PearCom:</strong> consumer king, premium devices, trusted security brand.</li>
-            <li className="text-gray-300"><strong className="text-green-400">SoftCom:</strong> enterprise giant, cloud and productivity dominance, AI leader via OpenAIco.</li>
+            <li className="text-gray-300"><strong className="text-purple-400">PearCom:</strong> consumer king, premium devices, trusted security brand.</li>
+            <li className="text-gray-300"><strong className="text-red-400">SoftCom:</strong> enterprise giant, cloud and productivity dominance, AI leader via OpenAIco.</li>
           </ul>
           <p className="text-gray-300 leading-relaxed mb-4">Their fate depends on a network of chokepoints:</p>
           <ul className="space-y-2">
-            <li className="text-gray-300"><strong className="text-red-400">Silicore:</strong> the only trusted source of secure chips.</li>
-            <li className="text-gray-300"><strong className="text-teal-400">OpenAIco:</strong> the AI brain trust.</li>
-            <li className="text-gray-300"><strong className="text-amber-400">AmeriShop:</strong> consumer retail gatekeeper.</li>
-            <li className="text-gray-300"><strong className="text-purple-400">CorpSolutions:</strong> enterprise distribution gatekeeper.</li>
+            <li className="text-gray-300"><strong className="text-blue-400">Silicore:</strong> the only trusted source of secure chips.</li>
+            <li className="text-gray-300"><strong className="text-green-400">OpenAIco:</strong> the AI brain trust.</li>
+            <li className="text-gray-300"><strong className="text-yellow-400">AmeriShop:</strong> consumer retail gatekeeper.</li>
+            <li className="text-gray-300"><strong className="text-gray-400">CorpSolutions:</strong> enterprise distribution gatekeeper.</li>
           </ul>
           <p className="text-gray-400 mt-4 leading-relaxed">
             Global competition is rising (especially in Asia), regulators are tightening standards, and AI integration has created both massive upside and new risks. Each company must choose a strategy with clear costs, dependencies, and uncertain payoffs.
@@ -117,11 +117,11 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
         <div className="bg-gray-900 rounded-xl p-6 mb-8 border border-gray-800">
           <h2 className="text-2xl font-semibold mb-4 text-white">Strategic Tension</h2>
           <ul className="space-y-3">
-            <li className="text-gray-300"><strong className="text-blue-400">PearCom</strong> wants enterprise access and AI, but risks weakening its consumer fortress.</li>
-            <li className="text-gray-300"><strong className="text-green-400">SoftCom</strong> wants hardware control, but needs chips and a retailer to avoid a costly failure.</li>
-            <li className="text-gray-300"><strong className="text-red-400">Silicore</strong> must balance capacity, bribes, and exclusivity.</li>
-            <li className="text-gray-300"><strong className="text-teal-400">OpenAIco</strong> can chase growth at the risk of backlash or lawsuits.</li>
-            <li className="text-gray-300"><strong className="text-amber-400">AmeriShop</strong> and <strong className="text-purple-400">CorpSolutions</strong> can extract value by choosing sides or staying neutral.</li>
+            <li className="text-gray-300"><strong className="text-purple-400">PearCom</strong> wants enterprise access and AI, but risks weakening its consumer fortress.</li>
+            <li className="text-gray-300"><strong className="text-red-400">SoftCom</strong> wants hardware control, but needs chips and a retailer to avoid a costly failure.</li>
+            <li className="text-gray-300"><strong className="text-blue-400">Silicore</strong> must balance capacity, bribes, and exclusivity.</li>
+            <li className="text-gray-300"><strong className="text-green-400">OpenAIco</strong> can chase growth at the risk of backlash or lawsuits.</li>
+            <li className="text-gray-300"><strong className="text-yellow-400">AmeriShop</strong> and <strong className="text-gray-400">CorpSolutions</strong> can extract value by choosing sides or staying neutral.</li>
           </ul>
           <p className="text-gray-400 mt-4 italic">
             This is a game about leverage, timing, and asymmetric dependencies.
