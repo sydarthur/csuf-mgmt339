@@ -198,12 +198,13 @@
           "target_choices": ["PearCom", "SoftCom"],
           "effects": {
             "penalty_to_other": 5,
-            "bounty_paid_by_target": 6,
+            "bounty_paid_by_target": 5,
+            "bonus_to_target": 8,
             "veto_target_enterprise": true
           }
         },
         "Integrator": {
-          "cost": 1,
+          "cost": 0,
           "base_revenue": 0,
           "target_choices": ["PearCom", "SoftCom"],
           "effects": {

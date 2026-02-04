@@ -100,7 +100,7 @@ export default function MarketAnalysis() {
                 </div>
                 <div className="bg-gray-800 rounded-lg p-3">
                   <div className="text-sm font-medium text-white">Migration Agent</div>
-                  <div className="text-xs text-gray-400 mt-1">Target pays 6B bounty; opposing manufacturer loses 5B. Vetoes opposing enterprise strategy.</div>
+                  <div className="text-xs text-gray-400 mt-1">Target pays 5B bounty and receives 8B bonus; opposing manufacturer loses 5B. Vetoes opposing enterprise strategy.</div>
                 </div>
               </div>
             </div>

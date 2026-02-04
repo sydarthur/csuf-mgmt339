@@ -238,11 +238,11 @@ export const companies: Company[] = [
         grossRevenue: '6B',
         die: 'None',
         dependencies:
-          'Target pays 6B bounty; opposing manufacturer loses 5B and has enterprise strategy vetoed.',
+          'Target pays 5B bounty and receives 8B bonus; opposing manufacturer loses 5B and has enterprise strategy vetoed.',
       },
       {
         name: 'Integrator',
-        upfrontCost: 1,
+        upfrontCost: 0,
         grossRevenue: '25% of target gross',
         die: 'None',
         dependencies:

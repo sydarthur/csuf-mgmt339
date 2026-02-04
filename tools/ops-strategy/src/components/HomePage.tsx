@@ -35,7 +35,7 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
         <div className="bg-gray-900 rounded-xl p-6 mb-8 border border-gray-800">
           <h2 className="text-2xl font-semibold mb-4 text-white">Background</h2>
           <p className="text-gray-300 leading-relaxed mb-4">
-            It is 2025. Two American giants sit at the center of a shifting tech landscape:
+            It is 2026. Two American giants sit at the center of a shifting tech landscape:
           </p>
           <ul className="space-y-2 mb-4">
             <li className="text-gray-300"><strong className="text-purple-400">PearCom:</strong> consumer king, premium devices, trusted security brand.</li>

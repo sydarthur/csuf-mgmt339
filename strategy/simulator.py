@@ -326,6 +326,7 @@ def compute_round_expected(scenario_opts, config, round_idx, spot_method, lock_i
             victim = "SoftCom" if target == "PearCom" else "PearCom"
             gross[victim] -= effects.get("penalty_to_other", 0)
             gross[target] -= effects.get("bounty_paid_by_target", 0)
+            gross[target] += effects.get("bonus_to_target", 0)
 
         if soft_opt["base_name"] == "HardwareBlitz" and not corp_integrator_for_soft:
             gross["CorpSolutions"] -= float(rules.get("softcom_bundle_penalty", 0))

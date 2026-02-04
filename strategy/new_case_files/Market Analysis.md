@@ -37,8 +37,8 @@
   - Takes 25% of target gross revenue
   - Grants enterprise access
 - CorpSolutions Migration Agent:
-  - Target pays 6B bounty; opposing manufacturer loses 5B
-  - Vetoes opposing enterprise strategy
+  - Target pays 5B bounty, gains +8B revenue
+  - Opposing manufacturer loses 5B and is vetoed on enterprise strategy
 
 ## Shock Summary (Round 2)
 - Shock A: Capacity forced to 60

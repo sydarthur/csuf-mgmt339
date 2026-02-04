@@ -84,8 +84,8 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | Option | Gross Revenue | Upfront Cost | Base Net | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- |
 | Agnostic | 3 (or 5 if PearCom EnterprisePivot) | 0 | 3 (or 5) | None | Conditional revenue boost if PearCom pivots. |
-| MigrationAgent_PearCom / MigrationAgent_SoftCom | 6 | 0 | 6 | None | Other manufacturer loses -5B. Target pays -6B bounty. Veto opposing enterprise-tagged strategy. |
-| Integrator_PearCom / Integrator_SoftCom | 25% of target gross | 1 | Varies | None | Target gross reduced by 25%. Grants enterprise access to target. |
+| MigrationAgent_PearCom / MigrationAgent_SoftCom | 6 | 0 | 6 | None | Other manufacturer loses -5B. Target pays -5B bounty and gains +8B revenue. Veto opposing enterprise-tagged strategy. |
+| Integrator_PearCom / Integrator_SoftCom | 25% of target gross | 0 | Varies | None | Target gross reduced by 25%. Grants enterprise access to target. |
 
 # Example Scenarios (from output)
 
