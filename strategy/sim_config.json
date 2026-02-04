@@ -1,0 +1,217 @@
+{
+  "rounds": 3,
+  "dice_tables": {
+    "standard": {"1": 0.0, "2": 0.5, "3": 0.5, "4": 1.0, "5": 1.0, "6": 1.5},
+    "open_model": {"1": 0.0, "2": 0.5, "3": 0.5, "4": 1.0, "5": 1.0, "6": 1.0},
+    "hw_integration": {"1": 0.0, "2": 0.0, "3": 0.0, "4": 1.0, "5": 1.0, "6": 1.0}
+  },
+  "rules": {
+    "chip_capacity": 100,
+    "chip_failure_threshold": 0.5,
+    "softcom_bundle_penalty": 3,
+    "lock_in_penalty_to_silicore": 2,
+    "openai_degradation_round": 2,
+    "openai_degradation_penalty": -2
+  },
+  "shocks": {
+    "round": 2,
+    "selection_die": {
+      "1-2": "ShockA_SupplyChainFracture",
+      "3-4": "ShockB_DeepfakeScandal",
+      "5-6": "ShockC_AntitrustDecree"
+    },
+    "variants": {
+      "ShockA_SupplyChainFracture": {
+        "type": "capacity_override",
+        "capacity": 60
+      },
+      "ShockB_DeepfakeScandal": {
+        "type": "roll_modifiers",
+        "mods": [
+          {"team": "SoftCom", "options": ["HardwareBlitz"], "delta": -2},
+          {"team": "PearCom", "options": ["EnterprisePivot"], "delta": -2},
+          {"team": "OpenAIco", "options": ["Any"], "delta": -2},
+          {"team": "PearCom", "options": ["Fortress"], "delta": 1},
+          {"team": "Silicore", "options": ["PearComExclusive"], "delta": 1}
+        ]
+      },
+      "ShockC_AntitrustDecree": {
+        "type": "fines",
+        "fine": 3,
+        "applies_to": {
+          "Silicore": ["PearComExclusive"],
+          "OpenAIco": ["SoftComExclusive"],
+          "AmeriShop": ["PremiumPartner"],
+          "CorpSolutions": ["Integrator"]
+        }
+      }
+    }
+  },
+  "runs": {
+    "spot_market_methods": ["proportional", "highest_bidder"],
+    "lock_in_modes": ["off", "on"],
+    "shock_variants": ["none", "ShockA_SupplyChainFracture", "ShockB_DeepfakeScandal", "ShockC_AntitrustDecree"]
+  },
+  "teams": {
+    "PearCom": {
+      "type": "manufacturer",
+      "options": {
+        "Fortress": {
+          "cost": 3,
+          "base_revenue": 12,
+          "chips_needed": 90
+        },
+        "EnterprisePivot": {
+          "cost": 5,
+          "base_revenue": 22,
+          "chips_needed": 30,
+          "risk_table": "standard",
+          "requires": {
+            "corp_integrator": true,
+            "ai_access": true
+          },
+          "tags": ["enterprise"]
+        },
+        "PartnerSoftCom": {
+          "cost": 1,
+          "base_revenue": 8,
+          "chips_needed": 0,
+          "requires": {
+            "softcom_arms_dealer": true
+          },
+          "split_net_with": "SoftCom"
+        }
+      }
+    },
+    "SoftCom": {
+      "type": "manufacturer",
+      "options": {
+        "HardwareBlitz": {
+          "cost": 8,
+          "base_revenue": 25,
+          "chips_needed": 40,
+          "risk_table": "standard",
+          "requires": {
+            "retailer_premium_partner": true
+          },
+          "tags": ["enterprise"]
+        },
+        "AIArmsDealer": {
+          "cost": 2,
+          "base_revenue": 10,
+          "risk_table": "standard",
+          "requires": {
+            "pearcom_options": ["EnterprisePivot", "PartnerSoftCom"]
+          }
+        },
+        "StaySoftware": {
+          "cost": 0,
+          "base_revenue": 6,
+          "per_round_delta": -1
+        }
+      }
+    },
+    "Silicore": {
+      "type": "supplier",
+      "options": {
+        "PearComExclusive": {
+          "cost": 2,
+          "base_revenue": 10,
+          "allocation": {"PearCom": 90, "SoftCom": 10}
+        },
+        "SplitFab": {
+          "cost": 3,
+          "base_revenue": 15,
+          "allocation": {"PearCom": 50, "SoftCom": 50},
+          "yield_fail_capacity": 60,
+          "yield_fail_rolls": [1, 2, 3]
+        },
+        "SpotMarket": {
+          "cost": 0,
+          "base_revenue": 8,
+          "allocation": "spot_market"
+        }
+      }
+    },
+    "OpenAIco": {
+      "type": "ai",
+      "options": {
+        "SoftComExclusive": {
+          "cost": 0,
+          "base_revenue_by_round": [4, 3, 2]
+        },
+        "OpenModel": {
+          "cost": 2,
+          "base_revenue": 12,
+          "risk_table": "open_model"
+        },
+        "HardwareIntegration": {
+          "cost": 4,
+          "base_revenue": 20,
+          "risk_table": "hw_integration",
+          "requires": {
+            "pearcom_option": "EnterprisePivot"
+          }
+        }
+      }
+    },
+    "AmeriShop": {
+      "type": "retailer",
+      "options": {
+        "OpenMarket": {
+          "cost": 0,
+          "base_revenue": 4
+        },
+        "PrivateLabel": {
+          "cost": 2,
+          "base_revenue": 8,
+          "target_choices": ["PearCom", "SoftCom"],
+          "effects": {
+            "penalty_to_target": 3,
+            "roll_mod_to_target": -1
+          }
+        },
+        "PremiumPartner": {
+          "cost": 1,
+          "base_revenue": 2,
+          "target_choices": ["PearCom", "SoftCom"],
+          "effects": {
+            "share_of_target_gross": 0.25,
+            "roll_mod_to_target": 1
+          }
+        }
+      }
+    },
+    "CorpSolutions": {
+      "type": "enterprise_retail",
+      "options": {
+        "Agnostic": {
+          "cost": 0,
+          "base_revenue": 3,
+          "conditional_revenue": {
+            "if_pearcom_pivot": 5
+          }
+        },
+        "MigrationAgent": {
+          "cost": 0,
+          "base_revenue": 6,
+          "target_choices": ["PearCom", "SoftCom"],
+          "effects": {
+            "penalty_to_other": 5,
+            "bounty_paid_by_target": 6,
+            "veto_target_enterprise": true
+          }
+        },
+        "Integrator": {
+          "cost": 1,
+          "base_revenue": 0,
+          "target_choices": ["PearCom", "SoftCom"],
+          "effects": {
+            "share_of_target_gross": 0.25,
+            "grants_enterprise_access": true
+          }
+        }
+      }
+    }
+  }
+}
