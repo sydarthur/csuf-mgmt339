@@ -58,10 +58,20 @@ export default function CompanyPage({ company }: { company: Company }) {
 
         {/* Super Power */}
         <div className={`${colors.bg} border ${colors.border} rounded-xl p-6 mb-6`}>
-          <h2 className="text-xl font-semibold mb-2 text-white">
-            Super Power: <span className={colors.text}>{company.superPower.name}</span>
-          </h2>
+          <div className="flex items-center gap-3 mb-3">
+            <h2 className="text-xl font-semibold text-white">
+              Super Power: <span className={colors.text}>{company.superPower.name}</span>
+            </h2>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${
+              company.superPower.type === 'nuclear'
+                ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                : 'bg-green-500/20 text-green-400 border border-green-500/50'
+            }`}>
+              {company.superPower.type === 'nuclear' ? 'Once Per Game' : 'Once Per Round'}
+            </span>
+          </div>
           <p className="text-gray-300 leading-relaxed">{company.superPower.effect}</p>
+          <p className="text-gray-500 text-sm mt-3 italic">{company.superPower.reason}</p>
         </div>
 
         {/* Strategy Options Table */}

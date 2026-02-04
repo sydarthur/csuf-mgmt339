@@ -15,7 +15,7 @@ export interface Company {
   description: string
   advantages: string[]
   disadvantages: string[]
-  superPower: { name: string; effect: string }
+  superPower: { name: string; effect: string; type: 'nuclear' | 'regenerating'; reason: string }
   strategies: StrategyOption[]
   hasChipsColumn: boolean
   hasAllocationColumn: boolean
@@ -44,6 +44,8 @@ export const companies: Company[] = [
       name: 'Lock-In',
       effect:
         'You can veto Silicore from selling chips to SoftCom this round. Effect: SoftCom gets 0 chips; Silicore loses 2B revenue.',
+      type: 'nuclear',
+      reason: 'If used twice, SoftCom is mathematically eliminated.',
     },
     strategies: [
       {
@@ -103,6 +105,8 @@ export const companies: Company[] = [
       name: 'The Bundle',
       effect:
         'If CorpSolutions refuses to sell your hardware, their revenue is cut by 3B (cloud license pressure). Applies when you choose Hardware Blitz and CorpSolutions is not Integrator_SoftCom.',
+      type: 'regenerating',
+      reason: "It's just pricing leverage.",
     },
     strategies: [
       {
@@ -161,6 +165,8 @@ export const companies: Company[] = [
       name: 'The Algorithm',
       effect:
         'You can boost or bury one manufacturer\'s die roll (+1 or -1) by adjusting search ranking. Baked into Premium Partner (+1) and Private Label (-1).',
+      type: 'regenerating',
+      reason: "It's just software.",
     },
     strategies: [
       {
@@ -215,6 +221,8 @@ export const companies: Company[] = [
       name: 'The Veto',
       effect:
         'You can refuse to certify a device, cutting its enterprise revenue to 0 for the round. Modeled via Migration Agent against the opposing manufacturer.',
+      type: 'nuclear',
+      reason: 'Blocking revenue repeatedly forces the manufacturer to fire you, destroying the partnership dynamic.',
     },
     strategies: [
       {
@@ -269,6 +277,8 @@ export const companies: Company[] = [
       name: 'Model Degradation',
       effect:
         "If you switch partners, the old partner's next die roll suffers a -2 penalty. Applies in Round 2 if you are not SoftCom Exclusive.",
+      type: 'regenerating',
+      reason: 'Happens automatically every time they switch.',
     },
     strategies: [
       {
@@ -323,6 +333,8 @@ export const companies: Company[] = [
       name: 'Allocation Priority',
       effect:
         'In a shortage, you choose who gets chips. You can demand bribes to prioritize a customer (GM adjudication).',
+      type: 'nuclear',
+      reason: 'Doing this repeatedly destroys your reputation as a "neutral" supplier.',
     },
     strategies: [
       {
