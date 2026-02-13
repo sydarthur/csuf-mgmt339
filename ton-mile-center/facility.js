@@ -1,16 +1,34 @@
 const { mulberry32, computeCenter, computeObjective } = FacilityMath;
 const { REGION_MAP, REGIONS, METROS } = FacilityData;
 
+const mapEl = document.getElementById("map");
+if (!window.L) {
+  mapEl.innerHTML = '<div style="padding:16px;color:white;">Map failed to load. Leaflet is unavailable (check network/CDN).</div>';
+  throw new Error('Leaflet not loaded');
+}
+
+function showMapError(message) {
+  mapEl.innerHTML = `<div style="padding:16px;color:white;">${message}</div>`;
+}
+
 const map = L.map("map", { zoomControl: false }).setView([39.5, -98.35], 4);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
-}).addTo(map);
+});
+
+tileLayer.on('tileerror', () => {
+  showMapError('Map tiles failed to load. Check network access or try again.');
+});
+
+tileLayer.addTo(map);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
-const pointsLayer = L.markerClusterGroup({
-  disableClusteringAtZoom: 7,
-  maxClusterRadius: 40,
-});
+const pointsLayer = L.markerClusterGroup
+  ? L.markerClusterGroup({
+      disableClusteringAtZoom: 7,
+      maxClusterRadius: 40,
+    })
+  : L.layerGroup();
 map.addLayer(pointsLayer);
 const inactiveLayer = L.layerGroup().addTo(map);
 const regionOverlayLayer = L.layerGroup().addTo(map);
