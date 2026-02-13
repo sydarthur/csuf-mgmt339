@@ -1,0 +1,271 @@
+:root {
+  --bg: #0a0f1d;
+  --panel: #111827;
+  --panel-alt: #1f2937;
+  --text: #f8fafc;
+  --muted: #cbd5f5;
+  --accent: #22c55e;
+  --accent-2: #38bdf8;
+  --warn: #f97316;
+  --border: rgba(148, 163, 184, 0.25);
+  --shadow: 0 20px 60px rgba(15, 23, 42, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top, #1e293b, #050814 60%);
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.page {
+  padding: 24px clamp(20px, 4vw, 54px) 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 24px;
+  background: linear-gradient(140deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.95));
+  box-shadow: var(--shadow);
+}
+
+.title-block h1 {
+  font-family: "Space Grotesk", sans-serif;
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+}
+
+.title-block p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 620px;
+}
+
+.chip {
+  background: rgba(34, 197, 94, 0.18);
+  color: #dcfce7;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 360px) 1fr;
+  gap: 24px;
+}
+
+.controls {
+  background: var(--panel);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+}
+
+.controls h2 {
+  margin: 0 0 4px;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.section {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.field.inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 8px 10px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+.btn {
+  background: var(--accent);
+  color: #052e16;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.map-panel {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  box-shadow: var(--shadow);
+}
+
+#map {
+  width: 100%;
+  height: 680px;
+}
+
+.output-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 14px;
+  min-width: 240px;
+}
+
+.output-panel h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--accent-2);
+}
+
+.output-grid {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.table {
+  width: 100%;
+  font-size: 0.75rem;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.legend span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.howto {
+  background: rgba(30, 41, 59, 0.5);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.region-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.state-list {
+  max-height: 160px;
+  overflow-y: auto;
+  background: #0b1220;
+  border-radius: 10px;
+  padding: 8px;
+  border: 1px solid var(--border);
+}
+
+.state-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.toggle-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pill {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fed7aa;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 1080px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  #map {
+    height: 520px;
+  }
+}

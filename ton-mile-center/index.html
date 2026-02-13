@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Facility Location (2D)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+    <link rel="stylesheet" href="facility.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="title-block">
+          <div class="chip">Facility Location (2D)</div>
+          <h1>Center of Gravity / Ton‑Mile Center</h1>
+          <p>
+            Adjust demand, cost, and service coverage to watch the optimal facility
+            location shift across the US.
+          </p>
+          <p>
+            <a href="../index.html">Back to MGMT339 tools</a>
+          </p>
+        </div>
+        <div class="legend" id="regionLegend"></div>
+      </header>
+
+      <div class="layout">
+        <aside class="controls" aria-label="Controls">
+          <h2>Scenario Controls</h2>
+
+          <div class="section">
+            <h3>Dataset</h3>
+            <div class="field">
+              <label for="pointsCount">N points</label>
+              <input type="range" id="pointsCount" min="20" max="500" value="150" />
+              <input type="number" id="pointsCountInput" min="20" max="500" value="150" />
+            </div>
+            <div class="field">
+              <label for="datasetMode">Point geography</label>
+              <select id="datasetMode">
+                <option value="metro">Metro-weighted (realistic)</option>
+                <option value="uniform">Uniform US (approx)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="seed">Random seed</label>
+              <input type="number" id="seed" value="42" />
+            </div>
+            <div class="toggle-row">
+              <button class="btn" id="regen">Regenerate points</button>
+              <button class="btn secondary" id="reset">Reset defaults</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Demand</h3>
+            <div class="field">
+              <label for="volumeDist">Volume distribution</label>
+              <select id="volumeDist">
+                <option value="uniform">Uniform</option>
+                <option value="lognormal">Lognormal</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="volumeMult">Global volume multiplier</label>
+              <input type="range" id="volumeMult" min="0.2" max="3" step="0.1" value="1" />
+              <input type="number" id="volumeMultInput" step="0.1" value="1" />
+            </div>
+            <div class="field">
+              <label>Point inspector</label>
+              <div class="howto" id="inspector">Click a point to inspect.</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Transportation Costs</h3>
+            <div class="field">
+              <label for="baseRate">Base rate</label>
+              <input type="number" id="baseRate" step="0.1" value="1" />
+              <small class="howto">Distance is Euclidean in projected space (not road distance).</small>
+            </div>
+            <div class="field">
+              <label for="projToggle">Compute in projected coordinates</label>
+              <div class="toggle-row">
+                <input type="checkbox" id="projToggle" checked />
+                <span class="pill">Recommended</span>
+              </div>
+              <small class="howto">
+                Direct lat/lon averaging is a simplification. Projection reduces distortion.
+              </small>
+            </div>
+            <div id="regionRates"></div>
+          </div>
+
+          <div class="section">
+            <h3>Service Coverage</h3>
+            <div class="field">
+              <label>Regions</label>
+              <div class="region-grid" id="regionToggles"></div>
+            </div>
+            <div class="field">
+              <label for="stateSearch">States</label>
+              <input type="text" id="stateSearch" placeholder="Search state…" />
+              <div class="state-list" id="stateList"></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Presets</h3>
+            <div class="toggle-row">
+              <button class="btn secondary" data-preset="exit-ca">Exit California</button>
+              <button class="btn secondary" data-preset="exit-ne">Exit Northeast</button>
+            </div>
+            <div class="toggle-row">
+              <button class="btn secondary" data-preset="west-costs">Increase West costs +20%</button>
+              <button class="btn secondary" data-preset="double-tx">Double demand in Texas</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>How to interpret</h3>
+            <div class="howto">
+              <ul>
+                <li>Higher demand pulls the facility closer.</li>
+                <li>Higher cost rates pull the facility closer.</li>
+                <li>Removing regions shifts the balance point.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Method</h3>
+            <div class="howto">
+              <div><strong>Weight:</strong> wᵢ = volumeᵢ × rateᵢ</div>
+              <div><strong>Center:</strong> x* = Σ(wᵢxᵢ)/Σwᵢ, y* = Σ(wᵢyᵢ)/Σwᵢ</div>
+              <div>Projection is recommended to reduce map distortion.</div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="map-panel">
+          <div id="map" aria-label="Map"></div>
+          <div class="output-panel">
+            <h3>Outputs</h3>
+            <div class="output-grid" id="outputs"></div>
+            <table class="table" id="regionTable"></table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="facility_math.js"></script>
+    <script src="facility_data.js"></script>
+    <script src="facility.js"></script>
+  </body>
+</html>
