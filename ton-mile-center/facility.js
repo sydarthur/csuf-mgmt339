@@ -1,3 +1,6 @@
+(function() {
+'use strict';
+
 const { mulberry32, computeCenter, computeObjective } = FacilityMath;
 const { REGION_MAP, REGIONS, METROS } = FacilityData;
 
@@ -540,3 +543,5 @@ setupRegionControls();
 setupStateControls();
 bindControls();
 buildPoints();
+
+})();
