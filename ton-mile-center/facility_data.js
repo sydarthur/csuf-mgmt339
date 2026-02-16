@@ -1,3 +1,6 @@
+(function() {
+'use strict';
+
 const REGION_MAP = {
   "Alabama": "Southeast",
   "Alaska": "West",
@@ -95,3 +98,5 @@ if (typeof module !== "undefined" && module.exports) {
 } else {
   window.FacilityData = { REGION_MAP, REGIONS, METROS };
 }
+
+})();
