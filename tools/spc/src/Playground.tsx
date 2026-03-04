@@ -380,19 +380,27 @@ const Playground = () => {
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey={selectedChart === 'xbar' ? 'day' : 'day'} />
-                <YAxis domain={selectedChart === 'xbar' ? [45, 55] : [0, 0.1]} />
+                <YAxis
+                  domain={selectedChart === 'xbar'
+                    ? ([dataMin, dataMax]: [number, number]) => {
+                        const pad = Math.max((dataMax - dataMin) * 0.5, 1)
+                        return [Math.floor(dataMin - pad), Math.ceil(dataMax + pad)]
+                      }
+                    : [0, 0.15]
+                  }
+                />
                 <Tooltip />
                 {currentStep >= 5 && (
                   <>
-                    <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="UCL" />
-                    <Line type="monotone" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="LCL" />
+                    <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="UCL" />
+                    <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="LCL" />
                   </>
                 )}
                 {currentStep >= 4 && (
-                  <Line type="monotone" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Center" />
+                  <Line type="linear" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Center" />
                 )}
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey={selectedChart === 'xbar' ? 'mean' : 'proportion'}
                   stroke="#3b82f6"
                   strokeWidth={2}

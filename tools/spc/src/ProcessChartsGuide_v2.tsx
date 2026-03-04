@@ -262,12 +262,12 @@ const ProcessChartsGuide = () => {
             <LineChart data={xbarData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="sample" label={{ value: 'Sample Number', position: 'insideBottom', offset: -5 }} />
-              <YAxis domain={[30, 60]} label={{ value: 'Mean Value', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[46, 55]} label={{ value: 'Mean Value', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="monotone" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="Lower Control Limit" />
-              <Line type="monotone" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Target" />
-              <Line type="monotone" dataKey="mean" stroke="#3b82f6" strokeWidth={2} name="Sample Mean" dot={{ r: 4 }} />
+              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
+              <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="Lower Control Limit" />
+              <Line type="linear" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Target" />
+              <Line type="linear" dataKey="mean" stroke="#3b82f6" strokeWidth={2} name="Sample Mean" dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         );
@@ -277,10 +277,10 @@ const ProcessChartsGuide = () => {
             <LineChart data={rChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="sample" label={{ value: 'Sample Number', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'Range', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[0, 7]} label={{ value: 'Range', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="monotone" dataKey="range" stroke="#8b5cf6" strokeWidth={2} name="Sample Range" dot={{ r: 4 }} />
+              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
+              <Line type="linear" dataKey="range" stroke="#8b5cf6" strokeWidth={2} name="Sample Range" dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         );
@@ -290,10 +290,10 @@ const ProcessChartsGuide = () => {
             <LineChart data={pChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'Proportion Defective', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[0, 0.1]} label={{ value: 'Proportion Defective', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="monotone" dataKey="proportion" stroke="#f59e0b" strokeWidth={2} name="Proportion" dot={{ r: 4 }} />
+              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
+              <Line type="linear" dataKey="proportion" stroke="#f59e0b" strokeWidth={2} name="Proportion" dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         );
@@ -303,10 +303,10 @@ const ProcessChartsGuide = () => {
             <LineChart data={cChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: -5 }} />
-              <YAxis label={{ value: 'Number of Defects', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[0, 17]} label={{ value: 'Number of Defects', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Line type="monotone" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="monotone" dataKey="defects" stroke="#10b981" strokeWidth={2} name="Defect Count" dot={{ r: 4 }} />
+              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
+              <Line type="linear" dataKey="defects" stroke="#10b981" strokeWidth={2} name="Defect Count" dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         );
