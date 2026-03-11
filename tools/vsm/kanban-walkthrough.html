@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanban Systems — A Visual Walkthrough</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --text: #1a1612;
+    --text-muted: #6b6054;
+    --accent: #c0442a;
+    --accent-light: #fceae6;
+    --blue: #2a6496;
+    --blue-light: #e3eef6;
+    --green: #2d7a50;
+    --green-light: #e1f2e8;
+    --yellow: #d4a017;
+    --yellow-light: #fdf5d8;
+    --orange: #c76f20;
+    --orange-light: #fdf0e0;
+    --purple: #6b4c9a;
+    --purple-light: #ede6f6;
+    --card: #ffffff;
+    --border: #e0dbd3;
+    --shadow: 0 2px 12px rgba(26,22,18,0.07);
+    --shadow-lg: 0 8px 32px rgba(26,22,18,0.12);
+    --dark: #1a1612;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--purple);
+  }
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--purple-light);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 52px; left: 0;
+    height: 3px;
+    background: var(--purple);
+    z-index: 101;
+    transition: width 0.4s ease;
+  }
+
+  .section {
+    min-height: 100vh;
+    padding: 80px 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section-inner {
+    max-width: 860px;
+    width: 100%;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--purple);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  .section h2 em { color: var(--purple); font-style: italic; }
+  .section p {
+    font-size: 17px;
+    margin-bottom: 16px;
+    max-width: 660px;
+  }
+  .section p.muted { color: var(--text-muted); font-size: 15px; }
+
+  .hero-k {
+    background: var(--dark);
+    color: var(--bg);
+    min-height: 100vh;
+  }
+  .hero-k h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 5.5vw, 56px);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .hero-k h1 em { color: var(--yellow); font-style: italic; }
+  .hero-k p { color: #b5ae9f; }
+
+  .callout {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+  }
+  .callout.purple { border-color: var(--purple); background: var(--purple-light); }
+  .callout.blue { border-color: var(--blue); background: var(--blue-light); }
+  .callout.green { border-color: var(--green); background: var(--green-light); }
+  .callout.yellow { border-color: var(--yellow); background: var(--yellow-light); }
+  .callout.accent { border-color: var(--accent); background: var(--accent-light); }
+  .callout-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout.purple .callout-label { color: var(--purple); }
+  .callout.blue .callout-label { color: var(--blue); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.yellow .callout-label { color: var(--yellow); }
+  .callout.accent .callout-label { color: var(--accent); }
+  .callout-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .callout-body { font-size: 15px; line-height: 1.6; }
+
+  .diagram-container {
+    margin: 28px 0;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .diagram-header {
+    padding: 10px 18px;
+    background: #f3f0ea;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600;
+    color: var(--text-muted); letter-spacing: 0.5px;
+  }
+  .diagram-body { padding: 24px; }
+
+  .quote-block {
+    border-left: 4px solid var(--purple);
+    padding: 12px 20px;
+    margin: 20px 0;
+    background: var(--purple-light);
+    border-radius: 0 6px 6px 0;
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ====== KANBAN ANIMATION ====== */
+  .kanban-scene {
+    position: relative;
+    height: 340px;
+    background: #f9f7f3;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .kb-station {
+    position: absolute;
+    width: 150px;
+    text-align: center;
+  }
+  .kb-station-box {
+    padding: 12px 8px;
+    background: var(--card);
+    border: 2.5px solid var(--text);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .kb-station-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .kb-baking { left: 60px; top: 80px; }
+  .kb-packaging { right: 60px; top: 80px; }
+
+  .kb-container-area {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .kb-containers {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 120px;
+  }
+
+  .kb-bin {
+    width: 32px;
+    height: 24px;
+    border-radius: 4px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    transition: all 0.5s ease;
+  }
+  .kb-bin.full {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .kb-bin.empty {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Animated card/signal */
+  .kb-signal {
+    position: absolute;
+    width: 50px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.8s ease;
+    z-index: 10;
+  }
+  .kb-signal.card {
+    background: var(--yellow);
+    color: var(--text);
+    border: 2px solid #b8900f;
+  }
+  .kb-signal.loaves {
+    background: var(--green);
+    color: white;
+    border: 2px solid #1f5e3a;
+  }
+
+  /* Flow arrows */
+  .kb-flow-top, .kb-flow-bottom {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kb-flow-top {
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--green);
+  }
+  .kb-flow-bottom {
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+  }
+  .kb-flow-arrow {
+    font-size: 16px;
+  }
+
+  .kb-controls {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .kb-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--text);
+    border-radius: 6px;
+    background: var(--card);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .kb-btn:hover { background: var(--text); color: var(--bg); }
+  .kb-btn.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+  .kb-narration {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--yellow-light);
+    border: 1.5px solid var(--yellow);
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    transition: opacity 0.3s;
+    text-align: center;
+    max-width: 90%;
+    white-space: normal;
+  }
+
+  /* ====== FORMULA SECTION ====== */
+  .formula-dark {
+    background: var(--dark);
+    color: var(--bg);
+  }
+  .formula-dark h2 { color: var(--bg); }
+  .formula-dark h2 em { color: var(--yellow); }
+  .formula-dark p { color: #b5ae9f; }
+
+  .formula-box {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-align: center;
+    margin: 24px 0;
+  }
+  .formula-main {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    color: var(--yellow);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .formula-main .fvar { 
+    cursor: pointer; 
+    transition: color 0.2s;
+    position: relative;
+  }
+  .formula-main .fvar:hover { color: white; }
+  .formula-where {
+    font-size: 13px;
+    color: #8a8275;
+    line-height: 1.8;
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .formula-where strong { color: var(--yellow); font-family: 'JetBrains Mono', monospace; }
+
+  /* Variable cards */
+  .var-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) { .var-cards { grid-template-columns: 1fr; } }
+
+  .var-card {
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+  .var-card:hover { border-color: rgba(255,255,255,0.3); }
+  .var-card-sym {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--yellow);
+    margin-bottom: 2px;
+  }
+  .var-card-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #d4cfc5;
+    margin-bottom: 4px;
+  }
+  .var-card-story {
+    font-size: 13px;
+    color: #8a8275;
+    line-height: 1.5;
+  }
+  .var-card-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yellow);
+    margin-top: 8px;
+    background: rgba(212,160,23,0.1);
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Calculation walkthrough */
+  .calc-steps {
+    margin: 24px 0;
+  }
+  .calc-step {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    border-left: 3px solid rgba(255,255,255,0.1);
+    transition: border-color 0.3s;
+  }
+  .calc-step:hover { border-left-color: var(--yellow); }
+  .calc-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #6b6054;
+    font-weight: 600;
+    flex-shrink: 0;
+    width: 20px;
+  }
+  .calc-step-math {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: #d4cfc5;
+    flex: 1;
+  }
+  .calc-step-math .hl { color: var(--yellow); font-weight: 600; }
+  .calc-step-note {
+    font-size: 12px;
+    color: #6b6054;
+    flex-shrink: 0;
+  }
+
+  .calc-answer {
+    text-align: center;
+    margin: 24px 0;
+    padding: 20px;
+    background: rgba(45,122,80,0.12);
+    border: 2px solid rgba(45,122,80,0.3);
+    border-radius: 10px;
+  }
+  .calc-answer-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5fba86;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .calc-answer-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    color: #5fba86;
+    margin-top: 4px;
+  }
+  .calc-answer-note {
+    font-size: 13px;
+    color: #8a8275;
+    margin-top: 6px;
+  }
+
+  /* lead time callout inside dark */
+  .lt-callout {
+    background: rgba(42,100,150,0.15);
+    border: 1.5px solid rgba(42,100,150,0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .lt-callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6ba8d4;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .lt-callout-body {
+    font-size: 14px;
+    color: #b5c8d9;
+    line-height: 1.5;
+  }
+  .lt-callout-body strong { color: #8dc2e8; }
+
+  .footer-cta {
+    text-align: center;
+    padding: 48px 32px;
+    background: var(--purple-light);
+    border-top: 2px solid var(--purple);
+  }
+  .footer-cta h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  .footer-cta p {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 640px) {
+    .section { padding: 70px 20px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-brand">Kanban Systems</div>
+  <div class="nav-badge">MGMT 339</div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ====== HERO ====== -->
+<div class="section hero-k" data-step="0">
+  <div class="section-inner">
+    <div class="section-num" style="color: var(--yellow); opacity:0.5;">From Push to Pull</div>
+    <h1>What if the factory<br>only made things<br><em>when asked?</em></h1>
+    <p>In a push system, every station works as fast as it can and shoves output to the next step — whether it's ready or not. The result? Mountains of WIP.</p>
+    <p>A <strong style="color:var(--yellow);">Kanban system</strong> flips this. The downstream step sends a signal — a card — back upstream that says: <em>"I just used some. Send me more."</em></p>
+    <p style="color:#8a8275;">Nothing is produced until that signal arrives. No signal, no production.</p>
+  </div>
+</div>
+
+<!-- ====== KANBAN ANIMATION ====== -->
+<div class="section" data-step="1" style="background:#f0ece4;">
+  <div class="section-inner">
+    <div class="section-num fade-in">See It in Action</div>
+    <h2 class="fade-in">The Kanban Loop:<br><em>Baking ↔ Packaging</em></h2>
+    <p class="fade-in muted">Watch the pull signal flow between two steps at SunCrest Bakery. Packaging consumes a container of loaves, then sends the empty bin (with its Kanban card) back to Baking as a signal to produce more.</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">🔄 KANBAN PULL SYSTEM — SUNCREST BAKERY</div>
+      <div class="diagram-body" style="padding:0;">
+        <div class="kanban-scene" id="kanbanScene">
+          
+          <div class="kb-narration" id="kbNarration">Click a step to see the Kanban cycle in action</div>
+
+          <!-- Baking station -->
+          <div class="kb-station kb-baking">
+            <div class="kb-station-box">🔥 BAKING</div>
+            <div class="kb-station-sub">Upstream</div>
+          </div>
+
+          <!-- Packaging station -->
+          <div class="kb-station kb-packaging">
+            <div class="kb-station-box">📦 PACKAGING</div>
+            <div class="kb-station-sub">Downstream</div>
+          </div>
+
+          <!-- Top flow label -->
+          <div class="kb-flow-top">
+            <span>Full containers</span>
+            <span class="kb-flow-arrow">→→→</span>
+          </div>
+
+          <!-- Bottom flow label -->
+          <div class="kb-flow-bottom">
+            <span class="kb-flow-arrow">←←←</span>
+            <span>Empty bin + Kanban card</span>
+          </div>
+
+          <!-- Container area -->
+          <div class="kb-container-area">
+            <div style="font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:1px;">CONTAINERS</div>
+            <div class="kb-containers" id="kbContainers"></div>
+          </div>
+
+          <!-- Animated signal -->
+          <div class="kb-signal card" id="kbCard">📋 CARD</div>
+          <div class="kb-signal loaves" id="kbLoaves">🍞 FULL</div>
+
+          <!-- Controls -->
+          <div class="kb-controls">
+            <button class="kb-btn" id="btnConsume" onclick="kanbanStep('consume')">1. Packaging Consumes</button>
+            <button class="kb-btn" id="btnSignal" onclick="kanbanStep('signal')">2. Send Kanban Card</button>
+            <button class="kb-btn" id="btnProduce" onclick="kanbanStep('produce')">3. Baking Produces</button>
+            <button class="kb-btn" onclick="kanbanReset()">↺ Reset</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="callout purple fade-in">
+      <div class="callout-label">The Key Insight</div>
+      <div class="callout-body">Baking <strong>never</strong> starts a new batch until it receives a Kanban card from Packaging. No card = no production. This is what makes it a <em>pull</em> system — demand pulls product through the line, rather than supply pushing it.</div>
+    </div>
+
+    <div class="callout fade-in" style="border-left: 4px solid var(--purple);">
+      <div class="callout-body">
+        <strong>But how many containers should be circulating in this loop?</strong> Too few and Packaging starves. Too many and we're back to a push system with mountains of WIP. There's a formula for that.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== FORMULA INTRO ====== -->
+<div class="section formula-dark" data-step="2">
+  <div class="section-inner">
+    <div class="section-num fade-in" style="color:var(--yellow); opacity:0.5;">The Math</div>
+    <h2 class="fade-in">The Kanban <em>Formula</em></h2>
+    <p class="fade-in">This formula tells you exactly how many containers need to circulate in the loop. Not one more, not one less.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-main">
+        <span class="fvar">k</span> = <span style="font-size:0.7em; vertical-align:middle;">
+          <span class="fvar">d</span> ( <span class="fvar">v</span> + <span class="fvar">r</span> ) ( 1 + <span class="fvar">a</span> )
+        </span>
+        <span style="font-size:0.6em; vertical-align:middle;"> / </span>
+        <span class="fvar">c</span>
+      </div>
+      <div class="formula-where">
+        <strong>k</strong> = number of Kanban containers<br>
+        <strong>d</strong> = daily demand (units/day)<br>
+        <strong>v</strong> = waiting / handling time (days)<br>
+        <strong>r</strong> = processing time per container (days)<br>
+        <strong>a</strong> = safety factor (e.g., 0.10 = 10%)<br>
+        <strong>c</strong> = units per container
+      </div>
+    </div>
+
+    <p class="fade-in" style="color:#8a8275;">Let's make these variables come alive with a story.</p>
+  </div>
+</div>
+
+<!-- ====== VARIABLE STORIES ====== -->
+<div class="section formula-dark" data-step="3">
+  <div class="section-inner">
+    <div class="section-num fade-in" style="color:var(--yellow); opacity:0.5;">The Story</div>
+    <h2 class="fade-in">A Coffee Shop's<br><em>Custom Printed Cups</em></h2>
+    <p class="fade-in">Imagine you run a coffee shop. You order custom printed cups from a supplier. They arrive in plastic tote bins. When a bin is empty, you send it back and they refill it. This is a Kanban loop.</p>
+    <p class="fade-in" style="color:#8a8275;">Let's figure out how many bins need to be circulating.</p>
+
+    <div class="var-cards fade-in">
+      <div class="var-card">
+        <div class="var-card-sym">d</div>
+        <div class="var-card-name">Daily Demand</div>
+        <div class="var-card-story">How thirsty are the customers? How many cups do we burn through in a day?</div>
+        <div class="var-card-val">500 cups/day</div>
+      </div>
+      <div class="var-card">
+        <div class="var-card-sym">v</div>
+        <div class="var-card-name">Waiting / Handling Time</div>
+        <div class="var-card-story">When we send the empty bin back, how long does it sit on the truck or wait on the loading dock?</div>
+        <div class="var-card-val">0.1 days</div>
+      </div>
+      <div class="var-card">
+        <div class="var-card-sym">r</div>
+        <div class="var-card-name">Processing Time</div>
+        <div class="var-card-story">How long does it take the supplier to actually print and fill the bin with new cups?</div>
+        <div class="var-card-val">0.2 days</div>
+      </div>
+      <div class="var-card">
+        <div class="var-card-sym">a</div>
+        <div class="var-card-name">Safety Factor</div>
+        <div class="var-card-story">Reality is messy. Trucks get flat tires. Demand spikes randomly. We add a buffer.</div>
+        <div class="var-card-val">0.10 (10%)</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin:16px 0;" class="fade-in">
+      <div class="var-card" style="display:inline-block; max-width:300px;">
+        <div class="var-card-sym">c</div>
+        <div class="var-card-name">Units per Container</div>
+        <div class="var-card-story">How many cups actually fit inside one plastic tote bin?</div>
+        <div class="var-card-val">50 cups/bin</div>
+      </div>
+    </div>
+
+    <div class="lt-callout fade-in">
+      <div class="lt-callout-label">Key Insight: v + r</div>
+      <div class="lt-callout-body">If you add waiting time and processing time together, that is your <strong>total Lead Time</strong>. It's the total time you are <em>blind</em> — between sending the empty bin out and getting a full one back. In our case: <strong>0.1 + 0.2 = 0.3 days</strong>.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== CALCULATION ====== -->
+<div class="section formula-dark" data-step="4">
+  <div class="section-inner">
+    <div class="section-num fade-in" style="color:var(--yellow); opacity:0.5;">The Math in Action</div>
+    <h2 class="fade-in">Plug it in,<br><em>solve it.</em></h2>
+
+    <div class="formula-box fade-in" style="margin-bottom:28px;">
+      <div class="formula-main" style="font-size:clamp(22px,3.5vw,32px);">
+        k = <span style="font-size:0.85em;">500 × (0.1 + 0.2) × (1 + 0.10)</span> <span style="font-size:0.6em;">/</span> 50
+      </div>
+    </div>
+
+    <div class="calc-steps fade-in">
+      <div class="calc-step">
+        <div class="calc-step-num">①</div>
+        <div class="calc-step-math">v + r = 0.1 + 0.2 = <span class="hl">0.3 days</span></div>
+        <div class="calc-step-note">Total lead time</div>
+      </div>
+      <div class="calc-step">
+        <div class="calc-step-num">②</div>
+        <div class="calc-step-math">d × (v + r) = 500 × 0.3 = <span class="hl">150 cups</span></div>
+        <div class="calc-step-note">Demand during lead time</div>
+      </div>
+      <div class="calc-step">
+        <div class="calc-step-num">③</div>
+        <div class="calc-step-math">1 + a = 1 + 0.10 = <span class="hl">1.10</span></div>
+        <div class="calc-step-note">Safety multiplier</div>
+      </div>
+      <div class="calc-step">
+        <div class="calc-step-num">④</div>
+        <div class="calc-step-math">150 × 1.10 = <span class="hl">165 cups</span></div>
+        <div class="calc-step-note">Demand + safety buffer</div>
+      </div>
+      <div class="calc-step">
+        <div class="calc-step-num">⑤</div>
+        <div class="calc-step-math">165 / 50 = <span class="hl">3.3</span></div>
+        <div class="calc-step-note">Divide by container size</div>
+      </div>
+    </div>
+
+    <div class="calc-answer fade-in">
+      <div class="calc-answer-label">Answer</div>
+      <div class="calc-answer-val">k ≈ 3.3 → round up to 4 bins</div>
+      <div class="calc-answer-note">4 plastic tote bins need to circulate between the coffee shop and the supplier to ensure you never run out of cups — but also never have a cluttered backroom.</div>
+    </div>
+
+    <div class="quote-block fade-in" style="background:rgba(107,76,154,0.1); border-color:rgba(107,76,154,0.4); color:#d4cfc5;">
+      "The Kanban formula doesn't tell you how to run faster. It tells you exactly how much inventory you need to absorb the gap between demand and replenishment — no more, no less."
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<div class="footer-cta">
+  <h3>The formula is simple. The thinking behind it is powerful.</h3>
+  <p>Kanban forces you to define your lead time, acknowledge your uncertainty, and size your buffers deliberately — instead of just piling up inventory "just in case."</p>
+</div>
+
+<script>
+  // === Scroll animations ===
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const progressBar = document.getElementById('progressBar');
+
+  function onScroll() {
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) el.classList.add('visible');
+    });
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // === Kanban Animation ===
+  const TOTAL_BINS = 4;
+  let bins = []; // true = full, false = empty
+  let kbState = 'idle'; // idle, consumed, signaled, produced
+
+  function initBins() {
+    bins = Array(TOTAL_BINS).fill(true);
+    renderBins();
+  }
+
+  function renderBins() {
+    const cont = document.getElementById('kbContainers');
+    cont.innerHTML = bins.map((full, i) => 
+      `<div class="kb-bin ${full ? 'full' : 'empty'}">${full ? '🍞' : '○'}</div>`
+    ).join('');
+  }
+
+  function setNarration(text) {
+    document.getElementById('kbNarration').textContent = text;
+  }
+
+  function kanbanStep(step) {
+    const card = document.getElementById('kbCard');
+    const loaves = document.getElementById('kbLoaves');
+
+    // Reset signals
+    card.style.opacity = '0';
+    loaves.style.opacity = '0';
+
+    if (step === 'consume') {
+      // Find first full bin and empty it
+      const idx = bins.indexOf(true);
+      if (idx === -1) {
+        setNarration('⚠️ No full containers left! Packaging is starving.');
+        return;
+      }
+      bins[idx] = false;
+      renderBins();
+      kbState = 'consumed';
+      setNarration(`Step 1: Packaging uses a container of loaves. ${bins.filter(b=>b).length} full, ${bins.filter(b=>!b).length} empty.`);
+      
+      document.getElementById('btnConsume').classList.add('active');
+      document.getElementById('btnSignal').classList.remove('active');
+      document.getElementById('btnProduce').classList.remove('active');
+
+    } else if (step === 'signal') {
+      if (bins.every(b => b)) {
+        setNarration('All bins are full — no empty bin to send back.');
+        return;
+      }
+      // Show card moving from right to left
+      card.style.top = '230px';
+      card.style.right = '80px';
+      card.style.left = 'auto';
+      card.style.opacity = '1';
+      
+      setTimeout(() => {
+        card.style.transition = 'all 1s ease';
+        card.style.right = 'auto';
+        card.style.left = '80px';
+      }, 100);
+
+      kbState = 'signaled';
+      setNarration('Step 2: Empty bin + Kanban card sent back to Baking → "Make more!"');
+
+      document.getElementById('btnConsume').classList.remove('active');
+      document.getElementById('btnSignal').classList.add('active');
+      document.getElementById('btnProduce').classList.remove('active');
+
+    } else if (step === 'produce') {
+      // Find first empty bin and fill it
+      const idx = bins.indexOf(false);
+      if (idx === -1) {
+        setNarration('All bins are already full. No card received.');
+        return;
+      }
+
+      // Show loaves moving left to right
+      loaves.style.top = '140px';
+      loaves.style.left = '80px';
+      loaves.style.right = 'auto';
+      loaves.style.opacity = '1';
+      card.style.opacity = '0';
+
+      setTimeout(() => {
+        loaves.style.transition = 'all 1s ease';
+        loaves.style.left = 'auto';
+        loaves.style.right = '80px';
+      }, 100);
+
+      setTimeout(() => {
+        bins[idx] = true;
+        renderBins();
+        loaves.style.opacity = '0';
+      }, 1200);
+
+      kbState = 'produced';
+      setNarration(`Step 3: Baking produces & sends a full container. Cycle complete!`);
+
+      document.getElementById('btnConsume').classList.remove('active');
+      document.getElementById('btnSignal').classList.remove('active');
+      document.getElementById('btnProduce').classList.add('active');
+    }
+  }
+
+  function kanbanReset() {
+    const card = document.getElementById('kbCard');
+    const loaves = document.getElementById('kbLoaves');
+    card.style.transition = 'none';
+    loaves.style.transition = 'none';
+    card.style.opacity = '0';
+    loaves.style.opacity = '0';
+    kbState = 'idle';
+    initBins();
+    setNarration('Click a step to see the Kanban cycle in action');
+    document.querySelectorAll('.kb-btn').forEach(b => b.classList.remove('active'));
+    // Reset transitions
+    setTimeout(() => {
+      card.style.transition = 'all 0.8s ease';
+      loaves.style.transition = 'all 0.8s ease';
+    }, 50);
+  }
+
+  initBins();
+</script>
+
+</body>
+</html>
