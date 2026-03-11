@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Value Stream Map — SunCrest Bakery</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f5f0e8;
+    --text: #2c2416;
+    --accent: #b85c2f;
+    --blue: #2e6b9e;
+    --blue-light: #d4e4f0;
+    --green: #3a7d5c;
+    --green-light: #d6eddf;
+    --yellow: #e8c840;
+    --yellow-light: #fdf6d8;
+    --orange-light: #fce8d5;
+    --red: #c0392b;
+    --gray: #7a7062;
+    --white: #ffffff;
+    --shadow: 0 2px 8px rgba(44,36,22,0.10);
+    --shadow-lg: 0 4px 20px rgba(44,36,22,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  .header {
+    background: var(--text);
+    color: var(--bg);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: #a89e8e;
+    font-weight: 400;
+  }
+  .header .badge {
+    background: var(--accent);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .canvas {
+    padding: 28px 32px 32px;
+    min-width: 1100px;
+    position: relative;
+  }
+
+  /* === INFORMATION FLOW (top section) === */
+  .info-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .entity-box {
+    width: 140px;
+    text-align: center;
+  }
+  .entity-icon {
+    width: 100px;
+    height: 60px;
+    margin: 0 auto 6px;
+    background: var(--blue-light);
+    border: 2px solid var(--blue);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    position: relative;
+  }
+  .entity-label {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--blue);
+  }
+  .entity-detail {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .production-control {
+    background: var(--yellow-light);
+    border: 2px solid var(--yellow);
+    border-radius: 8px;
+    padding: 12px 28px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  /* Info flow arrows/labels */
+  .info-arrows {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+  }
+  .info-label {
+    position: absolute;
+    font-size: 10px;
+    color: var(--red);
+    font-weight: 600;
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  /* === SVG Overlay for arrows === */
+  .arrow-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* === PROCESS FLOW (middle section) === */
+  .process-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    margin: 20px 0 0;
+    position: relative;
+  }
+
+  .supply-ship, .customer-ship {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px;
+    flex-shrink: 0;
+    margin-top: 10px;
+  }
+  .ship-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+  .ship-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--blue);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .inventory-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    flex-shrink: 0;
+    margin-top: 10px;
+  }
+  .inv-triangle {
+    width: 0;
+    height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 30px solid var(--yellow);
+    position: relative;
+    margin-bottom: 3px;
+  }
+  .inv-triangle::after {
+    content: 'I';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .inv-detail {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .process-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 170px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .process-box {
+    width: 155px;
+    background: var(--white);
+    border: 2px solid var(--text);
+    border-radius: 4px;
+    text-align: center;
+    padding: 10px 8px;
+    font-weight: 700;
+    font-size: 12px;
+    position: relative;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .process-box:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .process-box .operator-icon {
+    position: absolute;
+    bottom: -18px;
+    left: 10px;
+    font-size: 16px;
+  }
+  .process-box .operator-count {
+    position: absolute;
+    bottom: -17px;
+    left: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Push arrows between steps */
+  .push-arrows {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    margin-top: 18px;
+  }
+  .push-arrows span {
+    display: flex;
+    gap: 2px;
+  }
+  .push-arrows span i {
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid var(--text);
+  }
+
+  .data-box {
+    width: 155px;
+    background: var(--white);
+    border: 1.5px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+  }
+  .data-box .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .data-box .data-label {
+    color: var(--gray);
+    font-weight: 400;
+  }
+  .data-box .data-value {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* === TIMELINE (bottom section) === */
+  .timeline-section {
+    margin: 28px 0 0;
+    padding: 0 20px;
+  }
+
+  .timeline {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    position: relative;
+  }
+
+  .tl-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+
+  .tl-nva {
+    height: 36px;
+    border-bottom: 2.5px solid var(--text);
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+  }
+  .tl-nva .tl-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+  }
+
+  .tl-va {
+    height: 36px;
+    border-top: 2.5px solid var(--text);
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 6px;
+  }
+  .tl-va .tl-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .tl-step-up {
+    border-right: 2.5px solid var(--text);
+    align-self: stretch;
+  }
+  .tl-step-down {
+    border-right: 2.5px solid var(--text);
+    align-self: stretch;
+  }
+
+  /* Summary boxes */
+  .summary-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 0 20px;
+  }
+  .summary-box {
+    background: var(--white);
+    border: 2px solid var(--text);
+    border-radius: 6px;
+    padding: 10px 18px;
+    box-shadow: var(--shadow);
+    text-align: right;
+  }
+  .summary-box .s-label {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .summary-box .s-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Info flow row between supplier/control/customer */
+  .info-flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-bottom: 0;
+    position: relative;
+    min-height: 90px;
+  }
+
+  .info-flow-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  /* Flow connection labels */
+  .flow-labels-left, .flow-labels-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 140px;
+  }
+  .flow-label-item {
+    background: var(--orange-light);
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Schedule bar */
+  .schedule-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 12px 0 0;
+    position: relative;
+    padding: 0 20px;
+  }
+  .schedule-box {
+    background: var(--yellow-light);
+    border: 1.5px solid var(--yellow);
+    border-radius: 4px;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .schedule-arrows {
+    display: flex;
+    gap: 3px;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  /* Finished goods staging */
+  .staging-box {
+    width: 155px;
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    border-radius: 4px;
+    text-align: center;
+    padding: 10px 8px;
+    font-weight: 700;
+    font-size: 12px;
+    box-shadow: var(--shadow);
+    color: var(--green);
+  }
+
+  /* Tooltip */
+  .tooltip-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(44,36,22,0.3);
+    z-index: 100;
+    backdrop-filter: blur(2px);
+  }
+  .tooltip-overlay.active { display: flex; align-items: center; justify-content: center; }
+  .tooltip-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 24px 28px;
+    box-shadow: var(--shadow-lg);
+    max-width: 380px;
+    width: 90%;
+    position: relative;
+  }
+  .tooltip-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+  .tooltip-card table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .tooltip-card td {
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+  }
+  .tooltip-card td:first-child {
+    color: var(--gray);
+    font-weight: 500;
+  }
+  .tooltip-card td:last-child {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+  .tooltip-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--gray);
+  }
+
+  /* Down arrows from production control */
+  .down-arrows {
+    display: flex;
+    justify-content: center;
+    gap: 120px;
+    margin: 4px 0 0;
+    padding: 0 20px;
+  }
+  .down-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .down-arrow-line {
+    width: 2px;
+    height: 20px;
+    background: var(--text);
+  }
+  .down-arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--text);
+  }
+
+  /* Responsive helper */
+  .scroll-hint {
+    display: none;
+    text-align: center;
+    padding: 8px;
+    font-size: 11px;
+    color: var(--gray);
+    background: var(--yellow-light);
+    border-bottom: 1px solid var(--yellow);
+  }
+  @media (max-width: 1100px) {
+    .scroll-hint { display: block; }
+  }
+
+  /* Helper: red info-flow arrows (using CSS) */
+  .red-arrow-right, .red-arrow-left {
+    display: inline-block;
+    width: 28px;
+    height: 2px;
+    background: var(--red);
+    position: relative;
+    vertical-align: middle;
+    margin: 0 4px;
+  }
+  .red-arrow-right::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid var(--red);
+  }
+  .red-arrow-left::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -4px;
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 7px solid var(--red);
+  }
+
+  .info-connect {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--red);
+  }
+
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+  .customer-info-box {
+    background: var(--orange-light);
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Value Stream Map — Current State</h1>
+    <div class="subtitle">SunCrest Bakery · Artisan Bread Production Line</div>
+  </div>
+  <div class="badge">MGMT 339</div>
+</div>
+
+<div class="scroll-hint">← Scroll horizontally to see full map →</div>
+
+<div class="canvas">
+
+  <!-- ====== INFORMATION FLOW ROW ====== -->
+  <div class="info-flow-row">
+
+    <!-- SUPPLIER -->
+    <div class="entity-box">
+      <div class="entity-icon">🌾</div>
+      <div class="entity-label">Heartland<br>Flour Mill</div>
+      <div class="entity-detail">500 lb bags</div>
+    </div>
+
+    <!-- LEFT INFO LABELS -->
+    <div class="flow-labels-left">
+      <div style="display:flex; align-items:center; gap:4px;">
+        <span class="red-arrow-right"></span>
+        <span class="flow-label-item">6-Week Forecast</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:4px;">
+        <span class="red-arrow-left"></span>
+        <span class="flow-label-item">Weekly Fax</span>
+      </div>
+    </div>
+
+    <!-- PRODUCTION CONTROL -->
+    <div class="info-flow-center">
+      <div class="production-control">PRODUCTION CONTROL</div>
+    </div>
+
+    <!-- RIGHT INFO LABELS -->
+    <div class="flow-labels-right">
+      <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">
+        <span class="flow-label-item">90/60/30-day Forecasts</span>
+        <span class="red-arrow-right"></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:4px; justify-content:flex-end;">
+        <span class="flow-label-item">Daily Order</span>
+        <span class="red-arrow-left"></span>
+      </div>
+    </div>
+
+    <!-- CUSTOMER -->
+    <div class="entity-box">
+      <div class="entity-icon">🏪</div>
+      <div class="entity-label">Metro Fresh<br>Grocers</div>
+      <div class="customer-info">
+        <div class="customer-info-box">
+          2,400 loaves/week<br>
+          800 Sourdough<br>
+          1,600 Wheat<br>
+          Rack = 30 loaves<br>
+          1 shift
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule bar + down arrows -->
+  <div class="schedule-bar">
+    <div class="schedule-box">Weekly Schedule</div>
+    <div style="position:absolute; bottom:-28px; left: 50%; transform: translateX(-50%); display:flex; gap: 100px;">
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 0 40px; margin-top: 4px;">
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="ship-icon">🚛</div>
+      <div class="ship-label">1x/Week<br>Tuesday</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div style="font-size:10px; font-weight:600; color:var(--gray); margin-bottom:4px;">Daily Ship Schedule</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="ship-icon">🚛</div>
+      <div class="ship-label">1x/Day</div>
+    </div>
+  </div>
+
+  <!-- ====== PROCESS FLOW ROW ====== -->
+  <div class="process-flow">
+
+    <!-- Raw Material Inventory -->
+    <div class="inventory-block">
+      <div class="inv-triangle"></div>
+      <div class="inv-detail">Flour<br>4 days</div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- STEP 1: MIXING -->
+    <div class="process-step">
+      <div class="process-box" onclick="showDetail('mixing')">
+        MIXING
+        <div class="operator-icon">👤</div>
+        <div class="operator-count">1</div>
+      </div>
+      <div class="data-box">
+        <div class="data-row"><span class="data-label">C/T</span><span class="data-value">18 sec</span></div>
+        <div class="data-row"><span class="data-label">C/O</span><span class="data-value">12 min</span></div>
+        <div class="data-row"><span class="data-label">Uptime</span><span class="data-value">97%</span></div>
+        <div class="data-row"><span class="data-label">Avail.</span><span class="data-value">27,000 sec</span></div>
+        <div class="data-row"><span class="data-label">Shifts</span><span class="data-value">1</span></div>
+      </div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- WIP 1 -->
+    <div class="inventory-block">
+      <div class="inv-triangle"></div>
+      <div class="inv-detail">840<br>loaves</div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- STEP 2: PROOFING -->
+    <div class="process-step">
+      <div class="process-box" onclick="showDetail('proofing')">
+        PROOFING
+        <div class="operator-icon">👤</div>
+        <div class="operator-count">1</div>
+      </div>
+      <div class="data-box">
+        <div class="data-row"><span class="data-label">C/T</span><span class="data-value">40 sec</span></div>
+        <div class="data-row"><span class="data-label">C/O</span><span class="data-value">5 min</span></div>
+        <div class="data-row"><span class="data-label">Uptime</span><span class="data-value">100%</span></div>
+        <div class="data-row"><span class="data-label">Avail.</span><span class="data-value">27,000 sec</span></div>
+        <div class="data-row"><span class="data-label">Shifts</span><span class="data-value">1</span></div>
+      </div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- WIP 2 -->
+    <div class="inventory-block">
+      <div class="inv-triangle"></div>
+      <div class="inv-detail">1,200<br>loaves</div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- STEP 3: BAKING -->
+    <div class="process-step">
+      <div class="process-box" onclick="showDetail('baking')">
+        BAKING
+        <div class="operator-icon">👤</div>
+        <div class="operator-count">1</div>
+      </div>
+      <div class="data-box">
+        <div class="data-row"><span class="data-label">C/T</span><span class="data-value">50 sec</span></div>
+        <div class="data-row"><span class="data-label">C/O</span><span class="data-value">20 min</span></div>
+        <div class="data-row"><span class="data-label">Uptime</span><span class="data-value">95%</span></div>
+        <div class="data-row"><span class="data-label">Avail.</span><span class="data-value">27,000 sec</span></div>
+        <div class="data-row"><span class="data-label">Shifts</span><span class="data-value">1</span></div>
+      </div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- WIP 3 -->
+    <div class="inventory-block">
+      <div class="inv-triangle"></div>
+      <div class="inv-detail">600<br>loaves</div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- STEP 4: PACKAGING -->
+    <div class="process-step">
+      <div class="process-box" onclick="showDetail('packaging')">
+        PACKAGING
+        <div class="operator-icon">👤</div>
+        <div class="operator-count">1</div>
+      </div>
+      <div class="data-box">
+        <div class="data-row"><span class="data-label">C/T</span><span class="data-value">15 sec</span></div>
+        <div class="data-row"><span class="data-label">C/O</span><span class="data-value">8 min</span></div>
+        <div class="data-row"><span class="data-label">Uptime</span><span class="data-value">100%</span></div>
+        <div class="data-row"><span class="data-label">Avail.</span><span class="data-value">27,000 sec</span></div>
+        <div class="data-row"><span class="data-label">Shifts</span><span class="data-value">1</span></div>
+      </div>
+    </div>
+
+    <div class="push-arrows"><span><i></i><i></i></span></div>
+
+    <!-- SHIPPING / FG -->
+    <div class="process-step">
+      <div class="staging-box">
+        SHIPPING<br><span style="font-weight:400; font-size:11px;">Staging</span>
+      </div>
+      <div style="margin-top:24px;">
+        <div class="inv-triangle" style="border-bottom-color: var(--green);"></div>
+        <div class="inv-detail" style="color:var(--green);">960<br>loaves</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ====== TIMELINE ====== -->
+  <div class="timeline-section">
+    <div class="timeline">
+      <!-- Raw material wait -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">4 days</span></div>
+        <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
+      </div>
+      <!-- Mixing VA -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
+        <div class="tl-va"><span class="tl-val">18 sec</span></div>
+      </div>
+      <!-- WIP 1 wait -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">1.75 days</span></div>
+        <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
+      </div>
+      <!-- Proofing VA -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
+        <div class="tl-va"><span class="tl-val">40 sec</span></div>
+      </div>
+      <!-- WIP 2 wait -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">2.5 days</span></div>
+        <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
+      </div>
+      <!-- Baking VA -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
+        <div class="tl-va"><span class="tl-val">50 sec</span></div>
+      </div>
+      <!-- WIP 3 wait -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">1.25 days</span></div>
+        <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
+      </div>
+      <!-- Packaging VA -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
+        <div class="tl-va"><span class="tl-val">15 sec</span></div>
+      </div>
+      <!-- FG wait -->
+      <div class="tl-segment">
+        <div class="tl-nva"><span class="tl-val">2.0 days</span></div>
+        <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SUMMARY BOXES ====== -->
+  <div class="summary-row">
+    <div class="summary-box">
+      <div class="s-label">Production Lead Time</div>
+      <div class="s-value">11.5 days</div>
+    </div>
+    <div class="summary-box">
+      <div class="s-label">Processing Time</div>
+      <div class="s-value">123 seconds</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====== DETAIL OVERLAY ====== -->
+<div class="tooltip-overlay" id="tooltipOverlay" onclick="hideDetail()">
+  <div class="tooltip-card" onclick="event.stopPropagation()">
+    <button class="tooltip-close" onclick="hideDetail()">✕</button>
+    <h3 id="tooltipTitle"></h3>
+    <table id="tooltipTable"></table>
+  </div>
+</div>
+
+<script>
+const details = {
+  mixing: {
+    title: 'Mixing',
+    rows: [
+      ['Cycle Time', '18 seconds/loaf'],
+      ['Changeover', '12 minutes'],
+      ['Uptime', '97%'],
+      ['Available Time', '27,000 sec/shift'],
+      ['Shifts', '1'],
+      ['Operators', '1'],
+      ['Notes', 'Switches between sourdough & wheat recipes']
+    ]
+  },
+  proofing: {
+    title: 'Proofing',
+    rows: [
+      ['Cycle Time', '40 seconds/loaf'],
+      ['Changeover', '5 minutes'],
+      ['Uptime', '100%'],
+      ['Available Time', '27,000 sec/shift'],
+      ['Shifts', '1'],
+      ['Operators', '1'],
+      ['Notes', 'Temperature-controlled chambers']
+    ]
+  },
+  baking: {
+    title: 'Baking',
+    rows: [
+      ['Cycle Time', '50 seconds/loaf'],
+      ['Changeover', '20 minutes'],
+      ['Uptime', '95%'],
+      ['Available Time', '27,000 sec/shift'],
+      ['Shifts', '1'],
+      ['Operators', '1'],
+      ['Notes', 'Reflow oven; longest changeover in the line']
+    ]
+  },
+  packaging: {
+    title: 'Packaging',
+    rows: [
+      ['Cycle Time', '15 seconds/loaf'],
+      ['Changeover', '8 minutes'],
+      ['Uptime', '100%'],
+      ['Available Time', '27,000 sec/shift'],
+      ['Shifts', '1'],
+      ['Operators', '1'],
+      ['Notes', 'Bagging & labeling station']
+    ]
+  }
+};
+
+function showDetail(key) {
+  const d = details[key];
+  document.getElementById('tooltipTitle').textContent = d.title;
+  const table = document.getElementById('tooltipTable');
+  table.innerHTML = d.rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+  document.getElementById('tooltipOverlay').classList.add('active');
+}
+
+function hideDetail() {
+  document.getElementById('tooltipOverlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') hideDetail(); });
+</script>
+
+</body>
+</html>
