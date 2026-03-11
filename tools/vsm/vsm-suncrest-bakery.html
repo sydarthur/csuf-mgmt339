@@ -314,13 +314,13 @@
   /* === TIMELINE (bottom section) === */
   .timeline-section {
     margin: 28px 0 0;
-    padding: 0 20px;
+    display: flex;
+    justify-content: center;
   }
 
   .timeline {
     display: flex;
     align-items: stretch;
-    width: 100%;
     position: relative;
   }
 
@@ -328,7 +328,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
+    flex: 0 0 auto;
     position: relative;
   }
 
@@ -845,50 +845,54 @@
   </div>
 
   <!-- ====== TIMELINE ====== -->
+  <!-- Segment widths match process-flow above:
+       NVA (inventory 80px + half arrows): 90px start, 100px mid
+       VA  (process box 170px + half arrows): 190px
+       Last NVA (shipping 170px + half arrow): 180px -->
   <div class="timeline-section">
     <div class="timeline">
-      <!-- Raw material wait -->
-      <div class="tl-segment">
+      <!-- Raw material wait: 80 + 10 = 90px -->
+      <div class="tl-segment" style="width:90px">
         <div class="tl-nva"><span class="tl-val">4 days</span></div>
         <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
       </div>
-      <!-- Mixing VA -->
-      <div class="tl-segment">
+      <!-- Mixing VA: 10 + 170 + 10 = 190px -->
+      <div class="tl-segment" style="width:190px">
         <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
         <div class="tl-va"><span class="tl-val">18 sec</span></div>
       </div>
-      <!-- WIP 1 wait -->
-      <div class="tl-segment">
+      <!-- WIP 1 wait: 10 + 80 + 10 = 100px -->
+      <div class="tl-segment" style="width:100px">
         <div class="tl-nva"><span class="tl-val">1.75 days</span></div>
         <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
       </div>
-      <!-- Proofing VA -->
-      <div class="tl-segment">
+      <!-- Proofing VA: 10 + 170 + 10 = 190px -->
+      <div class="tl-segment" style="width:190px">
         <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
         <div class="tl-va"><span class="tl-val">40 sec</span></div>
       </div>
-      <!-- WIP 2 wait -->
-      <div class="tl-segment">
+      <!-- WIP 2 wait: 10 + 80 + 10 = 100px -->
+      <div class="tl-segment" style="width:100px">
         <div class="tl-nva"><span class="tl-val">2.5 days</span></div>
         <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
       </div>
-      <!-- Baking VA -->
-      <div class="tl-segment">
+      <!-- Baking VA: 10 + 170 + 10 = 190px -->
+      <div class="tl-segment" style="width:190px">
         <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
         <div class="tl-va"><span class="tl-val">50 sec</span></div>
       </div>
-      <!-- WIP 3 wait -->
-      <div class="tl-segment">
+      <!-- WIP 3 wait: 10 + 80 + 10 = 100px -->
+      <div class="tl-segment" style="width:100px">
         <div class="tl-nva"><span class="tl-val">1.25 days</span></div>
         <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
       </div>
-      <!-- Packaging VA -->
-      <div class="tl-segment">
+      <!-- Packaging VA: 10 + 170 + 10 = 190px -->
+      <div class="tl-segment" style="width:190px">
         <div class="tl-nva"><span class="tl-val">&nbsp;</span></div>
         <div class="tl-va"><span class="tl-val">15 sec</span></div>
       </div>
-      <!-- FG wait -->
-      <div class="tl-segment">
+      <!-- FG/Shipping wait: 10 + 170 = 180px -->
+      <div class="tl-segment" style="width:180px">
         <div class="tl-nva"><span class="tl-val">2.0 days</span></div>
         <div class="tl-va"><span class="tl-val">&nbsp;</span></div>
       </div>
