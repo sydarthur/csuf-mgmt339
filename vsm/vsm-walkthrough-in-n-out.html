@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Value Stream Mapping — A Visual Walkthrough</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --text: #1a1612;
+    --text-muted: #6b6054;
+    --accent: #c0442a;
+    --accent-light: #fceae6;
+    --blue: #2a6496;
+    --blue-light: #e3eef6;
+    --green: #2d7a50;
+    --green-light: #e1f2e8;
+    --yellow: #d4a017;
+    --yellow-light: #fdf5d8;
+    --orange: #c76f20;
+    --orange-light: #fdf0e0;
+    --card: #ffffff;
+    --border: #e0dbd3;
+    --shadow: 0 2px 12px rgba(26,22,18,0.07);
+    --shadow-lg: 0 8px 32px rgba(26,22,18,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === NAVIGATION HEADER === */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .nav-steps {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+  }
+  .nav-dot.active {
+    background: var(--accent);
+    width: 28px;
+    border-radius: 5px;
+  }
+  .nav-dot:hover { background: var(--text-muted); }
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--yellow-light);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  /* === PROGRESS BAR === */
+  .progress-bar {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    z-index: 101;
+    transition: width 0.4s ease;
+  }
+
+  /* === SECTIONS === */
+  .section {
+    min-height: 100vh;
+    padding: 80px 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .section-inner {
+    max-width: 820px;
+    width: 100%;
+  }
+
+  /* Section numbering */
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .section h2 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .section p {
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+  .section p.muted {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* === HERO === */
+  .hero {
+    background: var(--text);
+    color: var(--bg);
+    min-height: 100vh;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 5.5vw, 56px);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .hero h1 em { color: var(--yellow); font-style: italic; }
+  .hero p { color: #b5ae9f; }
+  .hero .start-btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 12px 28px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .hero .start-btn:hover { transform: translateY(-2px); }
+
+  /* === CALLOUT CARDS === */
+  .callout {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+  }
+  .callout.accent {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .callout.blue {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+  .callout.green {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .callout.yellow {
+    border-color: var(--yellow);
+    background: var(--yellow-light);
+  }
+  .callout.orange {
+    border-color: var(--orange);
+    background: var(--orange-light);
+  }
+
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout.accent .callout-label { color: var(--accent); }
+  .callout.blue .callout-label { color: var(--blue); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.yellow .callout-label { color: var(--yellow); }
+  .callout.orange .callout-label { color: var(--orange); }
+
+  .callout-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .callout-body {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* === VISUAL DIAGRAMS (inline) === */
+  .diagram-container {
+    margin: 28px 0;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .diagram-header {
+    padding: 10px 18px;
+    background: #f3f0ea;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .diagram-body {
+    padding: 24px;
+  }
+
+  /* Drive-thru visual */
+  .drive-thru {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 16px 0;
+    overflow-x: auto;
+  }
+  .car {
+    flex-shrink: 0;
+    width: 50px;
+    height: 32px;
+    background: var(--blue-light);
+    border: 2px solid var(--blue);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-right: 6px;
+    position: relative;
+  }
+  .car.you {
+    background: var(--accent-light);
+    border-color: var(--accent);
+  }
+  .car.you::after {
+    content: 'YOU';
+    position: absolute;
+    bottom: -18px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .kitchen-box {
+    flex-shrink: 0;
+    width: 100px;
+    height: 56px;
+    background: var(--yellow-light);
+    border: 2px solid var(--yellow);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-left: 10px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .window-box {
+    flex-shrink: 0;
+    width: 70px;
+    height: 56px;
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+    margin-left: 6px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .dt-arrow {
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* Time comparison bar */
+  .time-compare {
+    margin: 20px 0;
+  }
+  .time-bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .time-bar-label {
+    width: 110px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .time-bar-track {
+    flex: 1;
+    height: 28px;
+    background: #eee;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .time-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    transition: width 1s ease;
+  }
+
+  /* Layer diagram */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--text);
+  }
+  .layer-row {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-row:hover { filter: brightness(0.97); }
+  .layer-row.brain { background: var(--orange-light); }
+  .layer-row.body { background: var(--blue-light); }
+  .layer-row.truth { background: var(--green-light); }
+  .layer-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    opacity: 0.3;
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .layer-content { flex: 1; }
+  .layer-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .layer-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .layer-position {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.06);
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Process box mini */
+  .mini-process {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+  }
+  .mini-pbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+  }
+  .mini-pbox-top {
+    width: 110px;
+    background: var(--card);
+    border: 2px solid var(--text);
+    border-radius: 4px;
+    text-align: center;
+    padding: 8px 4px;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .mini-databox {
+    width: 110px;
+    margin-top: 4px;
+    background: var(--card);
+    border: 1.5px solid #ccc;
+    border-radius: 3px;
+    padding: 6px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .mini-inv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    margin-top: 8px;
+  }
+  .mini-tri {
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 20px solid var(--yellow);
+    margin-bottom: 3px;
+  }
+  .mini-inv-label {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .mini-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* Timeline visual (simplified) */
+  .timeline-visual {
+    margin: 16px 0;
+    position: relative;
+  }
+  .tl-row {
+    display: flex;
+    align-items: flex-end;
+    height: 50px;
+    border-bottom: 2.5px solid var(--text);
+  }
+  .tl-row-bottom {
+    display: flex;
+    align-items: flex-start;
+    height: 50px;
+    border-top: none;
+  }
+  .tl-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+  }
+  .tl-cell.nva {
+    color: var(--accent);
+    border-right: 2.5px solid var(--text);
+  }
+  .tl-cell.va {
+    color: var(--green);
+    border-right: 2.5px solid var(--text);
+    align-items: flex-start;
+    padding-top: 8px;
+  }
+  .tl-cell:last-child { border-right: none; }
+
+  /* Quote block */
+  .quote-block {
+    border-left: 4px solid var(--accent);
+    padding: 12px 20px;
+    margin: 20px 0;
+    background: var(--accent-light);
+    border-radius: 0 6px 6px 0;
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Punchline section */
+  .punchline-section {
+    background: var(--text);
+    color: var(--bg);
+  }
+  .punchline-section h2 { color: var(--bg); }
+  .punchline-section h2 em { color: var(--yellow); }
+  .punchline-section p { color: #b5ae9f; }
+  .punchline-section .callout {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .punchline-section .callout-label { color: var(--yellow); }
+  .punchline-section .callout-body { color: #d4cfc5; }
+
+  /* Comparison columns */
+  .compare-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .compare-col {
+    padding: 18px;
+    border-radius: 8px;
+  }
+  .compare-col.bad {
+    background: rgba(192,68,42,0.12);
+    border: 1.5px solid var(--accent);
+  }
+  .compare-col.good {
+    background: rgba(45,122,80,0.12);
+    border: 1.5px solid var(--green);
+  }
+  .compare-col h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .compare-col.bad h4 { color: var(--accent); }
+  .compare-col.good h4 { color: var(--green); }
+  .compare-col p {
+    font-size: 14px;
+    margin-bottom: 0;
+    color: var(--text-muted);
+  }
+  .punchline-section .compare-col p { color: #b5ae9f; }
+  .punchline-section .compare-col.bad { background: rgba(192,68,42,0.18); border-color: rgba(192,68,42,0.5); }
+  .punchline-section .compare-col.good { background: rgba(45,122,80,0.18); border-color: rgba(45,122,80,0.5); }
+  .punchline-section .compare-col.bad h4 { color: #e8836f; }
+  .punchline-section .compare-col.good h4 { color: #5fba86; }
+
+  /* Footer CTA */
+  .footer-cta {
+    text-align: center;
+    padding: 48px 32px;
+    background: var(--yellow-light);
+    border-top: 2px solid var(--yellow);
+  }
+  .footer-cta h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  .footer-cta p {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Animations */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Scroll spacer */
+  .spacer { height: 40px; }
+
+  @media (max-width: 640px) {
+    .section { padding: 70px 20px 40px; }
+    .compare-cols { grid-template-columns: 1fr; }
+    .nav { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-brand">Value Stream Mapping</div>
+  <div class="nav-steps" id="navSteps"></div>
+  <div class="nav-badge">MGMT 339</div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ====== SECTION 0: HERO ====== -->
+<div class="section hero" data-step="0">
+  <div class="section-inner">
+    <div class="section-num" style="color: var(--yellow); opacity:0.5;">The Detective's Map</div>
+    <h1>How do you find waste<br>in a factory <em>the size of<br>three football fields?</em></h1>
+    <p>Toyota conquered the world by ruthlessly eliminating waste. But when Taiichi Ohno walked into a massive factory, he needed more than instinct. He needed an X-ray of the entire business.</p>
+    <p>In Lean Management, that X-ray is called a <strong style="color:var(--yellow);">Value Stream Map</strong>.</p>
+    <p class="muted">It maps every single step a product takes — from customer order to delivery. But before we can read the map, we need to learn three words.</p>
+    <button class="start-btn" onclick="document.querySelector('[data-step=\\'1\\']').scrollIntoView({behavior:'smooth'})">Let's start with a burger →</button>
+  </div>
+</div>
+
+<!-- ====== SECTION 1: CYCLE TIME ====== -->
+<div class="section" data-step="1">
+  <div class="section-inner">
+    <div class="section-num fade-in">Word 1 of 3</div>
+    <h2 class="fade-in">Cycle Time:<br><em>The Actual Work</em></h2>
+    <p class="fade-in">Picture yourself in the kitchen at In-N-Out Burger, holding a stopwatch.</p>
+    <p class="fade-in">The cook puts a raw patty on the grill. You click <strong>start</strong>. The burger cooks, goes on a bun, gets wrapped, and is handed to the window. You click <strong>stop</strong>.</p>
+
+    <div class="callout accent fade-in">
+      <div class="callout-label">Definition</div>
+      <div class="callout-title">Cycle Time (C/T)</div>
+      <div class="callout-body">The physical time it takes to complete the actual, value-adding work on <strong>one unit</strong>. This is the real work — hands on the product.</div>
+    </div>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">🍔 INSIDE THE KITCHEN</div>
+      <div class="diagram-body" style="text-align:center;">
+        <div style="display:inline-flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center;">
+          <div style="padding:8px 14px; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:6px; font-size:13px; font-weight:600;">🥩 Raw Patty</div>
+          <span style="font-size:18px; color:var(--text-muted);">→</span>
+          <div style="padding:8px 14px; background:var(--yellow-light); border:1.5px solid var(--yellow); border-radius:6px; font-size:13px; font-weight:600;">🔥 Grill</div>
+          <span style="font-size:18px; color:var(--text-muted);">→</span>
+          <div style="padding:8px 14px; background:var(--orange-light); border:1.5px solid var(--orange); border-radius:6px; font-size:13px; font-weight:600;">🍞 Assemble</div>
+          <span style="font-size:18px; color:var(--text-muted);">→</span>
+          <div style="padding:8px 14px; background:var(--green-light); border:1.5px solid var(--green); border-radius:6px; font-size:13px; font-weight:600;">📦 Wrap</div>
+        </div>
+        <div style="margin-top:16px; font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--accent);">⏱ 2 minutes</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">This is the Cycle Time — the real work to make one burger.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 2: LEAD TIME ====== -->
+<div class="section" data-step="2">
+  <div class="section-inner">
+    <div class="section-num fade-in">Word 2 of 3</div>
+    <h2 class="fade-in">Lead Time:<br><em>The Customer's Reality</em></h2>
+    <p class="fade-in">Now step <strong>outside</strong> the restaurant. You pull your car into the back of a massive drive-thru line. You place your order. You wait. You inch forward. You wait some more. Finally, they hand you your food.</p>
+
+    <div class="callout blue fade-in">
+      <div class="callout-label">Definition</div>
+      <div class="callout-title">Lead Time</div>
+      <div class="callout-body">The <strong>total time the customer actually experiences</strong> from order to delivery. It includes all the waiting, not just the work.</div>
+    </div>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">🚗 THE DRIVE-THRU LINE — THE CUSTOMER'S VIEW</div>
+      <div class="diagram-body">
+        <div class="drive-thru">
+          <div class="car you">🚗</div>
+          <div class="car">🚗</div>
+          <div class="car">🚗</div>
+          <div class="car">🚗</div>
+          <div class="car">🚗</div>
+          <div class="car">🚗</div>
+          <div class="car">🚗</div>
+          <div class="dt-arrow">→</div>
+          <div class="kitchen-box">🍳<br>Kitchen</div>
+          <div class="dt-arrow">→</div>
+          <div class="window-box">🟢<br>Window</div>
+        </div>
+        <div style="margin-top:16px; font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--blue);">⏱ 15 minutes</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">This is Lead Time — the total time YOU waited from order to food-in-hand.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 3: WIP ====== -->
+<div class="section" data-step="3">
+  <div class="section-inner">
+    <div class="section-num fade-in">Word 3 of 3</div>
+    <h2 class="fade-in">Work-In-Process:<br><em>The Traffic Jam</em></h2>
+    <p class="fade-in">If the Cycle Time is only 2 minutes, why did you wait 15 minutes? Where did those extra 13 minutes go?</p>
+    <p class="fade-in">They went to <strong>waiting</strong> — waiting behind all the other half-finished orders sitting in the system.</p>
+
+    <div class="callout yellow fade-in">
+      <div class="callout-label">Definition</div>
+      <div class="callout-title">Work-In-Process (WIP)</div>
+      <div class="callout-body">All the partially completed units sitting between process steps. WIP is the <strong>traffic jam</strong> that destroys your Lead Time.</div>
+    </div>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">⏱ WHY 2 MINUTES BECAME 15 MINUTES</div>
+      <div class="diagram-body">
+        <div class="time-compare">
+          <div class="time-bar-row">
+            <div class="time-bar-label" style="color:var(--green);">Actual Work</div>
+            <div class="time-bar-track">
+              <div class="time-bar-fill" style="width:13.3%; background:var(--green);" id="bar1">2 min</div>
+            </div>
+          </div>
+          <div class="time-bar-row">
+            <div class="time-bar-label" style="color:var(--accent);">Waiting (WIP)</div>
+            <div class="time-bar-track">
+              <div class="time-bar-fill" style="width:86.7%; background:var(--accent);" id="bar2">13 min</div>
+            </div>
+          </div>
+          <div class="time-bar-row">
+            <div class="time-bar-label" style="color:var(--blue);">Lead Time</div>
+            <div class="time-bar-track">
+              <div class="time-bar-fill" style="width:100%; background:var(--blue);" id="bar3">15 min total</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:13px; color:var(--text-muted); text-align:center; margin-top:8px;">86.7% of the customer's time was pure waiting. Only 13.3% was real work.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 4: WHY VSM ====== -->
+<div class="section" data-step="4" style="background:#f0ece4;">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Core Lesson</div>
+    <h2 class="fade-in">A VSM exposes<br><em>the traffic jam</em></h2>
+    <p class="fade-in">This is why we draw a Value Stream Map. We draw a timeline to compare the tiny Cycle Time against the massive Lead Time — so we know exactly where to attack the waste.</p>
+
+    <div class="compare-cols fade-in">
+      <div class="compare-col bad">
+        <h4>❌ Traditional Manager</h4>
+        <p>"Flip the burgers faster! Shave 10 seconds off the cook time! Buy a faster grill!"</p>
+        <p style="margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:12px;">Attacks the 2 minutes.</p>
+      </div>
+      <div class="compare-col good">
+        <h4>✓ Lean Manager</h4>
+        <p>"Why are we spending money to save 10 seconds of work time, when we have 13 minutes of dead waiting time?"</p>
+        <p style="margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:12px;">Attacks the 13 minutes.</p>
+      </div>
+    </div>
+
+    <div class="quote-block fade-in">
+      "The goal of a Value Stream Map is to make the traffic jam visible — so you stop optimizing the wrong thing."
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 5: THE 3 LAYERS ====== -->
+<div class="section" data-step="5">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Anatomy</div>
+    <h2 class="fade-in">A VSM has <em>three layers</em></h2>
+    <p class="fade-in">A VSM is not a normal flowchart. Normal flowcharts just show "what happens next." A VSM tracks two completely different things at once: how <strong>information</strong> flows backward, and how <strong>material</strong> flows forward.</p>
+    <p class="fade-in muted">We break the page into three horizontal layers:</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">THE THREE LAYERS OF A VALUE STREAM MAP</div>
+      <div class="diagram-body" style="padding:0;">
+        <div class="layer-stack">
+          <div class="layer-row brain">
+            <div class="layer-num">1</div>
+            <div class="layer-content">
+              <div class="layer-title">The Brain — Information Flow</div>
+              <div class="layer-subtitle">Customer → Production Control → Supplier. How does the company think and communicate?</div>
+            </div>
+            <div class="layer-position">TOP</div>
+          </div>
+          <div class="layer-row body">
+            <div class="layer-num">2</div>
+            <div class="layer-content">
+              <div class="layer-title">The Body — Material Flow & Data</div>
+              <div class="layer-subtitle">Process boxes, inventory triangles, data boxes. The physical factory floor.</div>
+            </div>
+            <div class="layer-position">MIDDLE</div>
+          </div>
+          <div class="layer-row truth">
+            <div class="layer-num">3</div>
+            <div class="layer-content">
+              <div class="layer-title">The Truth — The Timeline</div>
+              <div class="layer-subtitle">Value-added time vs. non-value-added time. This is the whole reason the map exists.</div>
+            </div>
+            <div class="layer-position">BOTTOM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 6: LAYER 1 — THE BRAIN ====== -->
+<div class="section" data-step="6">
+  <div class="section-inner">
+    <div class="section-num fade-in">Layer 1 — Top of Page</div>
+    <h2 class="fade-in">The Brain:<br><em>Information Flow</em></h2>
+    <p class="fade-in">At the very top of the map, we draw how the company <strong>thinks</strong>. Customer on the right. Supplier on the left. Production Control in the middle.</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">LAYER 1 — INFORMATION FLOW</div>
+      <div class="diagram-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div style="text-align:center; width:100px;">
+            <div style="font-size:28px;">🌾</div>
+            <div style="font-size:12px; font-weight:700; color:var(--blue);">Supplier</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <span style="font-size:10px; color:var(--accent); font-weight:600;">← Forecasts →</span>
+            <span style="font-size:10px; color:var(--accent); font-weight:600;">← Orders →</span>
+          </div>
+          <div style="text-align:center; padding:10px 20px; background:var(--yellow-light); border:2px solid var(--yellow); border-radius:6px;">
+            <div style="font-size:12px; font-weight:700;">PRODUCTION<br>CONTROL</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <span style="font-size:10px; color:var(--accent); font-weight:600;">← Forecasts →</span>
+            <span style="font-size:10px; color:var(--accent); font-weight:600;">← Daily Orders →</span>
+          </div>
+          <div style="text-align:center; width:100px;">
+            <div style="font-size:28px;">🏪</div>
+            <div style="font-size:12px; font-weight:700; color:var(--blue);">Customer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout orange fade-in">
+      <div class="callout-label">Why Map This?</div>
+      <div class="callout-body">Because <strong>bad information causes physical waste</strong>. If the customer changes their order on Tuesday but management doesn't tell the floor until Thursday — the factory just spent two days overproducing the wrong product.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 7: LAYER 2 — THE BODY ====== -->
+<div class="section" data-step="7">
+  <div class="section-inner">
+    <div class="section-num fade-in">Layer 2 — Middle of Page</div>
+    <h2 class="fade-in">The Body:<br><em>Material Flow & Data</em></h2>
+    <p class="fade-in">The middle of the page is the physical factory floor. Two main symbols:</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;" class="fade-in">
+      <div class="callout blue" style="margin:0;">
+        <div class="callout-label">Process Boxes</div>
+        <div class="callout-body">Every major step gets a box (Mixing, Baking, etc.). Underneath each box: a <strong>Data Box</strong> with its vital signs.</div>
+      </div>
+      <div class="callout yellow" style="margin:0;">
+        <div class="callout-label">Inventory Triangles</div>
+        <div class="callout-body">Yellow warning triangles between steps. This is the WIP — the physical traffic jam from our drive-thru.</div>
+      </div>
+    </div>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">LAYER 2 — MATERIAL FLOW (Simplified)</div>
+      <div class="diagram-body">
+        <div class="mini-process">
+          <div class="mini-inv">
+            <div class="mini-tri"></div>
+            <div class="mini-inv-label">Raw<br>Material</div>
+          </div>
+          <div class="mini-arrow">→</div>
+          <div class="mini-pbox">
+            <div class="mini-pbox-top">MIXING</div>
+            <div class="mini-databox">C/T: 18 sec<br>C/O: 12 min<br>Uptime: 97%</div>
+          </div>
+          <div class="mini-arrow">→</div>
+          <div class="mini-inv">
+            <div class="mini-tri"></div>
+            <div class="mini-inv-label">840<br>loaves</div>
+          </div>
+          <div class="mini-arrow">→</div>
+          <div class="mini-pbox">
+            <div class="mini-pbox-top">BAKING</div>
+            <div class="mini-databox">C/T: 50 sec<br>C/O: 20 min<br>Uptime: 95%</div>
+          </div>
+          <div class="mini-arrow">→</div>
+          <div class="mini-inv">
+            <div class="mini-tri"></div>
+            <div class="mini-inv-label">600<br>loaves</div>
+          </div>
+          <div class="mini-arrow">→</div>
+          <div class="mini-pbox">
+            <div class="mini-pbox-top" style="background:var(--green-light); border-color:var(--green); color:var(--green);">SHIPPING</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout fade-in" style="border-left:4px solid var(--accent); border-color: var(--accent);">
+      <div class="callout-label" style="color:var(--accent);">The Data Box — Vital Signs</div>
+      <div class="callout-body">
+        <strong>C/T (Cycle Time):</strong> How fast does this step do the work?<br>
+        <strong>C/O (Changeover):</strong> How long to switch between products? (Dead time = bottleneck signal)<br>
+        <strong>Uptime:</strong> Is the machine actually running, or broken 10% of the time?<br>
+        <strong>Operators:</strong> How many people to run this step?
+      </div>
+    </div>
+
+    <p class="muted fade-in">By looking at data boxes and inventory triangles together, the bottleneck practically glows in the dark.</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 8: LAYER 3 — THE TRUTH ====== -->
+<div class="section punchline-section" data-step="8">
+  <div class="section-inner">
+    <div class="section-num fade-in" style="color:var(--yellow); opacity:0.5;">Layer 3 — Bottom of Page</div>
+    <h2 class="fade-in">The Truth:<br><em>The Timeline</em></h2>
+    <p class="fade-in">This is the entire reason the Value Stream Map exists. At the bottom, we draw a staircase timeline. It has high peaks and low valleys.</p>
+
+    <div class="diagram-container fade-in" style="border-color: rgba(255,255,255,0.15);">
+      <div class="diagram-header" style="background:rgba(255,255,255,0.06); color:#b5ae9f; border-color:rgba(255,255,255,0.1);">THE STAIRCASE TIMELINE</div>
+      <div class="diagram-body" style="background: rgba(255,255,255,0.04);">
+        <div class="timeline-visual">
+          <div class="tl-row">
+            <div class="tl-cell nva">4 days</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell nva">1.75 days</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell nva">2.5 days</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell nva">1.25 days</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell nva" style="border-right:none;">2.0 days</div>
+          </div>
+          <div class="tl-row-bottom" style="border-top: 2.5px solid rgba(255,255,255,0.4);">
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell va">18 sec</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell va">40 sec</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell va">50 sec</div>
+            <div class="tl-cell" style="border-right:2.5px solid rgba(255,255,255,0.3);"></div>
+            <div class="tl-cell va">15 sec</div>
+            <div class="tl-cell" style="border-right:none;"></div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:11px;">
+          <div style="color:var(--accent); font-weight:600;">▲ High peaks = Waiting (NVA) — measured in DAYS</div>
+          <div style="color:var(--green); font-weight:600;">▼ Low valleys = Processing (VA) — measured in SECONDS</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; margin-top:20px;" class="fade-in">
+      <div style="flex:1; text-align:center; padding:16px; background:rgba(192,68,42,0.15); border-radius:8px; border:1.5px solid rgba(192,68,42,0.3);">
+        <div style="font-size:11px; color:#e8836f; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Production Lead Time</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:700; color:#e8836f; margin-top:4px;">11.5 days</div>
+      </div>
+      <div style="flex:1; text-align:center; padding:16px; background:rgba(45,122,80,0.15); border-radius:8px; border:1.5px solid rgba(45,122,80,0.3);">
+        <div style="font-size:11px; color:#5fba86; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Processing Time</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:700; color:#5fba86; margin-top:4px;">123 seconds</div>
+      </div>
+    </div>
+
+    <div class="compare-cols fade-in" style="margin-top:24px;">
+      <div class="compare-col bad">
+        <h4>❌ Traditional Manager</h4>
+        <p>"Buy a faster oven! Shave 5 seconds off the bake time!"</p>
+        <p style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:11px;">Spends $1M to attack 123 seconds.</p>
+      </div>
+      <div class="compare-col good">
+        <h4>✓ Lean Manager</h4>
+        <p>"Why are loaves sitting for 2.5 days before the oven? Let's fix the queue."</p>
+        <p style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:11px;">Attacks the 11.5 days of waiting — for free.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== FOOTER CTA ====== -->
+<div class="footer-cta">
+  <h3>Now you're ready to read a real VSM.</h3>
+  <p>Next up: The SunCrest Bakery current-state map. You'll use everything you just learned to identify the bottleneck, calculate takt time, and find where the waste hides.</p>
+</div>
+
+<script>
+  // === Scroll-based animations ===
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const sections = document.querySelectorAll('.section');
+  const navSteps = document.getElementById('navSteps');
+  const progressBar = document.getElementById('progressBar');
+
+  // Create nav dots
+  sections.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.onclick = () => sections[i].scrollIntoView({ behavior: 'smooth' });
+    navSteps.appendChild(dot);
+  });
+  const dots = document.querySelectorAll('.nav-dot');
+
+  function onScroll() {
+    // Fade in elements
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) {
+        el.classList.add('visible');
+      }
+    });
+
+    // Progress bar
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = progress + '%';
+
+    // Active nav dot
+    let activeIdx = 0;
+    sections.forEach((sec, i) => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.5) activeIdx = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>
