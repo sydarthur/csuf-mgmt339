@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Lean to Theory of Constraints</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --text: #1a1612;
+    --text-muted: #6b6054;
+    --accent: #c0442a;
+    --accent-light: #fceae6;
+    --blue: #2a6496;
+    --blue-light: #e3eef6;
+    --green: #2d7a50;
+    --green-light: #e1f2e8;
+    --yellow: #d4a017;
+    --yellow-light: #fdf5d8;
+    --orange: #c76f20;
+    --orange-light: #fdf0e0;
+    --purple: #6b4c9a;
+    --purple-light: #ede6f6;
+    --card: #ffffff;
+    --border: #e0dbd3;
+    --dark: #1a1612;
+    --shadow: 0 2px 12px rgba(26,22,18,0.07);
+    --shadow-lg: 0 8px 32px rgba(26,22,18,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px;
+  }
+  .nav-brand { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--accent); }
+  .nav-badge { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--yellow-light); padding: 3px 10px; border-radius: 12px; }
+  .progress-bar { position: fixed; top: 52px; left: 0; height: 3px; background: var(--accent); z-index: 101; transition: width 0.4s ease; }
+
+  /* CONFIG BAR */
+  .config-bar {
+    position: fixed; top: 52px; left: 0; right: 0; z-index: 99;
+    background: rgba(250,248,244,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 32px;
+    display: flex; align-items: center; gap: 20px;
+    font-size: 13px;
+  }
+  .config-bar label {
+    display: flex; align-items: center; gap: 6px;
+    font-weight: 600; color: var(--text-muted); font-size: 12px;
+  }
+  .config-bar input {
+    width: 80px; padding: 3px 8px;
+    border: 1.5px solid var(--border); border-radius: 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 12px;
+    background: var(--card);
+  }
+  .config-bar input:focus { outline: none; border-color: var(--accent); }
+  .config-tag {
+    font-size: 10px; font-weight: 600; color: var(--text-muted);
+    letter-spacing: 1px; text-transform: uppercase; margin-right: 4px;
+  }
+
+  /* SECTIONS */
+  .section {
+    min-height: 100vh;
+    padding: 120px 32px 60px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .section-inner { max-width: 820px; width: 100%; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px; opacity: 0.7;
+  }
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.2; margin-bottom: 20px;
+  }
+  .section h2 em { color: var(--accent); font-style: italic; }
+  .section p { font-size: 17px; margin-bottom: 16px; max-width: 660px; }
+  .section p.muted { color: var(--text-muted); font-size: 15px; }
+
+  .hero-toc { background: var(--dark); color: var(--bg); }
+  .hero-toc h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 5.5vw, 56px);
+    line-height: 1.15; margin-bottom: 20px;
+  }
+  .hero-toc h1 em { color: var(--yellow); font-style: italic; }
+  .hero-toc p { color: #b5ae9f; }
+  .hero-toc .section-num { color: var(--yellow); }
+
+  .dark-section { background: var(--dark); color: var(--bg); }
+  .dark-section h2 { color: var(--bg); }
+  .dark-section h2 em { color: var(--yellow); }
+  .dark-section p { color: #b5ae9f; }
+  .dark-section .section-num { color: var(--yellow); opacity: 0.5; }
+
+  /* CALLOUTS */
+  .callout {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin: 20px 0; box-shadow: var(--shadow);
+  }
+  .callout.accent { border-color: var(--accent); background: var(--accent-light); }
+  .callout.blue { border-color: var(--blue); background: var(--blue-light); }
+  .callout.green { border-color: var(--green); background: var(--green-light); }
+  .callout.yellow { border-color: var(--yellow); background: var(--yellow-light); }
+  .callout.orange { border-color: var(--orange); background: var(--orange-light); }
+  .callout.purple { border-color: var(--purple); background: var(--purple-light); }
+  .callout-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .callout.accent .callout-label { color: var(--accent); }
+  .callout.blue .callout-label { color: var(--blue); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.yellow .callout-label { color: var(--yellow); }
+  .callout.orange .callout-label { color: var(--orange); }
+  .callout.purple .callout-label { color: var(--purple); }
+  .callout-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .callout-body { font-size: 15px; line-height: 1.6; }
+
+  .diagram-container {
+    margin: 28px 0; background: var(--card);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .diagram-header {
+    padding: 10px 18px; background: #f3f0ea;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+  }
+  .diagram-body { padding: 24px; }
+
+  .quote-block {
+    border-left: 4px solid var(--accent); padding: 12px 20px; margin: 20px 0;
+    background: var(--accent-light); border-radius: 0 6px 6px 0;
+    font-family: 'Instrument Serif', serif; font-size: 19px;
+    font-style: italic; line-height: 1.5;
+  }
+
+  .fade-in {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ====== WORKER FLOW VISUAL ====== */
+  .flow-visual {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 0; padding: 12px 0; flex-wrap: wrap;
+  }
+  .worker-card {
+    width: 160px; text-align: center; position: relative; flex-shrink: 0;
+  }
+  .worker-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin: 0 auto 6px;
+    border: 3px solid var(--border); background: var(--card);
+    transition: all 0.3s;
+  }
+  .worker-avatar.bottleneck {
+    border-color: var(--accent); background: var(--accent-light);
+    box-shadow: 0 0 0 4px rgba(192,68,42,0.15);
+  }
+  .worker-avatar.ok { border-color: var(--green); background: var(--green-light); }
+  .worker-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .worker-task { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .worker-cap {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 700; margin-bottom: 2px;
+  }
+  .worker-cap-label { font-size: 10px; color: var(--text-muted); }
+  .worker-badge {
+    display: inline-block; margin-top: 6px; padding: 2px 8px;
+    border-radius: 4px; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .worker-badge.bottleneck { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent); }
+  .worker-badge.new-bottleneck { background: var(--orange-light); color: var(--orange); border: 1px solid var(--orange); }
+  .worker-badge.improved { background: var(--green-light); color: var(--green); border: 1px solid var(--green); }
+
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; font-size: 18px; color: var(--text-muted);
+    padding-top: 20px; flex-shrink: 0;
+  }
+
+  .wip-pile {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    width: 60px; padding-top: 16px; flex-shrink: 0;
+  }
+  .wip-stack {
+    display: flex; flex-direction: column; gap: 2px; align-items: center;
+  }
+  .wip-unit {
+    width: 22px; height: 8px; background: var(--yellow);
+    border: 1px solid #b8900f; border-radius: 2px;
+  }
+  .wip-label {
+    font-size: 9px; font-weight: 700; color: var(--accent);
+    margin-top: 4px; text-align: center;
+  }
+
+  /* Capacity bar */
+  .cap-bar-container {
+    margin: 20px 0;
+  }
+  .cap-bar-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .cap-bar-name {
+    width: 100px; font-size: 13px; font-weight: 600; text-align: right; flex-shrink: 0;
+  }
+  .cap-bar-track {
+    flex: 1; height: 32px; background: #eee; border-radius: 4px;
+    position: relative; overflow: hidden;
+  }
+  .cap-bar-fill {
+    height: 100%; border-radius: 4px;
+    display: flex; align-items: center; padding-left: 12px;
+    font-size: 13px; font-weight: 700; color: white;
+    transition: width 0.8s ease;
+  }
+  .cap-bar-target {
+    position: absolute; top: 0; bottom: 0;
+    border-left: 2.5px dashed var(--accent); z-index: 2;
+  }
+  .cap-bar-target-label {
+    position: absolute; top: -18px;
+    font-size: 9px; font-weight: 700; color: var(--accent);
+    white-space: nowrap; transform: translateX(-50%);
+  }
+
+  /* TOC Steps */
+  .toc-steps {
+    display: flex; flex-direction: column; gap: 0;
+    border-radius: 10px; overflow: hidden;
+    border: 2px solid var(--border); margin: 20px 0;
+  }
+  .toc-step-row {
+    padding: 16px 20px;
+    display: flex; align-items: flex-start; gap: 16px;
+    border-bottom: 1.5px solid var(--border);
+    transition: background 0.2s;
+  }
+  .toc-step-row:last-child { border-bottom: none; }
+  .toc-step-row:hover { background: rgba(0,0,0,0.02); }
+  .toc-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    width: 24px; flex-shrink: 0; padding-top: 2px;
+  }
+  .toc-step-content { flex: 1; }
+  .toc-step-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .toc-step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* System output box */
+  .output-box {
+    text-align: center; padding: 16px;
+    border-radius: 8px; margin: 16px 0;
+  }
+  .output-box.red { background: var(--accent-light); border: 2px solid var(--accent); }
+  .output-box.green { background: var(--green-light); border: 2px solid var(--green); }
+  .output-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .output-box.red .output-label { color: var(--accent); }
+  .output-box.green .output-label { color: var(--green); }
+  .output-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px; font-weight: 700; margin-top: 2px;
+  }
+  .output-box.red .output-val { color: var(--accent); }
+  .output-box.green .output-val { color: var(--green); }
+  .output-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Shift animation */
+  .shift-diagram {
+    display: flex; justify-content: center; gap: 32px; margin: 20px 0; flex-wrap: wrap;
+  }
+  .shift-box {
+    text-align: center; padding: 20px 24px;
+    border-radius: 10px; min-width: 200px;
+  }
+  .shift-box.before { background: var(--accent-light); border: 2px solid var(--accent); }
+  .shift-box.after { background: var(--green-light); border: 2px solid var(--green); }
+  .shift-box-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .shift-box.before .shift-box-label { color: var(--accent); }
+  .shift-box.after .shift-box-label { color: var(--green); }
+  .shift-worker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; margin: 4px 0;
+  }
+  .shift-worker .bn { color: var(--accent); font-weight: 700; }
+  .shift-worker .nbn { color: var(--green); font-weight: 700; }
+  .shift-arrow { font-size: 28px; align-self: center; color: var(--text-muted); }
+
+  /* Dark section variants */
+  .dark-section .callout { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+  .dark-section .callout-label { color: var(--yellow); }
+  .dark-section .callout-body { color: #d4cfc5; }
+  .dark-section .quote-block {
+    background: rgba(192,68,42,0.12); border-color: rgba(192,68,42,0.4); color: #d4cfc5;
+  }
+
+  .footer-cta {
+    text-align: center; padding: 48px 32px;
+    background: var(--yellow-light); border-top: 2px solid var(--yellow);
+  }
+  .footer-cta h3 { font-family: 'Instrument Serif', serif; font-size: 24px; margin-bottom: 8px; }
+  .footer-cta p { font-size: 15px; color: var(--text-muted); max-width: 520px; margin: 0 auto; }
+
+  @media (max-width: 640px) {
+    .section { padding: 110px 20px 40px; }
+    .config-bar { flex-wrap: wrap; gap: 8px; padding: 6px 16px; }
+    .config-bar input { width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-brand">From Lean to TOC</div>
+  <div class="nav-badge">MGMT 339</div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- CONFIG BAR -->
+<div class="config-bar">
+  <span class="config-tag">Names</span>
+  <label>Station 1: <input type="text" id="cfgName1" value="Ashley" oninput="updateNames()"></label>
+  <label>Station 2: <input type="text" id="cfgName2" value="Nomi" oninput="updateNames()"></label>
+  <label>Station 3: <input type="text" id="cfgName3" value="Jay" oninput="updateNames()"></label>
+</div>
+
+<!-- ====== HERO ====== -->
+<div class="section hero-toc" data-step="0">
+  <div class="section-inner">
+    <div class="section-num">Lean → Theory of Constraints</div>
+    <h1>Every system has<br><em>one weakest link.</em></h1>
+    <p>We've learned how Lean thinking synchronizes a system to eliminate waste. But what happens when you ask: <em>what actually limits this system's output?</em></p>
+    <p>Let's walk through a simple burger shop to see how Lean thinking naturally leads to the Theory of Constraints.</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 1: THE SCENARIO ====== -->
+<div class="section" data-step="1">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Scenario</div>
+    <h2 class="fade-in">Three workers,<br><em>one burger line</em></h2>
+    <p class="fade-in">Imagine a small burger shop. Three workers, each with a specific job, assembling burgers in sequence. The shop's goal: produce <strong>4 burgers every 10 minutes</strong>.</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">🍔 THE BURGER LINE</div>
+      <div class="diagram-body">
+        <div class="flow-visual" id="scenarioFlow">
+          <div class="worker-card">
+            <div class="worker-avatar">🍞</div>
+            <div class="worker-name n1">Ashley</div>
+            <div class="worker-task">Preps buns, sauce, veggies</div>
+            <div class="worker-cap" style="color:var(--blue);">5</div>
+            <div class="worker-cap-label">burgers / 10 min</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="worker-card">
+            <div class="worker-avatar">🔥</div>
+            <div class="worker-name n2">Nomi</div>
+            <div class="worker-task">Grills patties, adds to buns</div>
+            <div class="worker-cap" style="color:var(--accent);">3</div>
+            <div class="worker-cap-label">burgers / 10 min</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="worker-card">
+            <div class="worker-avatar">📦</div>
+            <div class="worker-name n3">Jay</div>
+            <div class="worker-task">Wraps & packages</div>
+            <div class="worker-cap" style="color:var(--green);">4</div>
+            <div class="worker-cap-label">burgers / 10 min</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="worker-card">
+            <div class="worker-avatar" style="border-color:var(--yellow); background:var(--yellow-light);">😋</div>
+            <div class="worker-name">Customer</div>
+            <div class="worker-task">Wants 4 burgers / 10 min</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="muted fade-in">Each burger passes through all three steps in order. Let's see what happens when everyone works at full speed.</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 2: PUSH SYSTEM PROBLEM ====== -->
+<div class="section" data-step="2" style="background:#f0ece4;">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Push Problem</div>
+    <h2 class="fade-in">Everyone works hard.<br><em>The system fails.</em></h2>
+    <p class="fade-in">In a typical operation, each worker tries to maximize their own output. <span class="n1">Ashley</span> can prep 5 buns, so she does all 5 and pushes them to <span class="n2">Nomi</span>.</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">⚠️ PUSH SYSTEM — AFTER 10 MINUTES</div>
+      <div class="diagram-body">
+        <div class="flow-visual">
+          <div class="worker-card">
+            <div class="worker-avatar ok">🍞</div>
+            <div class="worker-name n1">Ashley</div>
+            <div class="worker-cap" style="color:var(--blue);">5 produced</div>
+          </div>
+          <div class="flow-arrow">→→</div>
+          <div class="wip-pile">
+            <div class="wip-stack">
+              <div class="wip-unit"></div>
+              <div class="wip-unit"></div>
+            </div>
+            <div class="wip-label">2 stuck<br>waiting!</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="worker-card">
+            <div class="worker-avatar bottleneck">🔥</div>
+            <div class="worker-name n2">Nomi</div>
+            <div class="worker-cap" style="color:var(--accent);">3 processed</div>
+            <div class="worker-badge bottleneck">Overloaded</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="worker-card">
+            <div class="worker-avatar">📦</div>
+            <div class="worker-name n3">Jay</div>
+            <div class="worker-cap" style="color:var(--text-muted);">3 wrapped</div>
+            <div class="worker-badge" style="background:#eee; color:var(--text-muted); border:1px solid #ccc;">Waiting for work</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="fade-in"><span class="n1">Ashley</span> made 5, but <span class="n2">Nomi</span> can only grill 3. Two buns pile up. <span class="n3">Jay</span> only gets 3 burgers to wrap even though he can handle 4. And every 10 minutes, the pile grows.</p>
+
+    <div class="quote-block fade-in">
+      "Optimizing each worker individually does not optimize the entire system."
+    </div>
+
+    <p class="muted fade-in">WIP piles up. Space gets cluttered. Lead time increases. Customers wait longer. Everyone is working hard, but the system performs poorly.</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 3: LEAN THINKING ====== -->
+<div class="section" data-step="3">
+  <div class="section-inner">
+    <div class="section-num fade-in">Lean Thinking</div>
+    <h2 class="fade-in">Match the pace of<br><em>the slowest step</em></h2>
+    <p class="fade-in">Lean asks a different question: <strong>What pace should the entire system operate at?</strong></p>
+    <p class="fade-in">We look at the capacities and find the slowest step:</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">📊 CAPACITY COMPARISON</div>
+      <div class="diagram-body">
+        <div class="cap-bar-container" id="capBars1">
+          <div class="cap-bar-row">
+            <div class="cap-bar-name n1">Ashley</div>
+            <div class="cap-bar-track">
+              <div class="cap-bar-fill" style="width:100%; background:var(--blue);">5 burgers</div>
+              <div class="cap-bar-target" style="left:80%;">
+                <div class="cap-bar-target-label">Goal: 4</div>
+              </div>
+            </div>
+          </div>
+          <div class="cap-bar-row">
+            <div class="cap-bar-name n2">Nomi</div>
+            <div class="cap-bar-track">
+              <div class="cap-bar-fill" style="width:60%; background:var(--accent);">3 burgers</div>
+              <div class="cap-bar-target" style="left:80%;"></div>
+            </div>
+          </div>
+          <div class="cap-bar-row">
+            <div class="cap-bar-name n3">Jay</div>
+            <div class="cap-bar-track">
+              <div class="cap-bar-fill" style="width:80%; background:var(--green);">4 burgers</div>
+              <div class="cap-bar-target" style="left:80%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:8px;">
+          <span style="font-size:12px; font-weight:700; color:var(--accent);">← <span class="n2">Nomi</span> is the constraint. The system can only move at 3 burgers / 10 min.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout green fade-in">
+      <div class="callout-label">Lean Solution</div>
+      <div class="callout-body">Instead of pushing, we synchronize. <span class="n1">Ashley</span> prepares only 3 buns. <span class="n2">Nomi</span> grills 3. <span class="n3">Jay</span> wraps 3. No WIP piles up. Smooth flow. This is a <strong>pull system</strong> — production matches the pace of the constraint.</div>
+    </div>
+
+    <div class="output-box red fade-in">
+      <div class="output-label">System Output</div>
+      <div class="output-val">3 burgers / 10 min</div>
+      <div class="output-note">Smooth flow, but below the goal of 4. Can we do better?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 4: ENTER TOC ====== -->
+<div class="section" data-step="4" style="background:#f0ece4;">
+  <div class="section-inner">
+    <div class="section-num fade-in">Theory of Constraints</div>
+    <h2 class="fade-in">What <em>limits</em><br>the system's output?</h2>
+    <p class="fade-in">Lean helped us synchronize and eliminate WIP. But the output is still only 3 burgers. The entire shop can't produce more than 3 every 10 minutes because of one station.</p>
+    <p class="fade-in">TOC says: <strong>every system has one primary constraint</strong>. Improvement should focus <em>only</em> on that constraint.</p>
+
+    <div class="diagram-container fade-in">
+      <div class="diagram-header">🎯 TOC — THE FIVE FOCUSING STEPS</div>
+      <div class="diagram-body" style="padding:0;">
+        <div class="toc-steps">
+          <div class="toc-step-row">
+            <div class="toc-step-num">1</div>
+            <div class="toc-step-content">
+              <div class="toc-step-title">Identify the Constraint</div>
+              <div class="toc-step-desc"><span class="n2">Nomi's</span> grill station — capacity of 3 vs. goal of 4.</div>
+            </div>
+          </div>
+          <div class="toc-step-row">
+            <div class="toc-step-num">2</div>
+            <div class="toc-step-content">
+              <div class="toc-step-title">Exploit the Constraint</div>
+              <div class="toc-step-desc">Make sure the grill is <strong>never idle</strong>. <span class="n1">Ashley</span> keeps buns ready. <span class="n3">Jay</span> clears finished burgers immediately. Zero interruptions at the grill.</div>
+            </div>
+          </div>
+          <div class="toc-step-row">
+            <div class="toc-step-num">3</div>
+            <div class="toc-step-content">
+              <div class="toc-step-title">Subordinate Everything Else</div>
+              <div class="toc-step-desc"><span class="n1">Ashley</span> matches the grill pace. No point prepping 5 buns when only 3 can be grilled. Other stations serve the constraint.</div>
+            </div>
+          </div>
+          <div class="toc-step-row">
+            <div class="toc-step-num">4</div>
+            <div class="toc-step-content">
+              <div class="toc-step-title">Elevate the Constraint</div>
+              <div class="toc-step-desc">Increase grill capacity: better equipment, two patties at once, preheating, or adding another grill.</div>
+            </div>
+          </div>
+          <div class="toc-step-row">
+            <div class="toc-step-num">5</div>
+            <div class="toc-step-content">
+              <div class="toc-step-title">Repeat — Don't Let Inertia Set In</div>
+              <div class="toc-step-desc">Once the constraint is broken, <strong>go back to Step 1</strong>. A new constraint will emerge.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 5: THE SHIFT ====== -->
+<div class="section dark-section" data-step="5">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Constraint Shifts</div>
+    <h2 class="fade-in">Fix one bottleneck,<br><em>another appears</em></h2>
+    <p class="fade-in">Suppose we upgrade the grill. <span class="n2">Nomi</span> can now cook <strong>5 burgers</strong> per 10 minutes.</p>
+    <p class="fade-in" style="color:#8a8275;">What happens to the system?</p>
+
+    <div class="shift-diagram fade-in">
+      <div class="shift-box before">
+        <div class="shift-box-label">Before</div>
+        <div class="shift-worker"><span class="n1">Ashley</span>: 5</div>
+        <div class="shift-worker"><span class="n2">Nomi</span>: <span class="bn">3 ← bottleneck</span></div>
+        <div class="shift-worker"><span class="n3">Jay</span>: 4</div>
+        <div style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--accent);">Output = 3</div>
+      </div>
+      <div class="shift-arrow">→</div>
+      <div class="shift-box after">
+        <div class="shift-box-label">After Improvement</div>
+        <div class="shift-worker"><span class="n1">Ashley</span>: 5</div>
+        <div class="shift-worker"><span class="n2">Nomi</span>: <span class="nbn">5 ✓ fixed</span></div>
+        <div class="shift-worker"><span class="n3">Jay</span>: <span class="bn">4 ← new bottleneck</span></div>
+        <div style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--green);">Output = 4 ✓</div>
+      </div>
+    </div>
+
+    <div class="callout fade-in">
+      <div class="callout-label" style="color:var(--yellow);">The TOC Cycle</div>
+      <div class="callout-body" style="color:#d4cfc5;">The constraint has shifted from <span class="n2">Nomi</span> to <span class="n3">Jay</span>. We met our goal of 4 burgers. But if demand increases to 6? We go back to Step 1 and improve <span class="n3">Jay's</span> station next. <strong>Continuous improvement is a cycle, not a one-time fix.</strong></div>
+    </div>
+
+    <div style="text-align:center; margin-top:24px; padding:20px; background:rgba(255,255,255,0.04); border-radius:10px; border:1.5px solid rgba(255,255,255,0.1);" class="fade-in">
+      <div style="font-size:13px; color:#8a8275; margin-bottom:8px;">Find constraint → Improve → Find next constraint</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--yellow); letter-spacing:2px;">
+        IDENTIFY → EXPLOIT → SUBORDINATE → ELEVATE → REPEAT
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 6: THE DIFFERENCE ====== -->
+<div class="section" data-step="6">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Key Distinction</div>
+    <h2 class="fade-in">Lean vs. TOC:<br><em>Two lenses, one goal</em></h2>
+    <p class="fade-in">Students should walk away understanding the difference:</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0;" class="fade-in">
+      <div class="callout blue" style="margin:0;">
+        <div class="callout-label">Lean</div>
+        <div class="callout-title">Flow & Waste</div>
+        <div class="callout-body">
+          Smooth production flow. Minimize inventory. Pull-based system. Synchronize to the pace of demand.
+        </div>
+      </div>
+      <div class="callout accent" style="margin:0;">
+        <div class="callout-label">Theory of Constraints</div>
+        <div class="callout-title">Throughput & Bottleneck</div>
+        <div class="callout-body">
+          Identify the constraint. Improve the constraint. Increase system capacity. Repeat the cycle.
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-block fade-in" style="border-color:var(--blue); background:var(--blue-light);">
+      "Lean tells you <em>how</em> to run smooth. TOC tells you <em>where</em> to focus."
+    </div>
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<div class="footer-cta">
+  <h3>Think about it</h3>
+  <p>If demand increases to 6 burgers every 10 minutes, what should we improve next? And what happens after that?</p>
+</div>
+
+<script>
+  // === Name config ===
+  function updateNames() {
+    const n1 = document.getElementById('cfgName1').value || 'Worker 1';
+    const n2 = document.getElementById('cfgName2').value || 'Worker 2';
+    const n3 = document.getElementById('cfgName3').value || 'Worker 3';
+    document.querySelectorAll('.n1').forEach(el => el.textContent = n1);
+    document.querySelectorAll('.n2').forEach(el => el.textContent = n2);
+    document.querySelectorAll('.n3').forEach(el => el.textContent = n3);
+  }
+
+  // === Scroll animations ===
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const progressBar = document.getElementById('progressBar');
+  function onScroll() {
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) el.classList.add('visible');
+    });
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  updateNames();
+</script>
+
+</body>
+</html>
