@@ -354,8 +354,8 @@
 <div class="config-bar">
   <span class="config-tag">Names</span>
   <label>Station 1: <input type="text" id="cfgName1" value="Ashley" oninput="updateNames()"></label>
-  <label>Station 2: <input type="text" id="cfgName2" value="Nomi" oninput="updateNames()"></label>
-  <label>Station 3: <input type="text" id="cfgName3" value="Jay" oninput="updateNames()"></label>
+  <label>Station 2: <input type="text" id="cfgName2" value="Bailey" oninput="updateNames()"></label>
+  <label>Station 3: <input type="text" id="cfgName3" value="Cesar" oninput="updateNames()"></label>
 </div>
 
 <!-- ====== HERO ====== -->
@@ -389,7 +389,7 @@
           <div class="flow-arrow">→</div>
           <div class="worker-card">
             <div class="worker-avatar">🔥</div>
-            <div class="worker-name n2">Nomi</div>
+            <div class="worker-name n2">Bailey</div>
             <div class="worker-task">Grills patties, adds to buns</div>
             <div class="worker-cap" style="color:var(--accent);">3</div>
             <div class="worker-cap-label">burgers / 10 min</div>
@@ -397,7 +397,7 @@
           <div class="flow-arrow">→</div>
           <div class="worker-card">
             <div class="worker-avatar">📦</div>
-            <div class="worker-name n3">Jay</div>
+            <div class="worker-name n3">Cesar</div>
             <div class="worker-task">Wraps & packages</div>
             <div class="worker-cap" style="color:var(--green);">4</div>
             <div class="worker-cap-label">burgers / 10 min</div>
@@ -421,7 +421,7 @@
   <div class="section-inner">
     <div class="section-num fade-in">The Push Problem</div>
     <h2 class="fade-in">Everyone works hard.<br><em>The system fails.</em></h2>
-    <p class="fade-in">In a typical operation, each worker tries to maximize their own output. <span class="n1">Ashley</span> can prep 5 buns, so she does all 5 and pushes them to <span class="n2">Nomi</span>.</p>
+    <p class="fade-in">In a typical operation, each worker tries to maximize their own output. <span class="n1">Ashley</span> can prep 5 buns, so she does all 5 and pushes them to <span class="n2">Bailey</span>.</p>
 
     <div class="diagram-container fade-in">
       <div class="diagram-header">⚠️ PUSH SYSTEM — AFTER 10 MINUTES</div>
@@ -443,14 +443,14 @@
           <div class="flow-arrow">→</div>
           <div class="worker-card">
             <div class="worker-avatar bottleneck">🔥</div>
-            <div class="worker-name n2">Nomi</div>
+            <div class="worker-name n2">Bailey</div>
             <div class="worker-cap" style="color:var(--accent);">3 processed</div>
             <div class="worker-badge bottleneck">Overloaded</div>
           </div>
           <div class="flow-arrow">→</div>
           <div class="worker-card">
             <div class="worker-avatar">📦</div>
-            <div class="worker-name n3">Jay</div>
+            <div class="worker-name n3">Cesar</div>
             <div class="worker-cap" style="color:var(--text-muted);">3 wrapped</div>
             <div class="worker-badge" style="background:#eee; color:var(--text-muted); border:1px solid #ccc;">Waiting for work</div>
           </div>
@@ -458,7 +458,7 @@
       </div>
     </div>
 
-    <p class="fade-in"><span class="n1">Ashley</span> made 5, but <span class="n2">Nomi</span> can only grill 3. Two buns pile up. <span class="n3">Jay</span> only gets 3 burgers to wrap even though he can handle 4. And every 10 minutes, the pile grows.</p>
+    <p class="fade-in"><span class="n1">Ashley</span> made 5, but <span class="n2">Bailey</span> can only grill 3. Two buns pile up. <span class="n3">Cesar</span> only gets 3 burgers to wrap even though he can handle 4. And every 10 minutes, the pile grows.</p>
 
     <div class="quote-block fade-in">
       "Optimizing each worker individually does not optimize the entire system."
@@ -490,14 +490,14 @@
             </div>
           </div>
           <div class="cap-bar-row">
-            <div class="cap-bar-name n2">Nomi</div>
+            <div class="cap-bar-name n2">Bailey</div>
             <div class="cap-bar-track">
               <div class="cap-bar-fill" style="width:60%; background:var(--accent);">3 burgers</div>
               <div class="cap-bar-target" style="left:80%;"></div>
             </div>
           </div>
           <div class="cap-bar-row">
-            <div class="cap-bar-name n3">Jay</div>
+            <div class="cap-bar-name n3">Cesar</div>
             <div class="cap-bar-track">
               <div class="cap-bar-fill" style="width:80%; background:var(--green);">4 burgers</div>
               <div class="cap-bar-target" style="left:80%;"></div>
@@ -505,14 +505,14 @@
           </div>
         </div>
         <div style="text-align:center; margin-top:8px;">
-          <span style="font-size:12px; font-weight:700; color:var(--accent);">← <span class="n2">Nomi</span> is the constraint. The system can only move at 3 burgers / 10 min.</span>
+          <span style="font-size:12px; font-weight:700; color:var(--accent);">← <span class="n2">Bailey</span> is the constraint. The system can only move at 3 burgers / 10 min.</span>
         </div>
       </div>
     </div>
 
     <div class="callout green fade-in">
       <div class="callout-label">Lean Solution</div>
-      <div class="callout-body">Instead of pushing, we synchronize. <span class="n1">Ashley</span> prepares only 3 buns. <span class="n2">Nomi</span> grills 3. <span class="n3">Jay</span> wraps 3. No WIP piles up. Smooth flow. This is a <strong>pull system</strong> — production matches the pace of the constraint.</div>
+      <div class="callout-body">Instead of pushing, we synchronize. <span class="n1">Ashley</span> prepares only 3 buns. <span class="n2">Bailey</span> grills 3. <span class="n3">Cesar</span> wraps 3. No WIP piles up. Smooth flow. This is a <strong>pull system</strong> — production matches the pace of the constraint.</div>
     </div>
 
     <div class="output-box red fade-in">
@@ -539,14 +539,14 @@
             <div class="toc-step-num">1</div>
             <div class="toc-step-content">
               <div class="toc-step-title">Identify the Constraint</div>
-              <div class="toc-step-desc"><span class="n2">Nomi's</span> grill station — capacity of 3 vs. goal of 4.</div>
+              <div class="toc-step-desc"><span class="n2">Bailey's</span> grill station — capacity of 3 vs. goal of 4.</div>
             </div>
           </div>
           <div class="toc-step-row">
             <div class="toc-step-num">2</div>
             <div class="toc-step-content">
               <div class="toc-step-title">Exploit the Constraint</div>
-              <div class="toc-step-desc">Make sure the grill is <strong>never idle</strong>. <span class="n1">Ashley</span> keeps buns ready. <span class="n3">Jay</span> clears finished burgers immediately. Zero interruptions at the grill.</div>
+              <div class="toc-step-desc">Make sure the grill is <strong>never idle</strong>. <span class="n1">Ashley</span> keeps buns ready. <span class="n3">Cesar</span> clears finished burgers immediately. Zero interruptions at the grill.</div>
             </div>
           </div>
           <div class="toc-step-row">
@@ -581,30 +581,30 @@
   <div class="section-inner">
     <div class="section-num fade-in">The Constraint Shifts</div>
     <h2 class="fade-in">Fix one bottleneck,<br><em>another appears</em></h2>
-    <p class="fade-in">Suppose we upgrade the grill. <span class="n2">Nomi</span> can now cook <strong>5 burgers</strong> per 10 minutes.</p>
+    <p class="fade-in">Suppose we upgrade the grill. <span class="n2">Bailey</span> can now cook <strong>5 burgers</strong> per 10 minutes.</p>
     <p class="fade-in" style="color:#8a8275;">What happens to the system?</p>
 
     <div class="shift-diagram fade-in">
       <div class="shift-box before">
         <div class="shift-box-label">Before</div>
         <div class="shift-worker"><span class="n1">Ashley</span>: 5</div>
-        <div class="shift-worker"><span class="n2">Nomi</span>: <span class="bn">3 ← bottleneck</span></div>
-        <div class="shift-worker"><span class="n3">Jay</span>: 4</div>
+        <div class="shift-worker"><span class="n2">Bailey</span>: <span class="bn">3 ← bottleneck</span></div>
+        <div class="shift-worker"><span class="n3">Cesar</span>: 4</div>
         <div style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--accent);">Output = 3</div>
       </div>
       <div class="shift-arrow">→</div>
       <div class="shift-box after">
         <div class="shift-box-label">After Improvement</div>
         <div class="shift-worker"><span class="n1">Ashley</span>: 5</div>
-        <div class="shift-worker"><span class="n2">Nomi</span>: <span class="nbn">5 ✓ fixed</span></div>
-        <div class="shift-worker"><span class="n3">Jay</span>: <span class="bn">4 ← new bottleneck</span></div>
+        <div class="shift-worker"><span class="n2">Bailey</span>: <span class="nbn">5 ✓ fixed</span></div>
+        <div class="shift-worker"><span class="n3">Cesar</span>: <span class="bn">4 ← new bottleneck</span></div>
         <div style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--green);">Output = 4 ✓</div>
       </div>
     </div>
 
     <div class="callout fade-in">
       <div class="callout-label" style="color:var(--yellow);">The TOC Cycle</div>
-      <div class="callout-body" style="color:#d4cfc5;">The constraint has shifted from <span class="n2">Nomi</span> to <span class="n3">Jay</span>. We met our goal of 4 burgers. But if demand increases to 6? We go back to Step 1 and improve <span class="n3">Jay's</span> station next. <strong>Continuous improvement is a cycle, not a one-time fix.</strong></div>
+      <div class="callout-body" style="color:#d4cfc5;">The constraint has shifted from <span class="n2">Bailey</span> to <span class="n3">Cesar</span>. We met our goal of 4 burgers. But if demand increases to 6? We go back to Step 1 and improve <span class="n3">Cesar's</span> station next. <strong>Continuous improvement is a cycle, not a one-time fix.</strong></div>
     </div>
 
     <div style="text-align:center; margin-top:24px; padding:20px; background:rgba(255,255,255,0.04); border-radius:10px; border:1.5px solid rgba(255,255,255,0.1);" class="fade-in">
