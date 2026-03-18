@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assembly Line Balancing — A Step-by-Step Walkthrough</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --text: #1a1612;
+    --text-muted: #6b6054;
+    --accent: #c0442a;
+    --accent-light: #fceae6;
+    --blue: #2a6496;
+    --blue-light: #e3eef6;
+    --green: #2d7a50;
+    --green-light: #e1f2e8;
+    --yellow: #d4a017;
+    --yellow-light: #fdf5d8;
+    --orange: #c76f20;
+    --orange-light: #fdf0e0;
+    --purple: #6b4c9a;
+    --purple-light: #ede6f6;
+    --card: #ffffff;
+    --border: #e0dbd3;
+    --shadow: 0 2px 12px rgba(26,22,18,0.07);
+    --shadow-lg: 0 8px 32px rgba(26,22,18,0.12);
+    --dark: #1a1612;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px;
+  }
+  .nav-brand { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 20px; }
+  .nav-link { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; }
+  .nav-link:hover { color: var(--text); }
+  .nav-badge { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--yellow-light); padding: 3px 10px; border-radius: 12px; }
+  .progress-bar { position: fixed; top: 52px; left: 0; height: 3px; background: var(--accent); z-index: 101; transition: width 0.4s ease; }
+
+  .section {
+    min-height: 100vh;
+    padding: 100px 32px 60px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .section-inner { max-width: 860px; width: 100%; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px; opacity: 0.7;
+  }
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.2; margin-bottom: 20px;
+  }
+  .section h2 em { color: var(--accent); font-style: italic; }
+  .section p { font-size: 16px; color: var(--text-muted); margin-bottom: 16px; max-width: 680px; }
+  .section p strong { color: var(--text); }
+
+  .callout {
+    background: #1e1a16;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    border-left: 4px solid var(--accent);
+  }
+  .callout.blue { border-left-color: var(--blue); }
+  .callout.green { border-left-color: var(--green); }
+  .callout.yellow { border-left-color: var(--yellow); }
+  .callout.purple { border-left-color: var(--purple); }
+  .callout-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .callout.blue .callout-label { color: var(--blue); }
+  .callout.green .callout-label { color: var(--green); }
+  .callout.yellow .callout-label { color: var(--yellow); }
+  .callout.purple .callout-label { color: var(--purple); }
+  .callout-title { font-size: 18px; font-weight: 700; color: #f0ece4; margin-bottom: 6px; }
+  .callout-body { font-size: 14px; color: #9a8f82; line-height: 1.6; }
+  .callout-body strong { color: #f0ece4; }
+
+  .quote-block {
+    background: var(--yellow-light);
+    border-left: 4px solid var(--yellow);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 15px;
+    color: var(--text);
+    margin: 20px 0;
+    font-style: italic;
+  }
+
+  /* work element table */
+  .task-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+  }
+  .task-table th {
+    background: var(--dark);
+    color: #f0ece4;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .task-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .task-table tr:last-child td { border-bottom: none; }
+  .task-table tr:hover td { background: #f5f2ed; }
+  .task-table .total-row td { font-weight: 700; background: var(--yellow-light); }
+  .task-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--dark); color: #f0ece4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* formula box */
+  .formula-box {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+  }
+  .formula-box .formula-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .formula-box .formula-main {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 600;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .formula-box .formula-result {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: var(--accent); font-weight: 600;
+  }
+
+  /* precedence diagram */
+  .prec-diagram {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 30px 20px;
+    box-shadow: var(--shadow-lg);
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .prec-svg { display: block; margin: 0 auto; }
+
+  /* station cards */
+  .station-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .station-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .station-card:hover { transform: translateY(-2px); }
+  .station-card.s1 { border-top-color: #c0442a; }
+  .station-card.s2 { border-top-color: #2d7a50; }
+  .station-card.s3 { border-top-color: #2a6496; }
+  .station-card.s4 { border-top-color: #6b4c9a; }
+  .station-card.s5 { border-top-color: #d4a017; }
+  .station-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .station-tasks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .station-task {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px;
+    background: var(--dark); color: #f0ece4;
+  }
+  .station-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px; font-weight: 700; color: var(--text);
+  }
+  .station-idle {
+    font-size: 12px; color: var(--text-muted); margin-top: 2px;
+  }
+
+  /* idle time bar */
+  .bar-row {
+    margin: 10px 0;
+  }
+  .bar-label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 600; color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .bar-track {
+    height: 28px; background: var(--border); border-radius: 6px; overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 6px 0 0 6px;
+    display: flex; align-items: center; padding-left: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: white;
+    transition: width 1s ease;
+  }
+  .bar-idle-label {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-size: 11px; color: var(--text-muted); font-weight: 600;
+  }
+
+  /* lcr steps */
+  .lcr-step {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    padding: 18px 20px;
+    margin: 12px 0;
+    box-shadow: var(--shadow);
+  }
+  .lcr-step-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  }
+  .lcr-station-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px; color: white;
+  }
+  .lcr-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .lcr-table th {
+    text-align: left; padding: 6px 10px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted);
+    border-bottom: 1.5px solid var(--border);
+  }
+  .lcr-table td { padding: 7px 10px; border-bottom: 1px solid #f0ece4; }
+  .lcr-table tr.assigned td { background: #f0fdf4; }
+  .lcr-table tr.skipped td { color: #bbb; }
+  .check { color: #2d7a50; font-weight: 700; }
+  .cross { color: #c0442a; font-weight: 700; }
+
+  /* efficiency gauge */
+  .eff-display {
+    text-align: center; padding: 32px;
+    background: var(--dark); border-radius: 16px;
+    margin: 20px 0;
+  }
+  .eff-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 72px; color: var(--yellow);
+    line-height: 1;
+  }
+  .eff-label { font-size: 14px; color: #8a8275; margin-top: 6px; }
+
+  /* fade-in animation */
+  .fade-in { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 32px 60px;
+    background: linear-gradient(160deg, #faf8f4 0%, #f0ece4 100%);
+  }
+  .hero-inner { max-width: 700px; text-align: center; }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.1; margin-bottom: 20px;
+  }
+  .hero h1 em { color: var(--accent); font-style: italic; }
+  .hero p { font-size: 17px; color: var(--text-muted); margin-bottom: 32px; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--accent); color: white;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 6px 18px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .scroll-hint { font-size: 13px; color: var(--text-muted); margin-top: 40px; opacity: 0.6; }
+
+  .footer-cta {
+    background: var(--dark); color: white;
+    padding: 60px 32px; text-align: center;
+  }
+  .footer-cta h3 {
+    font-family: 'Instrument Serif', serif; font-size: 28px; margin-bottom: 10px;
+  }
+  .footer-cta p { font-size: 15px; color: #8a8275; max-width: 540px; margin: 0 auto; }
+
+  @media (max-width: 600px) {
+    .section { padding: 80px 16px 40px; }
+    .station-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-brand">Line Balancing</span>
+  <div class="nav-links">
+    <a href="/csuf-mgmt339/vsm/" class="nav-link">← VSM Tools</a>
+    <span class="nav-badge">Operations Management</span>
+  </div>
+</nav>
+<div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+<!-- ====== HERO ====== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Step-by-Step Walkthrough</div>
+    <h1>Assembly Line<br><em>Balancing</em></h1>
+    <p>How do you divide work across stations so every worker stays busy and the line flows at the right pace? This walkthrough solves a real 9-task assembly problem from scratch.</p>
+    <div class="scroll-hint">↓ Scroll to work through it</div>
+  </div>
+</div>
+
+<!-- ====== SECTION 1: THE PROBLEM ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">The Problem</div>
+    <h2 class="fade-in">A mixer assembly line<br><em>9 tasks, one goal</em></h2>
+    <p class="fade-in">A factory assembles stand mixers. There are <strong>9 work elements</strong> — each with a set time and constraints about which tasks must come first. We need to assign them to workstations to meet a target output rate.</p>
+
+    <table class="task-table fade-in">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Description</th>
+          <th>Time (sec)</th>
+          <th>Predecessor(s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="task-badge">A</span></td><td>Bolt leg frame to hopper</td><td>40</td><td>—</td></tr>
+        <tr><td><span class="task-badge">B</span></td><td>Insert impeller shaft</td><td>30</td><td>A</td></tr>
+        <tr><td><span class="task-badge">C</span></td><td>Attach axle</td><td>50</td><td>A</td></tr>
+        <tr><td><span class="task-badge">D</span></td><td>Attach agitator</td><td>40</td><td>B</td></tr>
+        <tr><td><span class="task-badge">E</span></td><td>Attach drive wheel</td><td>6</td><td>B</td></tr>
+        <tr><td><span class="task-badge">F</span></td><td>Attach free wheel</td><td>25</td><td>C</td></tr>
+        <tr><td><span class="task-badge">G</span></td><td>Mount lower post</td><td>15</td><td>C</td></tr>
+        <tr><td><span class="task-badge">H</span></td><td>Attach controls</td><td>20</td><td>D, E</td></tr>
+        <tr><td><span class="task-badge">I</span></td><td>Mount nameplate</td><td>18</td><td>F, G</td></tr>
+        <tr class="total-row"><td colspan="2"><strong>Total</strong></td><td><strong>244</strong></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout blue fade-in">
+      <div class="callout-label">Target Output</div>
+      <div class="callout-title">2,440 units/week → 60 units/hour</div>
+      <div class="callout-body">The factory runs 40.67 hours per week. Desired output = 2,440 ÷ 40.67 ≈ 60 units per hour. This is our production rate <strong>r</strong>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 2: CYCLE TIME ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 1</div>
+    <h2 class="fade-in">Calculate the<br><em>Cycle Time</em></h2>
+    <p class="fade-in">The cycle time is the maximum time allowed at any workstation. It's the reciprocal of the output rate — how many seconds we have between finished units rolling off the line.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-label">Cycle Time Formula</div>
+      <div class="formula-main">c = 1 / r</div>
+      <div class="formula-result">= 1 / (60 units/hr) = 1/60 hr/unit = <strong style="font-size:22px;">60 seconds/unit</strong></div>
+    </div>
+
+    <div class="quote-block fade-in">
+      Every 60 seconds, one finished mixer must leave the line. No single station can take longer than 60 seconds — or the whole line falls behind.
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px;" class="fade-in">
+      <div class="formula-box" style="border-color:var(--green); margin:0;">
+        <div class="formula-label" style="color:var(--green);">Total Work Content</div>
+        <div class="formula-main">244 sec</div>
+        <div class="formula-result" style="color:var(--text-muted);">Sum of all 9 task times</div>
+      </div>
+      <div class="formula-box" style="border-color:var(--accent); margin:0;">
+        <div class="formula-label" style="color:var(--accent);">Cycle Time Limit</div>
+        <div class="formula-main">60 sec</div>
+        <div class="formula-result" style="color:var(--text-muted);">Max per station</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 3: PRECEDENCE DIAGRAM ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 2</div>
+    <h2 class="fade-in">Draw the<br><em>Precedence Diagram</em></h2>
+    <p class="fade-in">Before assigning tasks to stations, we map out the dependencies. Tasks can only start after their predecessors are complete — this diagram shows the required order.</p>
+
+    <div class="prec-diagram fade-in">
+      <svg class="prec-svg" width="720" height="300" viewBox="0 0 720 300">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6b6054"/>
+          </marker>
+          <marker id="arrow-hl" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#c0442a"/>
+          </marker>
+        </defs>
+
+        <!-- Nodes: col positions ~90, 230, 370, 510, 650 -->
+        <!-- A at (90,150) -->
+        <!-- B at (230,80), C at (230,220) -->
+        <!-- D at (370,40), E at (370,120), F at (370,200), G at (370,270) -->
+        <!-- H at (510,80), I at (510,240) -->
+
+        <!-- Arrows -->
+        <!-- A→B --> <line x1="118" y1="143" x2="200" y2="98" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- A→C --> <line x1="118" y1="158" x2="200" y2="213" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- B→D --> <line x1="258" y1="73" x2="340" y2="52" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- B→E --> <line x1="258" y1="85" x2="340" y2="118" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- C→F --> <line x1="258" y1="213" x2="340" y2="202" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- C→G --> <line x1="258" y1="222" x2="340" y2="264" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- D→H --> <line x1="398" y1="43" x2="480" y2="72" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- E→H --> <line x1="398" y1="122" x2="480" y2="86" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- F→I --> <line x1="398" y1="203" x2="480" y2="234" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- G→I --> <line x1="398" y1="267" x2="480" y2="248" stroke="#6b6054" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- Node circles -->
+        <g font-family="'DM Sans', sans-serif" text-anchor="middle">
+          <!-- A -->
+          <circle cx="90" cy="150" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="90" y="146" fill="white" font-size="14" font-weight="700">A</text>
+          <text x="90" y="162" fill="#9dc4e0" font-size="11">40s</text>
+
+          <!-- B -->
+          <circle cx="230" cy="80" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="230" y="76" fill="white" font-size="14" font-weight="700">B</text>
+          <text x="230" y="92" fill="#9dc4e0" font-size="11">30s</text>
+
+          <!-- C -->
+          <circle cx="230" cy="220" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="230" y="216" fill="white" font-size="14" font-weight="700">C</text>
+          <text x="230" y="232" fill="#9dc4e0" font-size="11">50s</text>
+
+          <!-- D -->
+          <circle cx="370" cy="40" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="370" y="36" fill="white" font-size="14" font-weight="700">D</text>
+          <text x="370" y="52" fill="#9dc4e0" font-size="11">40s</text>
+
+          <!-- E -->
+          <circle cx="370" cy="125" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="370" y="121" fill="white" font-size="14" font-weight="700">E</text>
+          <text x="370" y="137" fill="#9dc4e0" font-size="11">6s</text>
+
+          <!-- F -->
+          <circle cx="370" cy="200" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="370" y="196" fill="white" font-size="14" font-weight="700">F</text>
+          <text x="370" y="212" fill="#9dc4e0" font-size="11">25s</text>
+
+          <!-- G -->
+          <circle cx="370" cy="272" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="370" y="268" fill="white" font-size="14" font-weight="700">G</text>
+          <text x="370" y="284" fill="#9dc4e0" font-size="11">15s</text>
+
+          <!-- H -->
+          <circle cx="510" cy="80" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="510" y="76" fill="white" font-size="14" font-weight="700">H</text>
+          <text x="510" y="92" fill="#9dc4e0" font-size="11">20s</text>
+
+          <!-- I -->
+          <circle cx="510" cy="240" r="28" fill="#1a3a5c" stroke="none"/>
+          <text x="510" y="236" fill="white" font-size="14" font-weight="700">I</text>
+          <text x="510" y="252" fill="#9dc4e0" font-size="11">18s</text>
+        </g>
+
+        <!-- Column labels -->
+        <g font-family="'JetBrains Mono', monospace" fill="#6b6054" font-size="10" font-weight="600" text-anchor="middle">
+          <text x="90" y="16">START</text>
+          <text x="230" y="16">COL 2</text>
+          <text x="370" y="16">COL 3</text>
+          <text x="510" y="16">FINISH</text>
+        </g>
+      </svg>
+    </div>
+
+    <p class="fade-in">Notice the two parallel paths: <strong>A → B → {D,E} → H</strong> and <strong>A → C → {F,G} → I</strong>. Tasks on different paths have no dependency on each other and can potentially be combined into one station.</p>
+  </div>
+</div>
+
+<!-- ====== SECTION 4: THEORETICAL MINIMUM ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 3</div>
+    <h2 class="fade-in">Calculate the<br><em>Theoretical Minimum</em></h2>
+    <p class="fade-in">Before we assign tasks, we calculate the fewest stations we could possibly need. This gives a lower bound — reality may require more due to precedence constraints.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-label">Theoretical Minimum Stations</div>
+      <div class="formula-main">TM = ⌈ Total Task Time / Cycle Time ⌉</div>
+      <div class="formula-result">= ⌈ 244 / 60 ⌉ = ⌈ 4.067 ⌉ = <strong style="font-size:22px;">5 stations</strong></div>
+    </div>
+
+    <div class="callout yellow fade-in">
+      <div class="callout-label">What does TM mean?</div>
+      <div class="callout-title">A floor, not a guarantee</div>
+      <div class="callout-body">TM = 5 means we need <strong>at least 5 stations</strong>. We can't do it in 4 because there isn't enough time per station (244 ÷ 4 = 61s > 60s limit). But precedence constraints could force us to use 6 or more — we won't know until we actually assign the tasks.</div>
+    </div>
+
+    <div class="quote-block fade-in">
+      If TM equals our actual number of stations, we got lucky. Usually precedence constraints force a few idle seconds somewhere.
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 5: LCR ASSIGNMENT ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 4</div>
+    <h2 class="fade-in">Assign tasks using the<br><em>Largest Candidate Rule</em></h2>
+    <p class="fade-in">The <strong>Largest Candidate Rule (LCR)</strong> is a simple heuristic: at each station, assign the largest eligible task first, then keep filling with the next-largest task that fits and is eligible, until nothing more fits. Repeat for the next station.</p>
+
+    <div class="callout blue fade-in">
+      <div class="callout-label">LCR Priority List</div>
+      <div class="callout-title">Tasks ranked by time (descending)</div>
+      <div class="callout-body">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#9dc4e0;">
+          C(50) &gt; A(40) = D(40) &gt; B(30) &gt; F(25) &gt; H(20) &gt; I(18) &gt; G(15) &gt; E(6)
+        </span><br><br>
+        A task is <strong>eligible</strong> when all its predecessors have already been assigned to earlier stations. We only consider eligible tasks when filling a station.
+      </div>
+    </div>
+
+    <!-- Station 1 -->
+    <div class="lcr-step fade-in">
+      <div class="lcr-step-header">
+        <span class="lcr-station-badge" style="background:#c0442a;">Station 1</span>
+        <span style="font-size:13px; color:var(--text-muted);">Remaining capacity: 60 sec</span>
+      </div>
+      <table class="lcr-table">
+        <thead><tr><th>Task</th><th>Time</th><th>Eligible?</th><th>Fits? (≤60s)</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr class="assigned"><td><strong>A</strong></td><td>40s</td><td><span class="check">✓</span> No predecessors</td><td><span class="check">✓</span> 40 ≤ 60</td><td><strong>✓ Assign — remaining: 20s</strong></td></tr>
+          <tr class="skipped"><td>B</td><td>30s</td><td>✗ Needs A (not yet done)</td><td>—</td><td>Skip</td></tr>
+          <tr class="skipped"><td>C</td><td>50s</td><td>✗ Needs A (not yet done)</td><td>—</td><td>Skip</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; padding:10px 14px; background:#fceae6; border-radius:8px; font-size:13px;">
+        <strong>Station 1:</strong> {A} — Total time: <strong>40s</strong> — Idle: 20s
+      </div>
+    </div>
+
+    <!-- Station 2 -->
+    <div class="lcr-step fade-in">
+      <div class="lcr-step-header">
+        <span class="lcr-station-badge" style="background:#2d7a50;">Station 2</span>
+        <span style="font-size:13px; color:var(--text-muted);">Remaining capacity: 60 sec — A is now done</span>
+      </div>
+      <table class="lcr-table">
+        <thead><tr><th>Task</th><th>Time</th><th>Eligible?</th><th>Fits?</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr class="assigned"><td><strong>C</strong></td><td>50s</td><td><span class="check">✓</span> A done</td><td><span class="check">✓</span> 50 ≤ 60</td><td><strong>✓ Assign — remaining: 10s</strong></td></tr>
+          <tr class="skipped"><td>B</td><td>30s</td><td><span class="check">✓</span> A done</td><td>✗ 30 > 10s left</td><td>Skip (doesn't fit)</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; padding:10px 14px; background:#e1f2e8; border-radius:8px; font-size:13px;">
+        <strong>Station 2:</strong> {C} — Total time: <strong>50s</strong> — Idle: 10s
+      </div>
+    </div>
+
+    <!-- Station 3 -->
+    <div class="lcr-step fade-in">
+      <div class="lcr-step-header">
+        <span class="lcr-station-badge" style="background:#2a6496;">Station 3</span>
+        <span style="font-size:13px; color:var(--text-muted);">Remaining capacity: 60 sec — A, C are done</span>
+      </div>
+      <table class="lcr-table">
+        <thead><tr><th>Task</th><th>Time</th><th>Eligible?</th><th>Fits?</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr class="assigned"><td><strong>B</strong></td><td>30s</td><td><span class="check">✓</span> A done</td><td><span class="check">✓</span> 30 ≤ 60</td><td><strong>✓ Assign — remaining: 30s</strong></td></tr>
+          <tr class="skipped"><td>D</td><td>40s</td><td>✗ Needs B (not yet done)</td><td>—</td><td>Skip</td></tr>
+          <tr class="assigned"><td><strong>F</strong></td><td>25s</td><td><span class="check">✓</span> C done</td><td><span class="check">✓</span> 25 ≤ 30</td><td><strong>✓ Assign — remaining: 5s</strong></td></tr>
+          <tr class="skipped"><td>G</td><td>15s</td><td><span class="check">✓</span> C done</td><td>✗ 15 > 5s left</td><td>Skip (doesn't fit)</td></tr>
+          <tr class="skipped"><td>E</td><td>6s</td><td>✗ Needs B (not yet done)</td><td>—</td><td>Skip</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; padding:10px 14px; background:#e3eef6; border-radius:8px; font-size:13px;">
+        <strong>Station 3:</strong> {B, F} — Total time: <strong>55s</strong> — Idle: 5s
+      </div>
+    </div>
+
+    <!-- Station 4 -->
+    <div class="lcr-step fade-in">
+      <div class="lcr-step-header">
+        <span class="lcr-station-badge" style="background:#6b4c9a;">Station 4</span>
+        <span style="font-size:13px; color:var(--text-muted);">Remaining capacity: 60 sec — A, C, B, F are done</span>
+      </div>
+      <table class="lcr-table">
+        <thead><tr><th>Task</th><th>Time</th><th>Eligible?</th><th>Fits?</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr class="assigned"><td><strong>D</strong></td><td>40s</td><td><span class="check">✓</span> B done</td><td><span class="check">✓</span> 40 ≤ 60</td><td><strong>✓ Assign — remaining: 20s</strong></td></tr>
+          <tr class="assigned"><td><strong>G</strong></td><td>15s</td><td><span class="check">✓</span> C done</td><td><span class="check">✓</span> 15 ≤ 20</td><td><strong>✓ Assign — remaining: 5s</strong></td></tr>
+          <tr class="skipped"><td>E</td><td>6s</td><td><span class="check">✓</span> B done</td><td>✗ 6 > 5s left</td><td>Skip (doesn't fit)</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; padding:10px 14px; background:#ede6f6; border-radius:8px; font-size:13px;">
+        <strong>Station 4:</strong> {D, G} — Total time: <strong>55s</strong> — Idle: 5s
+      </div>
+    </div>
+
+    <!-- Station 5 -->
+    <div class="lcr-step fade-in">
+      <div class="lcr-step-header">
+        <span class="lcr-station-badge" style="background:#b8860b;">Station 5</span>
+        <span style="font-size:13px; color:var(--text-muted);">All remaining tasks — A, C, B, F, D, G are done</span>
+      </div>
+      <table class="lcr-table">
+        <thead><tr><th>Task</th><th>Time</th><th>Eligible?</th><th>Fits?</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr class="assigned"><td><strong>I</strong></td><td>18s</td><td><span class="check">✓</span> F, G done</td><td><span class="check">✓</span> 18 ≤ 60</td><td><strong>✓ Assign — remaining: 42s</strong></td></tr>
+          <tr class="assigned"><td><strong>E</strong></td><td>6s</td><td><span class="check">✓</span> B done</td><td><span class="check">✓</span> 6 ≤ 42</td><td><strong>✓ Assign — remaining: 36s</strong></td></tr>
+          <tr class="assigned"><td><strong>H</strong></td><td>20s</td><td><span class="check">✓</span> D, E done</td><td><span class="check">✓</span> 20 ≤ 36</td><td><strong>✓ Assign — remaining: 16s</strong></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; padding:10px 14px; background:#fdf5d8; border-radius:8px; font-size:13px;">
+        <strong>Station 5:</strong> {I, E, H} — Total time: <strong>44s</strong> — Idle: 16s
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 6: BALANCE SUMMARY ====== -->
+<div class="section" style="background: linear-gradient(160deg, #f5f2ed 0%, #ede9e0 100%);">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 5</div>
+    <h2 class="fade-in">The balanced line<br><em>5 stations, each within 60s</em></h2>
+    <p class="fade-in">Every station is at or under the 60-second cycle time. Here's the final assignment at a glance.</p>
+
+    <div class="station-grid fade-in">
+      <div class="station-card s1">
+        <div class="station-label">Station 1</div>
+        <div class="station-tasks"><span class="station-task">A</span></div>
+        <div class="station-time">40s</div>
+        <div class="station-idle">Idle: 20s</div>
+      </div>
+      <div class="station-card s2">
+        <div class="station-label">Station 2</div>
+        <div class="station-tasks"><span class="station-task">C</span></div>
+        <div class="station-time">50s</div>
+        <div class="station-idle">Idle: 10s</div>
+      </div>
+      <div class="station-card s3">
+        <div class="station-label">Station 3</div>
+        <div class="station-tasks"><span class="station-task">B</span><span class="station-task">F</span></div>
+        <div class="station-time">55s</div>
+        <div class="station-idle">Idle: 5s</div>
+      </div>
+      <div class="station-card s4">
+        <div class="station-label">Station 4</div>
+        <div class="station-tasks"><span class="station-task">D</span><span class="station-task">G</span></div>
+        <div class="station-time">55s</div>
+        <div class="station-idle">Idle: 5s</div>
+      </div>
+      <div class="station-card s5">
+        <div class="station-label">Station 5</div>
+        <div class="station-tasks"><span class="station-task">I</span><span class="station-task">E</span><span class="station-task">H</span></div>
+        <div class="station-time">44s</div>
+        <div class="station-idle">Idle: 16s</div>
+      </div>
+    </div>
+
+    <p class="fade-in" style="margin-top:24px;">Time utilization per station — idle time is shown in gray:</p>
+
+    <div class="fade-in">
+      <div class="bar-row">
+        <div class="bar-label"><span>Station 1 — Task A</span><span>40 / 60s</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:66.7%; background:#c0442a;">40s</div>
+          <span class="bar-idle-label">idle 20s</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Station 2 — Task C</span><span>50 / 60s</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:83.3%; background:#2d7a50;">50s</div>
+          <span class="bar-idle-label">idle 10s</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Station 3 — Tasks B, F</span><span>55 / 60s</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:91.7%; background:#2a6496;">55s</div>
+          <span class="bar-idle-label">idle 5s</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Station 4 — Tasks D, G</span><span>55 / 60s</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:91.7%; background:#6b4c9a;">55s</div>
+          <span class="bar-idle-label">idle 5s</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><span>Station 5 — Tasks I, E, H</span><span>44 / 60s</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:73.3%; background:#b8860b;">44s</div>
+          <span class="bar-idle-label">idle 16s</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 7: EFFICIENCY ====== -->
+<div class="section">
+  <div class="section-inner">
+    <div class="section-num fade-in">Step 6</div>
+    <h2 class="fade-in">Calculate<br><em>Line Efficiency</em></h2>
+    <p class="fade-in">Even with a balanced line, there's always some idle time. Efficiency measures how much of the total station capacity is actually used doing productive work.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-label">Line Efficiency Formula</div>
+      <div class="formula-main">E = Total Task Time / (N × c)</div>
+      <div class="formula-result">= 244 / (5 × 60) = 244 / 300 = <strong style="font-size:22px;">81.3%</strong></div>
+    </div>
+
+    <div class="eff-display fade-in">
+      <div style="font-size:13px; color:#8a8275; margin-bottom:8px; letter-spacing:2px; text-transform:uppercase; font-weight:600;">Line Efficiency</div>
+      <div class="eff-number">81.3%</div>
+      <div class="eff-label">244 productive seconds out of 300 total station-seconds per cycle</div>
+      <div style="margin-top:16px; font-family:'JetBrains Mono',monospace; font-size:13px; color:#6b5f52;">
+        Idle time = 300 − 244 = <span style="color:#c0442a; font-weight:700;">56 seconds</span> wasted per cycle
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;" class="fade-in">
+      <div class="callout green" style="margin:0;">
+        <div class="callout-label">Total Station-Seconds</div>
+        <div class="callout-title">5 × 60 = 300s</div>
+        <div class="callout-body">If every station ran at full capacity every cycle — the theoretical maximum.</div>
+      </div>
+      <div class="callout" style="margin:0;">
+        <div class="callout-label">Idle Time Breakdown</div>
+        <div class="callout-title">56s per cycle</div>
+        <div class="callout-body">S1: 20s · S2: 10s · S3: 5s · S4: 5s · S5: 16s = <strong style="color:#f0ece4;">56s total idle</strong></div>
+      </div>
+    </div>
+
+    <div class="callout yellow fade-in" style="margin-top:20px;">
+      <div class="callout-label">Is 81.3% good?</div>
+      <div class="callout-title">It hits the theoretical minimum — that's hard to beat</div>
+      <div class="callout-body">We achieved TM = 5 stations, which means the precedence constraints didn't force us to add a 6th. An efficiency above 80% with 5 stations is typical for balanced lines. The remaining 18.7% idle time is largely unavoidable given the task structure — it's the <strong>cost of precedence constraints</strong>, not poor planning.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SECTION 8: SUMMARY ====== -->
+<div class="section" style="background: linear-gradient(160deg, #f5f2ed 0%, #ede9e0 100%);">
+  <div class="section-inner">
+    <div class="section-num fade-in">Summary</div>
+    <h2 class="fade-in">The complete solution<br><em>in six steps</em></h2>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin:20px 0;" class="fade-in">
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--accent); min-width:28px;">1</div>
+        <div><strong>Cycle Time</strong> = 1 / output rate = 1 / (60 units/hr) = <strong>60 sec/unit</strong></div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--blue); min-width:28px;">2</div>
+        <div><strong>Precedence Diagram</strong> — map task dependencies before assigning anything</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--green); min-width:28px;">3</div>
+        <div><strong>Theoretical Minimum</strong> = ⌈244 / 60⌉ = <strong>5 stations</strong></div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--purple); min-width:28px;">4</div>
+        <div><strong>Assign via LCR</strong> — S1:{A} · S2:{C} · S3:{B,F} · S4:{D,G} · S5:{I,E,H}</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--yellow); min-width:28px;">5</div>
+        <div><strong>Station times:</strong> 40, 50, 55, 55, 44 — all ≤ 60s ✓</div>
+      </div>
+      <div style="display:flex; gap:16px; align-items:flex-start; padding:14px 16px; background:var(--card); border-radius:10px; box-shadow:var(--shadow);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--orange); min-width:28px;">6</div>
+        <div><strong>Efficiency</strong> = 244 / (5 × 60) = <strong>81.3%</strong></div>
+      </div>
+    </div>
+
+    <div class="quote-block fade-in">
+      Line balancing is a constrained optimization problem. The LCR heuristic doesn't always find the <em>optimal</em> solution, but it's fast, systematic, and usually gets you close.
+    </div>
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<div class="footer-cta">
+  <h3>Think about it</h3>
+  <p>What if demand increased to 90 units/hour? How would the cycle time change, and how many stations would you need? Would any of the current station assignments still work?</p>
+  <div style="margin-top:24px;">
+    <a href="/csuf-mgmt339/vsm/" style="color:#d4a017; font-size:13px; font-weight:600; text-decoration:none;">← Back to VSM Tools</a>
+  </div>
+</div>
+
+<script>
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const progressBar = document.getElementById('progressBar');
+
+  function onScroll() {
+    fadeEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
+    });
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+
+</body>
+</html>
