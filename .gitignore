@@ -66,3 +66,11 @@ R2-new.tex
 # Media files
 media/
 *.csv
+
+# Exam Build folders (override build/ and *.pdf rules above)
+!exam/**/Build/
+!exam/**/Build/**
+!exam/**/*.md
+!exam/**/*.html
+!exam/**/*.png
+!exam/**/*.jpg
