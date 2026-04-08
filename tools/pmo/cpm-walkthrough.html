@@ -349,99 +349,187 @@ const STEPS = [
   <div class="callout blue">Start with activities that have no predecessors: A and B both begin at week 0.</div>`,
   focus:[],newReveal:{},dimOthers:false,showCrit:false
 },
+// Step 1a — A and B: ES
 {
-  title:'Step 1 — Activities A and B (ES = 0)',
+  title:'Step 1 — A and B: Early Start',
   phase:'forward',
-  content:`<p>Both A and B have no predecessors, so they start at week 0.</p>
+  content:`<p>A and B have no predecessors — they can start immediately at the beginning of the project.</p>
+  <div class="formula">
+    <span class="flabel">No predecessors → ES = 0</span>
+    ES(A) = 0<br>
+    ES(B) = 0
+  </div>
+  <p>Both activities are ready to begin on day one. Their Early Start is 0.</p>`,
+  focus:['A','B'],newReveal:{A:['es'],B:['es']},dimOthers:true,showCrit:false
+},
+// Step 1b — A and B: EF
+{
+  title:'Step 1 — A and B: Early Finish',
+  phase:'forward',
+  content:`<p>Now calculate Early Finish: <strong>EF = ES + Duration</strong>.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>A</td><td>0</td><td>12</td><td><strong>12</strong></td></tr>
     <tr class="focus"><td>B</td><td>0</td><td>9</td><td><strong>9</strong></td></tr>
   </table>
   <p>B finishes 3 weeks earlier than A. This matters later — B feeds the critical path.</p>`,
-  focus:['A','B'],newReveal:{A:['es','ef'],B:['es','ef']},dimOthers:true,showCrit:false
+  focus:['A','B'],newReveal:{A:['ef'],B:['ef']},dimOthers:true,showCrit:false
 },
+// Step 2a — C, F, I: ES
 {
-  title:'Step 2 — From A: Activities C, F, and I',
+  title:'Step 2 — C, F, I: Early Start',
   phase:'forward',
-  content:`<p>A finishes at week 12. Three activities wait for A to complete:</p>
+  content:`<p>C, F, and I all depend on A. They cannot start until A finishes.</p>
+  <div class="formula">
+    <span class="flabel">Predecessor A finishes at week 12</span>
+    ES(C) = ES(F) = ES(I) = A's EF = <strong>12</strong>
+  </div>
+  <p>All three inherit A's Early Finish as their earliest possible start.</p>`,
+  focus:['A','C','F','I'],newReveal:{C:['es'],F:['es'],I:['es']},dimOthers:true,showCrit:false
+},
+// Step 2b — C, F, I: EF
+{
+  title:'Step 2 — C, F, I: Early Finish',
+  phase:'forward',
+  content:`<p>EF = ES + Duration for each activity.</p>
   <table class="ctable">
-    <tr><th>Activity</th><th>ES (= A's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>C</td><td>12</td><td>10</td><td><strong>22</strong></td></tr>
     <tr class="focus"><td>F</td><td>12</td><td>10</td><td><strong>22</strong></td></tr>
     <tr class="focus"><td>I</td><td>12</td><td>15</td><td><strong>27</strong></td></tr>
-  </table>
-  <p>All three inherit A's Early Finish (12) as their Early Start.</p>`,
-  focus:['A','C','F','I'],newReveal:{C:['es','ef'],F:['es','ef'],I:['es','ef']},dimOthers:true,showCrit:false
+  </table>`,
+  focus:['A','C','F','I'],newReveal:{C:['ef'],F:['ef'],I:['ef']},dimOthers:true,showCrit:false
 },
+// Step 3a — D, E: ES
 {
-  title:'Step 3 — From B: Activities D and E',
+  title:'Step 3 — D and E: Early Start',
   phase:'forward',
-  content:`<p>B finishes at week 9. Two activities depend on B:</p>
+  content:`<p>D and E both depend on B. They cannot start until B finishes.</p>
+  <div class="formula">
+    <span class="flabel">Predecessor B finishes at week 9</span>
+    ES(D) = ES(E) = B's EF = <strong>9</strong>
+  </div>
+  <p>Both are downstream of B — the fastest-starting path in the network.</p>`,
+  focus:['B','D','E'],newReveal:{D:['es'],E:['es']},dimOthers:true,showCrit:false
+},
+// Step 3b — D, E: EF
+{
+  title:'Step 3 — D and E: Early Finish',
+  phase:'forward',
+  content:`<p>EF = ES + Duration for each activity.</p>
   <table class="ctable">
-    <tr><th>Activity</th><th>ES (= B's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>D</td><td>9</td><td>10</td><td><strong>19</strong></td></tr>
     <tr class="focus"><td>E</td><td>9</td><td>24</td><td><strong>33</strong></td></tr>
   </table>
-  <p>D and E are both downstream of B, the fastest-starting path in the network.</p>`,
-  focus:['B','D','E'],newReveal:{D:['es','ef'],E:['es','ef']},dimOthers:true,showCrit:false
+  <p>D is short and finishes quickly. E is a long activity (training) and runs well into the project.</p>`,
+  focus:['B','D','E'],newReveal:{D:['ef'],E:['ef']},dimOthers:true,showCrit:false
 },
+// Step 4a — G: ES
 {
-  title:'Step 4 — Activity G (from C)',
+  title:'Step 4 — G: Early Start',
   phase:'forward',
-  content:`<p>G can begin once C finishes at week 22.</p>
+  content:`<p>G depends on C. It cannot begin until C finishes.</p>
+  <div class="formula">
+    <span class="flabel">Predecessor C finishes at week 22</span>
+    ES(G) = C's EF = <strong>22</strong>
+  </div>`,
+  focus:['C','G'],newReveal:{G:['es']},dimOthers:true,showCrit:false
+},
+// Step 4b — G: EF
+{
+  title:'Step 4 — G: Early Finish',
+  phase:'forward',
+  content:`<p>G takes 35 weeks — the longest single activity in Phase 1.</p>
   <table class="ctable">
-    <tr><th>Activity</th><th>ES (= C's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>G</td><td>22</td><td>35</td><td><strong>57</strong></td></tr>
   </table>
-  <p>G takes 35 weeks — the longest single activity in Phase 1. It finishes at week 57.</p>`,
-  focus:['C','G'],newReveal:{G:['es','ef']},dimOthers:true,showCrit:false
+  <p>G finishes at week 57. It feeds directly into J.</p>`,
+  focus:['C','G'],newReveal:{G:['ef']},dimOthers:true,showCrit:false
 },
+// Step 5a — H: ES
 {
-  title:'Step 5 — Activity H (from D)',
+  title:'Step 5 — H: Early Start',
   phase:'forward',
-  content:`<p>H begins once D finishes at week 19.</p>
+  content:`<p>H depends on D. It cannot begin until D finishes.</p>
+  <div class="formula">
+    <span class="flabel">Predecessor D finishes at week 19</span>
+    ES(H) = D's EF = <strong>19</strong>
+  </div>`,
+  focus:['D','H'],newReveal:{H:['es']},dimOthers:true,showCrit:false
+},
+// Step 5b — H: EF
+{
+  title:'Step 5 — H: Early Finish',
+  phase:'forward',
+  content:`<p>H (building construction) is the <strong>longest activity overall</strong> at 40 weeks.</p>
   <table class="ctable">
-    <tr><th>Activity</th><th>ES (= D's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>H</td><td>19</td><td>40</td><td><strong>59</strong></td></tr>
   </table>
-  <p>H (construction) is the <strong>longest activity overall</strong> at 40 weeks. It finishes at week 59. Keep an eye on this one.</p>`,
-  focus:['D','H'],newReveal:{H:['es','ef']},dimOthers:true,showCrit:false
+  <p>H finishes at week 59. Keep an eye on this one — it will likely drive the critical path.</p>`,
+  focus:['D','H'],newReveal:{H:['ef']},dimOthers:true,showCrit:false
 },
+// Step 6a — J: ES (multiple predecessors)
 {
-  title:'Step 6 — Activity J: Three Predecessors',
+  title:'Step 6 — J: Early Start (Multiple Predecessors)',
   phase:'forward',
   content:`<p>J can only start after <em>all three</em> predecessors finish: H, E, and G.</p>
   <table class="ctable">
     <tr><th>Predecessor</th><th>EF</th></tr>
-    <tr><td>H (construction)</td><td><strong>59</strong> ← binding</td></tr>
+    <tr><td>H (construction)</td><td><strong>59</strong></td></tr>
     <tr><td>G (equipment)</td><td>57</td></tr>
     <tr><td>E (training)</td><td>33</td></tr>
   </table>
   <div class="formula">
-    <span class="flabel">Multiple predecessors rule</span>
-    ES(J) = max(59, 57, 33) = <strong>59</strong><br>
-    EF(J) = 59 + 4 = <strong>63</strong>
+    <span class="flabel">Multiple predecessors → take the max</span>
+    ES(J) = max(59, 57, 33) = <strong>59</strong>
   </div>
   <p>H is the binding constraint — J must wait for construction to finish.</p>`,
-  focus:['H','E','G','J'],newReveal:{J:['es','ef']},dimOthers:true,showCrit:false
+  focus:['H','E','G','J'],newReveal:{J:['es']},dimOthers:true,showCrit:false
 },
+// Step 6b — J: EF
 {
-  title:'Step 7 — Activity K and Project Duration',
+  title:'Step 6 — J: Early Finish',
   phase:'forward',
-  content:`<p>K waits for F, I, and J to all finish:</p>
+  content:`<p>J (inspection) takes only 4 weeks.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>J</td><td>59</td><td>4</td><td><strong>63</strong></td></tr>
+  </table>
+  <p>J finishes at week 63. It is the last activity before K.</p>`,
+  focus:['H','E','G','J'],newReveal:{J:['ef']},dimOthers:true,showCrit:false
+},
+// Step 7a — K: ES (multiple predecessors)
+{
+  title:'Step 7 — K: Early Start (Multiple Predecessors)',
+  phase:'forward',
+  content:`<p>K waits for F, I, and J to all finish.</p>
   <table class="ctable">
     <tr><th>Predecessor</th><th>EF</th></tr>
-    <tr><td>J (inspection)</td><td><strong>63</strong> ← binding</td></tr>
+    <tr><td>J (inspection)</td><td><strong>63</strong></td></tr>
     <tr><td>I (advertising)</td><td>27</td></tr>
     <tr><td>F (checklists)</td><td>22</td></tr>
   </table>
   <div class="formula">
-    <span class="flabel">Multiple predecessors rule</span>
-    ES(K) = max(63, 27, 22) = <strong>63</strong><br>
-    EF(K) = 63 + 6 = <strong>69 weeks</strong>
-  </div>`,
-  focus:['F','I','J','K'],newReveal:{K:['es','ef']},dimOthers:true,showCrit:false
+    <span class="flabel">Multiple predecessors → take the max</span>
+    ES(K) = max(63, 27, 22) = <strong>63</strong>
+  </div>
+  <p>J is the binding constraint on K's start.</p>`,
+  focus:['F','I','J','K'],newReveal:{K:['es']},dimOthers:true,showCrit:false
+},
+// Step 7b — K: EF (project duration)
+{
+  title:'Step 7 — K: Early Finish and Project Duration',
+  phase:'forward',
+  content:`<p>K (staff orientation) takes 6 weeks.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>K</td><td>63</td><td>6</td><td><strong>69</strong></td></tr>
+  </table>
+  <div class="callout green">K's Early Finish = <strong>69 weeks</strong> — this is the minimum project duration.</div>`,
+  focus:['F','I','J','K'],newReveal:{K:['ef']},dimOthers:true,showCrit:false
 },
 {
   title:'Forward Pass Complete — Project = 69 Weeks',
@@ -469,129 +557,232 @@ const STEPS = [
   content:`<p>The <strong>backward pass</strong> moves right to left, finding the latest each activity can start without delaying the project.</p>
   <div class="formula">
     <span class="flabel">Rules</span>
-    LS = LF − Duration<br>
     LF = min(LS of all successors)<br>
+    LS = LF − Duration<br>
     Slack (S) = LS − ES
   </div>
   <p>Start at K: its LF equals the project duration (69 weeks). Work backwards from there.</p>
   <p>When an activity has <strong>multiple successors</strong>, take the <em>minimum</em> of their Late Starts — you can't delay past the tightest constraint.</p>`,
   focus:[],newReveal:{},dimOthers:false,showCrit:false
 },
+// K: LF
 {
-  title:'K — Late Times and Slack',
+  title:'K — Late Finish',
   phase:'backward',
-  content:`<p>K is the final activity, so its Late Finish equals the project duration.</p>
+  content:`<p>K is the final activity. Its Late Finish equals the project end date — any later and the project overruns.</p>
   <div class="formula">
     <span class="flabel">Activity K</span>
-    LF = 69 (project end)<br>
-    LS = 69 − 6 = <strong>63</strong><br>
+    LF(K) = project duration = <strong>69</strong>
+  </div>`,
+  focus:['K'],newReveal:{K:['lf']},dimOthers:true,showCrit:false
+},
+// K: LS + S
+{
+  title:'K — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Now calculate LS and Slack for K.</p>
+  <div class="formula">
+    <span class="flabel">Activity K</span>
+    LS = LF − Duration = 69 − 6 = <strong>63</strong><br>
     S = LS − ES = 63 − 63 = <strong>0</strong>
   </div>
   <div class="callout red">S = 0 → K is <strong>critical</strong>. Any delay in K delays the project.</div>`,
-  focus:['K'],newReveal:{K:['ls','lf','s']},dimOthers:true,showCrit:false
+  focus:['K'],newReveal:{K:['ls','s']},dimOthers:true,showCrit:false
 },
+// J: LF
 {
-  title:'J — Late Times and Slack',
+  title:'J — Late Finish',
   phase:'backward',
-  content:`<p>J feeds only into K. K's Late Start is 63.</p>
+  content:`<p>J feeds only into K. K's Late Start is 63 — so J must finish by then at the latest.</p>
   <div class="formula">
     <span class="flabel">Activity J</span>
-    LF = K's LS = 63<br>
+    LF(J) = K's LS = <strong>63</strong>
+  </div>`,
+  focus:['J','K'],newReveal:{J:['lf']},dimOthers:true,showCrit:false
+},
+// J: LS + S
+{
+  title:'J — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for J.</p>
+  <div class="formula">
+    <span class="flabel">Activity J</span>
     LS = 63 − 4 = <strong>59</strong><br>
     S = 59 − 59 = <strong>0</strong>
   </div>
   <div class="callout red">S = 0 → J is critical. The inspection cannot slip at all.</div>`,
-  focus:['J','K'],newReveal:{J:['ls','lf','s']},dimOthers:true,showCrit:false
+  focus:['J','K'],newReveal:{J:['ls','s']},dimOthers:true,showCrit:false
 },
+// H: LF
 {
-  title:'H — Late Times and Slack',
+  title:'H — Late Finish',
   phase:'backward',
-  content:`<p>H feeds only into J. J's Late Start is 59.</p>
+  content:`<p>H feeds only into J. J's Late Start is 59 — so H must finish no later than week 59.</p>
   <div class="formula">
     <span class="flabel">Activity H</span>
-    LF = J's LS = 59<br>
+    LF(H) = J's LS = <strong>59</strong>
+  </div>`,
+  focus:['H','J'],newReveal:{H:['lf']},dimOthers:true,showCrit:false
+},
+// H: LS + S
+{
+  title:'H — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for H.</p>
+  <div class="formula">
+    <span class="flabel">Activity H</span>
     LS = 59 − 40 = <strong>19</strong><br>
     S = 19 − 19 = <strong>0</strong>
   </div>
   <div class="callout red">S = 0 → H (40-week construction) is critical. This is the riskiest activity in the entire project.</div>`,
-  focus:['H','J'],newReveal:{H:['ls','lf','s']},dimOthers:true,showCrit:false
+  focus:['H','J'],newReveal:{H:['ls','s']},dimOthers:true,showCrit:false
 },
+// G and E: LF
 {
-  title:'G and E — Both Feed into J',
+  title:'G and E — Late Finish',
   phase:'backward',
-  content:`<p>G and E both have J as their only successor (J's LS = 59).</p>
+  content:`<p>G and E both feed only into J. J's Late Start is 59 — that is their deadline.</p>
+  <div class="formula">
+    <span class="flabel">Both G and E</span>
+    LF(G) = LF(E) = J's LS = <strong>59</strong>
+  </div>`,
+  focus:['G','E','J'],newReveal:{G:['lf'],E:['lf']},dimOthers:true,showCrit:false
+},
+// G and E: LS + S
+{
+  title:'G and E — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for G and E.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>LF</th><th>Duration</th><th>LS</th><th>ES</th><th>S</th></tr>
     <tr class="focus"><td>G</td><td>59</td><td>35</td><td>24</td><td>22</td><td><strong>2</strong></td></tr>
     <tr class="focus"><td>E</td><td>59</td><td>24</td><td>35</td><td>9</td><td><strong>26</strong></td></tr>
   </table>
-  <p>G has only 2 weeks of flexibility. E has 26 weeks — it could slip over half a year without affecting the project.</p>`,
-  focus:['G','E','J'],newReveal:{G:['ls','lf','s'],E:['ls','lf','s']},dimOthers:true,showCrit:false
+  <p>G has only 2 weeks of flexibility. E has 26 weeks — training could slip over half a year without affecting the project.</p>`,
+  focus:['G','E','J'],newReveal:{G:['ls','s'],E:['ls','s']},dimOthers:true,showCrit:false
 },
+// D: LF
 {
-  title:'D — Late Times and Slack',
+  title:'D — Late Finish',
   phase:'backward',
   content:`<p>D feeds only into H. H's Late Start is 19.</p>
   <div class="formula">
     <span class="flabel">Activity D</span>
-    LF = H's LS = 19<br>
+    LF(D) = H's LS = <strong>19</strong>
+  </div>`,
+  focus:['D','H'],newReveal:{D:['lf']},dimOthers:true,showCrit:false
+},
+// D: LS + S
+{
+  title:'D — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for D.</p>
+  <div class="formula">
+    <span class="flabel">Activity D</span>
     LS = 19 − 10 = <strong>9</strong><br>
     S = 9 − 9 = <strong>0</strong>
   </div>
   <div class="callout red">S = 0 → D is critical. Site survey must start on time.</div>`,
-  focus:['D','H'],newReveal:{D:['ls','lf','s']},dimOthers:true,showCrit:false
+  focus:['D','H'],newReveal:{D:['ls','s']},dimOthers:true,showCrit:false
 },
+// C: LF
 {
-  title:'C — Late Times and Slack',
+  title:'C — Late Finish',
   phase:'backward',
   content:`<p>C feeds only into G. G's Late Start is 24.</p>
   <div class="formula">
     <span class="flabel">Activity C</span>
-    LF = G's LS = 24<br>
+    LF(C) = G's LS = <strong>24</strong>
+  </div>`,
+  focus:['C','G'],newReveal:{C:['lf']},dimOthers:true,showCrit:false
+},
+// C: LS + S
+{
+  title:'C — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for C.</p>
+  <div class="formula">
+    <span class="flabel">Activity C</span>
     LS = 24 − 10 = <strong>14</strong><br>
     S = 14 − 12 = <strong>2</strong>
   </div>
   <p>C has 2 weeks of slack — a small buffer, but not critical.</p>`,
-  focus:['C','G'],newReveal:{C:['ls','lf','s']},dimOthers:true,showCrit:false
+  focus:['C','G'],newReveal:{C:['ls','s']},dimOthers:true,showCrit:false
 },
+// F and I: LF
 {
-  title:'F and I — Very High Slack',
+  title:'F and I — Late Finish',
   phase:'backward',
-  content:`<p>F and I both feed into K (K's LS = 63).</p>
+  content:`<p>F and I both feed only into K. K's Late Start is 63.</p>
+  <div class="formula">
+    <span class="flabel">Both F and I</span>
+    LF(F) = LF(I) = K's LS = <strong>63</strong>
+  </div>`,
+  focus:['F','I','K'],newReveal:{F:['lf'],I:['lf']},dimOthers:true,showCrit:false
+},
+// F and I: LS + S
+{
+  title:'F and I — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for F and I.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>LF</th><th>LS</th><th>ES</th><th>S</th></tr>
     <tr class="focus"><td>F</td><td>63</td><td>53</td><td>12</td><td><strong>41 weeks!</strong></td></tr>
     <tr class="focus"><td>I</td><td>63</td><td>48</td><td>12</td><td><strong>36 weeks!</strong></td></tr>
   </table>
-  <div class="callout green">F and I have enormous flexibility. The team could delay starting them by 41 and 36 weeks respectively — and the project would still finish on time.</div>`,
-  focus:['F','I','K'],newReveal:{F:['ls','lf','s'],I:['ls','lf','s']},dimOthers:true,showCrit:false
+  <div class="callout green">F and I have enormous flexibility. They could be delayed by 41 and 36 weeks respectively — and the project would still finish on time.</div>`,
+  focus:['F','I','K'],newReveal:{F:['ls','s'],I:['ls','s']},dimOthers:true,showCrit:false
 },
+// B: LF
 {
-  title:'B — Late Times and Slack',
+  title:'B — Late Finish',
   phase:'backward',
-  content:`<p>B has two successors: D (LS=9) and E (LS=35). Take the <strong>minimum</strong>.</p>
+  content:`<p>B has two successors: D (LS=9) and E (LS=35). Take the <strong>minimum</strong> — B can't delay past the tightest downstream constraint.</p>
   <div class="formula">
-    <span class="flabel">Multiple successors rule</span>
+    <span class="flabel">Multiple successors → take the min</span>
     LF(B) = min(LS of D, LS of E)<br>
-    LF(B) = min(9, 35) = <strong>9</strong><br>
-    LS(B) = 9 − 9 = <strong>0</strong><br>
-    S(B) = 0 − 0 = <strong>0</strong>
+    LF(B) = min(9, 35) = <strong>9</strong>
   </div>
-  <div class="callout red">S = 0 → B is critical. D is the binding constraint on B's Late Finish.</div>`,
-  focus:['B','D','E'],newReveal:{B:['ls','lf','s']},dimOthers:true,showCrit:false
+  <p>D is the binding constraint on B's Late Finish.</p>`,
+  focus:['B','D','E'],newReveal:{B:['lf']},dimOthers:true,showCrit:false
 },
+// B: LS + S
 {
-  title:'A — Late Times and Slack',
+  title:'B — Late Start and Slack',
   phase:'backward',
-  content:`<p>A has three successors: C (LS=14), F (LS=53), I (LS=48). Take the minimum.</p>
+  content:`<p>Calculate LS and Slack for B.</p>
   <div class="formula">
-    <span class="flabel">Multiple successors rule</span>
-    LF(A) = min(14, 53, 48) = <strong>14</strong><br>
-    LS(A) = 14 − 12 = <strong>2</strong><br>
-    S(A) = 2 − 0 = <strong>2</strong>
+    <span class="flabel">Activity B</span>
+    LS = 9 − 9 = <strong>0</strong><br>
+    S = 0 − 0 = <strong>0</strong>
   </div>
-  <p>C → G → J is the tightest downstream chain from A, which is why C's LS (14) constrains A's Late Finish.</p>`,
-  focus:['A','C','F','I'],newReveal:{A:['ls','lf','s']},dimOthers:true,showCrit:false
+  <div class="callout red">S = 0 → B is critical. It must start immediately on day one.</div>`,
+  focus:['B','D','E'],newReveal:{B:['ls','s']},dimOthers:true,showCrit:false
+},
+// A: LF
+{
+  title:'A — Late Finish',
+  phase:'backward',
+  content:`<p>A has three successors: C (LS=14), F (LS=53), I (LS=48). Take the <strong>minimum</strong>.</p>
+  <div class="formula">
+    <span class="flabel">Multiple successors → take the min</span>
+    LF(A) = min(14, 53, 48) = <strong>14</strong>
+  </div>
+  <p>C → G → J is the tightest downstream chain from A, so C's LS (14) constrains A's Late Finish.</p>`,
+  focus:['A','C','F','I'],newReveal:{A:['lf']},dimOthers:true,showCrit:false
+},
+// A: LS + S
+{
+  title:'A — Late Start and Slack',
+  phase:'backward',
+  content:`<p>Calculate LS and Slack for A.</p>
+  <div class="formula">
+    <span class="flabel">Activity A</span>
+    LS = 14 − 12 = <strong>2</strong><br>
+    S = 2 − 0 = <strong>2</strong>
+  </div>
+  <p>A has 2 weeks of slack — not critical, but needs to start early.</p>`,
+  focus:['A','C','F','I'],newReveal:{A:['ls','s']},dimOthers:true,showCrit:false
 },
 {
   title:'Backward Pass Complete',
@@ -651,10 +842,7 @@ const STEPS = [
   phase:'critical',
   content:`<div class="callout green"><strong>Project duration:</strong> 69 weeks<br><strong>Critical path:</strong> B → D → H → J → K<br><strong>Key risk:</strong> Activity H (40-week construction)</div>
   <p>As project manager, focus your attention on the critical path — especially <strong>H</strong>, the longest and riskiest activity. A 1-week delay in construction = a 1-week delay in hospital opening.</p>
-  <p>F and I are safe to deprioritize. C, G, and A have small buffers — watch but don't panic.</p>
-  <div class="callout blue" style="margin-top:10px;font-size:.8rem">
-    <strong>Note:</strong> The original slide shows J with S = 10 — this is a typo. J feeds directly into K (LS=63), giving J a LF=63, LS=59, and S = 0. J is on the critical path.
-  </div>`,
+  <p>F and I are safe to deprioritize. C, G, and A have small buffers — watch but don't panic.</p>`,
   focus:[],newReveal:{},dimOthers:false,showCrit:true
 },
 ];
