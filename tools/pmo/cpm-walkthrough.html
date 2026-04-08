@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Critical Path Analysis — St. John's Hospital</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #1a202c;
+  --muted: #64748b;
+  --navy: #1e3a5f;
+  --blue: #2563eb;
+  --gold: #d97706;
+  --crit: #dc2626;
+  --crit-light: #fef2f2;
+  --green: #059669;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ── Header ── */
+header {
+  background:var(--navy);
+  color:#fff;
+  padding:10px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+}
+header h1 { font-size:.95rem; font-weight:600; letter-spacing:-.01em; }
+header a  { color:#93c5fd; font-size:.8rem; text-decoration:none; }
+header a:hover { color:#fff; }
+
+/* ── Progress bar ── */
+.prog-wrap {
+  background:var(--navy);
+  padding:0 20px 8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+}
+.prog-track { flex:1; height:5px; background:#2d4e73; border-radius:3px; }
+.prog-fill   { height:100%; background:#f59e0b; border-radius:3px; transition:width .35s ease; }
+.prog-lbl    { color:#94a3b8; font-size:.72rem; min-width:70px; text-align:right; }
+
+/* ── Main layout ── */
+#layout {
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 340px;
+  overflow:hidden;
+}
+
+/* ── Diagram panel ── */
+#diag-wrap {
+  background:#fff;
+  border-right:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  overflow:hidden;
+}
+#cpm-svg { width:100%; height:100%; }
+
+/* ── Info panel ── */
+#panel {
+  display:flex;
+  flex-direction:column;
+  background:#f8fafc;
+}
+#panel-body {
+  flex:1;
+  padding:18px 20px;
+  overflow-y:auto;
+}
+
+/* Phase tag */
+.tag {
+  display:inline-block;
+  padding:2px 9px;
+  border-radius:10px;
+  font-size:.68rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:8px;
+}
+.tag-intro    { background:#e2e8f0; color:#475569; }
+.tag-forward  { background:#dbeafe; color:#1d4ed8; }
+.tag-backward { background:#ede9fe; color:#6d28d9; }
+.tag-critical { background:#fee2e2; color:#b91c1c; }
+
+#step-title {
+  font-size:1rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.3;
+  margin-bottom:10px;
+}
+
+.step-body p  { font-size:.84rem; line-height:1.65; color:#374151; margin-bottom:8px; }
+.step-body ul, .step-body ol { padding-left:16px; margin-bottom:8px; }
+.step-body li { font-size:.84rem; line-height:1.6; color:#374151; margin-bottom:3px; }
+.step-body strong { color:var(--navy); }
+
+.formula {
+  background:#fff;
+  border:1.5px solid #c7d2fe;
+  border-radius:7px;
+  padding:10px 14px;
+  margin:10px 0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  color:#312e81;
+}
+.formula .flabel {
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:.68rem;
+  font-weight:700;
+  color:#6366f1;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  display:block;
+  margin-bottom:4px;
+}
+
+.callout {
+  border-left:3px solid #f59e0b;
+  background:#fffbeb;
+  padding:8px 12px;
+  border-radius:0 6px 6px 0;
+  margin:10px 0;
+  font-size:.82rem;
+  color:#78350f;
+  line-height:1.55;
+}
+.callout.red   { border-color:var(--crit); background:var(--crit-light); color:#991b1b; }
+.callout.blue  { border-color:#3b82f6; background:#eff6ff; color:#1e40af; }
+.callout.green { border-color:#10b981; background:#ecfdf5; color:#065f46; }
+
+.ctable { width:100%; border-collapse:collapse; font-size:.79rem; margin:8px 0; }
+.ctable th { background:#e0e7ff; color:#3730a3; padding:5px 7px; text-align:left; font-weight:600; }
+.ctable td { padding:4px 7px; border-bottom:1px solid var(--border); }
+.ctable tr.crit td { background:var(--crit-light); color:#991b1b; font-weight:600; }
+.ctable tr.focus td { background:#fef9c3; }
+
+/* ── Navigation ── */
+#panel-nav {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  background:#fff;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+#panel-nav button {
+  padding:7px 16px;
+  border-radius:6px;
+  font-size:.82rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:background .15s;
+}
+#btn-prev { background:#e2e8f0; color:#475569; }
+#btn-prev:hover:not(:disabled) { background:#cbd5e1; }
+#btn-prev:disabled { opacity:.35; cursor:default; }
+#btn-next { background:var(--navy); color:#fff; }
+#btn-next:hover { background:#2c5282; }
+.sctr { font-size:.75rem; color:#94a3b8; }
+
+/* ── Node label (guide box) ── */
+#node-guide {
+  position:absolute;
+  pointer-events:none;
+  display:none;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Critical Path Analysis — St. John's Hospital</h1>
+  <a href="/csuf-mgmt339/">← Back to Home</a>
+</header>
+
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="pgfill" style="width:0%"></div></div>
+  <span class="prog-lbl" id="pglbl">Step 1 of 27</span>
+</div>
+
+<div id="layout">
+  <div id="diag-wrap">
+    <svg id="cpm-svg" viewBox="0 0 950 510" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="ah-blue" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#4a90d9"/>
+        </marker>
+        <marker id="ah-crit" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#dc2626"/>
+        </marker>
+        <marker id="ah-dim" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#94a3b8"/>
+        </marker>
+        <marker id="ah-gold" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#d97706"/>
+        </marker>
+      </defs>
+      <g id="svg-edges"></g>
+      <g id="svg-nodes"></g>
+    </svg>
+  </div>
+
+  <div id="panel">
+    <div id="panel-body">
+      <span id="phase-tag" class="tag tag-intro">Intro</span>
+      <h2 id="step-title"></h2>
+      <div id="step-body" class="step-body"></div>
+    </div>
+    <div id="panel-nav">
+      <button id="btn-prev" onclick="go(-1)" disabled>← Previous</button>
+      <span class="sctr" id="sctr">1 / 27</span>
+      <button id="btn-next" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  Activity data
+// ─────────────────────────────────────────────
+const ACT = {
+  A: {es:0,  ef:12, ls:2,  lf:14, d:12, s:2,  crit:false, x:195, y:175},
+  B: {es:0,  ef:9,  ls:0,  lf:9,  d:9,  s:0,  crit:true,  x:195, y:357},
+  I: {es:12, ef:27, ls:48, lf:63, d:15, s:36, crit:false, x:364, y:90},
+  F: {es:12, ef:22, ls:53, lf:63, d:10, s:41, crit:false, x:364, y:165},
+  C: {es:12, ef:22, ls:14, lf:24, d:10, s:2,  crit:false, x:364, y:255},
+  D: {es:9,  ef:19, ls:9,  lf:19, d:10, s:0,  crit:true,  x:364, y:357},
+  E: {es:9,  ef:33, ls:35, lf:59, d:24, s:26, crit:false, x:364, y:455},
+  G: {es:22, ef:57, ls:24, lf:59, d:35, s:2,  crit:false, x:534, y:255},
+  H: {es:19, ef:59, ls:19, lf:59, d:40, s:0,  crit:true,  x:534, y:357},
+  J: {es:59, ef:63, ls:59, lf:63, d:4,  s:0,  crit:true,  x:664, y:357},
+  K: {es:63, ef:69, ls:63, lf:69, d:6,  s:0,  crit:true,  x:789, y:213},
+};
+
+// Edge definitions: [from, to, isCritical]
+const EDGES = [
+  ['START','A',false], ['START','B',true],
+  ['A','I',false], ['A','F',false], ['A','C',false],
+  ['B','D',true],  ['B','E',false],
+  ['C','G',false], ['D','H',true],
+  ['E','J',false], ['F','K',false], ['G','J',false],
+  ['H','J',true],  ['I','K',false], ['J','K',true],
+  ['K','FINISH',true],
+];
+
+// Node dimensions
+const NW=90, NH=56, LC=22, CC=46, RC=22;
+
+// ─────────────────────────────────────────────
+//  Step definitions
+// ─────────────────────────────────────────────
+// Each step: title, phase, content, focus[], newReveal{}, dimOthers
+const STEPS = [
+{
+  title:'Critical Path Method (CPM)',
+  phase:'intro',
+  content:`<p>CPM is a project scheduling technique that identifies the <strong>critical path</strong> — the longest sequence of dependent activities that determines the minimum project duration.</p>
+  <p>Activities on the critical path have <strong>zero slack</strong>: delay any one of them and the whole project is delayed.</p>
+  <p>Activities off the critical path have slack — room to slip without affecting the end date.</p>
+  <div class="callout blue">We'll walk through St. John's Hospital relocation project step by step, building up Early/Late times and identifying the critical path.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+{
+  title:'The St. John\'s Hospital Project',
+  phase:'intro',
+  content:`<p>St. John's Hospital is relocating to a new site. The project has <strong>11 activities (A–K)</strong> in two phases:</p>
+  <ul>
+    <li><strong>Phase 1:</strong> Organizing & Site Preparation (A–E)</li>
+    <li><strong>Phase 2:</strong> Physical Facilities & Infrastructure (F–K)</li>
+  </ul>
+  <p>Each activity has a defined <strong>duration (in weeks)</strong>, predecessors it depends on, and a responsible person.</p>
+  <div class="callout">Our goal: calculate the project duration and find which activities are critical.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+{
+  title:'How to Read a CPM Node',
+  phase:'intro',
+  content:`<p>Each circle in the diagram stores six values:</p>
+  <table class="ctable">
+    <tr><th>Position</th><th>Value</th><th>Meaning</th></tr>
+    <tr><td>Top-left</td><td><strong>ES</strong></td><td>Early Start — earliest it can begin</td></tr>
+    <tr><td>Top-right</td><td><strong>EF</strong></td><td>Early Finish = ES + Duration</td></tr>
+    <tr><td>Center top</td><td><strong>Name</strong></td><td>Activity letter</td></tr>
+    <tr><td>Center bot</td><td><strong>Duration</strong></td><td>Weeks to complete</td></tr>
+    <tr><td>Bot-left</td><td><strong>LS</strong></td><td>Latest it can start without delay</td></tr>
+    <tr><td>Bot-right</td><td><strong>LF</strong></td><td>Latest it can finish</td></tr>
+  </table>
+  <p>Below each node: <strong>S = Slack</strong> = LS − ES. If S = 0, the activity is critical.</p>`,
+  focus:['K'],newReveal:{K:['es','ef','ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'The Project Network',
+  phase:'intro',
+  content:`<p>The network shows all 11 activities and their dependencies. Arrows mean "must finish before the next can start."</p>
+  <ul>
+    <li><strong>A and B</strong> have no predecessors — they start immediately</li>
+    <li><strong>K</strong> is the final activity before completion</li>
+    <li>Some activities have <em>multiple predecessors</em> (J waits for H, E, and G)</li>
+  </ul>
+  <div class="callout blue">Duration values are already shown inside each node. We'll fill in ES, EF, LS, LF, and Slack as we go.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+// ── FORWARD PASS ──
+{
+  title:'Forward Pass: Calculating Early Times',
+  phase:'forward',
+  content:`<p>The <strong>forward pass</strong> moves left to right through the network, calculating the earliest each activity can start and finish.</p>
+  <div class="formula">
+    <span class="flabel">Rule</span>
+    EF = ES + Duration<br>
+    ES = max(EF of all predecessors)
+  </div>
+  <p>For activities with <strong>multiple predecessors</strong>, the earliest start is the latest of all predecessors' finish times — you must wait for everyone.</p>
+  <div class="callout blue">Start with activities that have no predecessors: A and B both begin at week 0.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+{
+  title:'Step 1 — Activities A and B (ES = 0)',
+  phase:'forward',
+  content:`<p>Both A and B have no predecessors, so they start at week 0.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>A</td><td>0</td><td>12</td><td><strong>12</strong></td></tr>
+    <tr class="focus"><td>B</td><td>0</td><td>9</td><td><strong>9</strong></td></tr>
+  </table>
+  <p>B finishes 3 weeks earlier than A. This matters later — B feeds the critical path.</p>`,
+  focus:['A','B'],newReveal:{A:['es','ef'],B:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 2 — From A: Activities C, F, and I',
+  phase:'forward',
+  content:`<p>A finishes at week 12. Three activities wait for A to complete:</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES (= A's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>C</td><td>12</td><td>10</td><td><strong>22</strong></td></tr>
+    <tr class="focus"><td>F</td><td>12</td><td>10</td><td><strong>22</strong></td></tr>
+    <tr class="focus"><td>I</td><td>12</td><td>15</td><td><strong>27</strong></td></tr>
+  </table>
+  <p>All three inherit A's Early Finish (12) as their Early Start.</p>`,
+  focus:['A','C','F','I'],newReveal:{C:['es','ef'],F:['es','ef'],I:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 3 — From B: Activities D and E',
+  phase:'forward',
+  content:`<p>B finishes at week 9. Two activities depend on B:</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES (= B's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>D</td><td>9</td><td>10</td><td><strong>19</strong></td></tr>
+    <tr class="focus"><td>E</td><td>9</td><td>24</td><td><strong>33</strong></td></tr>
+  </table>
+  <p>D and E are both downstream of B, the fastest-starting path in the network.</p>`,
+  focus:['B','D','E'],newReveal:{D:['es','ef'],E:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 4 — Activity G (from C)',
+  phase:'forward',
+  content:`<p>G can begin once C finishes at week 22.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES (= C's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>G</td><td>22</td><td>35</td><td><strong>57</strong></td></tr>
+  </table>
+  <p>G takes 35 weeks — the longest single activity in Phase 1. It finishes at week 57.</p>`,
+  focus:['C','G'],newReveal:{G:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 5 — Activity H (from D)',
+  phase:'forward',
+  content:`<p>H begins once D finishes at week 19.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES (= D's EF)</th><th>Duration</th><th>EF</th></tr>
+    <tr class="focus"><td>H</td><td>19</td><td>40</td><td><strong>59</strong></td></tr>
+  </table>
+  <p>H (construction) is the <strong>longest activity overall</strong> at 40 weeks. It finishes at week 59. Keep an eye on this one.</p>`,
+  focus:['D','H'],newReveal:{H:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 6 — Activity J: Three Predecessors',
+  phase:'forward',
+  content:`<p>J can only start after <em>all three</em> predecessors finish: H, E, and G.</p>
+  <table class="ctable">
+    <tr><th>Predecessor</th><th>EF</th></tr>
+    <tr><td>H (construction)</td><td><strong>59</strong> ← binding</td></tr>
+    <tr><td>G (equipment)</td><td>57</td></tr>
+    <tr><td>E (training)</td><td>33</td></tr>
+  </table>
+  <div class="formula">
+    <span class="flabel">Multiple predecessors rule</span>
+    ES(J) = max(59, 57, 33) = <strong>59</strong><br>
+    EF(J) = 59 + 4 = <strong>63</strong>
+  </div>
+  <p>H is the binding constraint — J must wait for construction to finish.</p>`,
+  focus:['H','E','G','J'],newReveal:{J:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Step 7 — Activity K and Project Duration',
+  phase:'forward',
+  content:`<p>K waits for F, I, and J to all finish:</p>
+  <table class="ctable">
+    <tr><th>Predecessor</th><th>EF</th></tr>
+    <tr><td>J (inspection)</td><td><strong>63</strong> ← binding</td></tr>
+    <tr><td>I (advertising)</td><td>27</td></tr>
+    <tr><td>F (checklists)</td><td>22</td></tr>
+  </table>
+  <div class="formula">
+    <span class="flabel">Multiple predecessors rule</span>
+    ES(K) = max(63, 27, 22) = <strong>63</strong><br>
+    EF(K) = 63 + 6 = <strong>69 weeks</strong>
+  </div>`,
+  focus:['F','I','J','K'],newReveal:{K:['es','ef']},dimOthers:true,showCrit:false
+},
+{
+  title:'Forward Pass Complete — Project = 69 Weeks',
+  phase:'forward',
+  content:`<p>All Early Start and Early Finish times are calculated. The project takes <strong>69 weeks</strong>.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES</th><th>EF</th></tr>
+    <tr><td>A</td><td>0</td><td>12</td></tr>
+    <tr><td>B</td><td>0</td><td>9</td></tr>
+    <tr><td>C,F</td><td>12</td><td>22</td></tr>
+    <tr><td>I</td><td>12</td><td>27</td></tr>
+    <tr><td>D,E</td><td>9</td><td>19, 33</td></tr>
+    <tr><td>G</td><td>22</td><td>57</td></tr>
+    <tr><td>H</td><td>19</td><td>59</td></tr>
+    <tr><td>J</td><td>59</td><td>63</td></tr>
+    <tr class="focus"><td>K</td><td>63</td><td><strong>69</strong></td></tr>
+  </table>
+  <div class="callout green">Now we work <strong>backwards</strong> to find the latest allowable times.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+// ── BACKWARD PASS ──
+{
+  title:'Backward Pass: Calculating Late Times',
+  phase:'backward',
+  content:`<p>The <strong>backward pass</strong> moves right to left, finding the latest each activity can start without delaying the project.</p>
+  <div class="formula">
+    <span class="flabel">Rules</span>
+    LS = LF − Duration<br>
+    LF = min(LS of all successors)<br>
+    Slack (S) = LS − ES
+  </div>
+  <p>Start at K: its LF equals the project duration (69 weeks). Work backwards from there.</p>
+  <p>When an activity has <strong>multiple successors</strong>, take the <em>minimum</em> of their Late Starts — you can't delay past the tightest constraint.</p>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+{
+  title:'K — Late Times and Slack',
+  phase:'backward',
+  content:`<p>K is the final activity, so its Late Finish equals the project duration.</p>
+  <div class="formula">
+    <span class="flabel">Activity K</span>
+    LF = 69 (project end)<br>
+    LS = 69 − 6 = <strong>63</strong><br>
+    S = LS − ES = 63 − 63 = <strong>0</strong>
+  </div>
+  <div class="callout red">S = 0 → K is <strong>critical</strong>. Any delay in K delays the project.</div>`,
+  focus:['K'],newReveal:{K:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'J — Late Times and Slack',
+  phase:'backward',
+  content:`<p>J feeds only into K. K's Late Start is 63.</p>
+  <div class="formula">
+    <span class="flabel">Activity J</span>
+    LF = K's LS = 63<br>
+    LS = 63 − 4 = <strong>59</strong><br>
+    S = 59 − 59 = <strong>0</strong>
+  </div>
+  <div class="callout red">S = 0 → J is critical. The inspection cannot slip at all.</div>`,
+  focus:['J','K'],newReveal:{J:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'H — Late Times and Slack',
+  phase:'backward',
+  content:`<p>H feeds only into J. J's Late Start is 59.</p>
+  <div class="formula">
+    <span class="flabel">Activity H</span>
+    LF = J's LS = 59<br>
+    LS = 59 − 40 = <strong>19</strong><br>
+    S = 19 − 19 = <strong>0</strong>
+  </div>
+  <div class="callout red">S = 0 → H (40-week construction) is critical. This is the riskiest activity in the entire project.</div>`,
+  focus:['H','J'],newReveal:{H:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'G and E — Both Feed into J',
+  phase:'backward',
+  content:`<p>G and E both have J as their only successor (J's LS = 59).</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>LF</th><th>Duration</th><th>LS</th><th>ES</th><th>S</th></tr>
+    <tr class="focus"><td>G</td><td>59</td><td>35</td><td>24</td><td>22</td><td><strong>2</strong></td></tr>
+    <tr class="focus"><td>E</td><td>59</td><td>24</td><td>35</td><td>9</td><td><strong>26</strong></td></tr>
+  </table>
+  <p>G has only 2 weeks of flexibility. E has 26 weeks — it could slip over half a year without affecting the project.</p>`,
+  focus:['G','E','J'],newReveal:{G:['ls','lf','s'],E:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'D — Late Times and Slack',
+  phase:'backward',
+  content:`<p>D feeds only into H. H's Late Start is 19.</p>
+  <div class="formula">
+    <span class="flabel">Activity D</span>
+    LF = H's LS = 19<br>
+    LS = 19 − 10 = <strong>9</strong><br>
+    S = 9 − 9 = <strong>0</strong>
+  </div>
+  <div class="callout red">S = 0 → D is critical. Site survey must start on time.</div>`,
+  focus:['D','H'],newReveal:{D:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'C — Late Times and Slack',
+  phase:'backward',
+  content:`<p>C feeds only into G. G's Late Start is 24.</p>
+  <div class="formula">
+    <span class="flabel">Activity C</span>
+    LF = G's LS = 24<br>
+    LS = 24 − 10 = <strong>14</strong><br>
+    S = 14 − 12 = <strong>2</strong>
+  </div>
+  <p>C has 2 weeks of slack — a small buffer, but not critical.</p>`,
+  focus:['C','G'],newReveal:{C:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'F and I — Very High Slack',
+  phase:'backward',
+  content:`<p>F and I both feed into K (K's LS = 63).</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>LF</th><th>LS</th><th>ES</th><th>S</th></tr>
+    <tr class="focus"><td>F</td><td>63</td><td>53</td><td>12</td><td><strong>41 weeks!</strong></td></tr>
+    <tr class="focus"><td>I</td><td>63</td><td>48</td><td>12</td><td><strong>36 weeks!</strong></td></tr>
+  </table>
+  <div class="callout green">F and I have enormous flexibility. The team could delay starting them by 41 and 36 weeks respectively — and the project would still finish on time.</div>`,
+  focus:['F','I','K'],newReveal:{F:['ls','lf','s'],I:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'B — Late Times and Slack',
+  phase:'backward',
+  content:`<p>B has two successors: D (LS=9) and E (LS=35). Take the <strong>minimum</strong>.</p>
+  <div class="formula">
+    <span class="flabel">Multiple successors rule</span>
+    LF(B) = min(LS of D, LS of E)<br>
+    LF(B) = min(9, 35) = <strong>9</strong><br>
+    LS(B) = 9 − 9 = <strong>0</strong><br>
+    S(B) = 0 − 0 = <strong>0</strong>
+  </div>
+  <div class="callout red">S = 0 → B is critical. D is the binding constraint on B's Late Finish.</div>`,
+  focus:['B','D','E'],newReveal:{B:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'A — Late Times and Slack',
+  phase:'backward',
+  content:`<p>A has three successors: C (LS=14), F (LS=53), I (LS=48). Take the minimum.</p>
+  <div class="formula">
+    <span class="flabel">Multiple successors rule</span>
+    LF(A) = min(14, 53, 48) = <strong>14</strong><br>
+    LS(A) = 14 − 12 = <strong>2</strong><br>
+    S(A) = 2 − 0 = <strong>2</strong>
+  </div>
+  <p>C → G → J is the tightest downstream chain from A, which is why C's LS (14) constrains A's Late Finish.</p>`,
+  focus:['A','C','F','I'],newReveal:{A:['ls','lf','s']},dimOthers:true,showCrit:false
+},
+{
+  title:'Backward Pass Complete',
+  phase:'backward',
+  content:`<p>All Late Start, Late Finish, and Slack values are now calculated.</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>ES</th><th>LS</th><th>Slack</th><th>Critical?</th></tr>
+    <tr class="crit"><td>B</td><td>0</td><td>0</td><td>0</td><td>✓ Yes</td></tr>
+    <tr><td>A</td><td>0</td><td>2</td><td>2</td><td>No</td></tr>
+    <tr class="crit"><td>D</td><td>9</td><td>9</td><td>0</td><td>✓ Yes</td></tr>
+    <tr><td>C</td><td>12</td><td>14</td><td>2</td><td>No</td></tr>
+    <tr><td>E</td><td>9</td><td>35</td><td>26</td><td>No</td></tr>
+    <tr><td>G</td><td>22</td><td>24</td><td>2</td><td>No</td></tr>
+    <tr class="crit"><td>H</td><td>19</td><td>19</td><td>0</td><td>✓ Yes</td></tr>
+    <tr><td>F</td><td>12</td><td>53</td><td>41</td><td>No</td></tr>
+    <tr><td>I</td><td>12</td><td>48</td><td>36</td><td>No</td></tr>
+    <tr class="crit"><td>J</td><td>59</td><td>59</td><td>0</td><td>✓ Yes</td></tr>
+    <tr class="crit"><td>K</td><td>63</td><td>63</td><td>0</td><td>✓ Yes</td></tr>
+  </table>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:false
+},
+// ── CRITICAL PATH ──
+{
+  title:'The Critical Path',
+  phase:'critical',
+  content:`<p>Activities with <strong>S = 0</strong> form the critical path:</p>
+  <div class="callout red" style="font-size:.92rem;font-weight:600;letter-spacing:-.01em">
+    Start → B → D → H → J → K → Finish
+  </div>
+  <table class="ctable" style="margin-top:8px">
+    <tr><th>Activity</th><th>Duration</th></tr>
+    <tr class="crit"><td>B</td><td>9 weeks</td></tr>
+    <tr class="crit"><td>D</td><td>10 weeks</td></tr>
+    <tr class="crit"><td>H</td><td>40 weeks</td></tr>
+    <tr class="crit"><td>J</td><td>4 weeks</td></tr>
+    <tr class="crit"><td>K</td><td>6 weeks</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>69 weeks</strong></td></tr>
+  </table>`,
+  focus:['B','D','H','J','K'],newReveal:{},dimOthers:true,showCrit:true
+},
+{
+  title:'What Slack Tells Us',
+  phase:'critical',
+  content:`<p>Non-critical activities give the project manager scheduling flexibility:</p>
+  <table class="ctable">
+    <tr><th>Activity</th><th>Slack</th><th>Implication</th></tr>
+    <tr><td>A, C, G</td><td>2 wks</td><td>Very little flexibility — monitor closely</td></tr>
+    <tr><td>E</td><td>26 wks</td><td>Training can be delayed significantly</td></tr>
+    <tr><td>I</td><td>36 wks</td><td>Advertising has enormous flexibility</td></tr>
+    <tr><td>F</td><td>41 wks</td><td>Checklists: lowest priority for scheduling</td></tr>
+  </table>
+  <div class="callout">Slack doesn't mean an activity is unimportant — only that it has scheduling flexibility. All activities must still be completed.</div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:true
+},
+{
+  title:'Summary',
+  phase:'critical',
+  content:`<div class="callout green"><strong>Project duration:</strong> 69 weeks<br><strong>Critical path:</strong> B → D → H → J → K<br><strong>Key risk:</strong> Activity H (40-week construction)</div>
+  <p>As project manager, focus your attention on the critical path — especially <strong>H</strong>, the longest and riskiest activity. A 1-week delay in construction = a 1-week delay in hospital opening.</p>
+  <p>F and I are safe to deprioritize. C, G, and A have small buffers — watch but don't panic.</p>
+  <div class="callout blue" style="margin-top:10px;font-size:.8rem">
+    <strong>Note:</strong> The original slide shows J with S = 10 — this is a typo. J feeds directly into K (LS=63), giving J a LF=63, LS=59, and S = 0. J is on the critical path.
+  </div>`,
+  focus:[],newReveal:{},dimOthers:false,showCrit:true
+},
+];
+
+// ─────────────────────────────────────────────
+//  State
+// ─────────────────────────────────────────────
+let step = 0;
+
+// Compute cumulative revealed values up to stepIdx
+function getRevealed(stepIdx) {
+  const rev = {};
+  for (let i=0; i<=stepIdx; i++) {
+    const nr = STEPS[i].newReveal || {};
+    for (const [id, vals] of Object.entries(nr)) {
+      if (!rev[id]) rev[id]=new Set();
+      vals.forEach(v=>rev[id].add(v));
+    }
+  }
+  return rev;
+}
+
+// ─────────────────────────────────────────────
+//  SVG rendering helpers
+// ─────────────────────────────────────────────
+function nodePos(id) {
+  if (id==='START') return {x:42,y:266};
+  if (id==='FINISH') return {x:908,y:213};
+  return {x:ACT[id].x, y:ACT[id].y};
+}
+
+function edgeEndpoints(from, to) {
+  const p1=nodePos(from), p2=nodePos(to);
+  const dx=p2.x-p1.x, dy=p2.y-p1.y;
+  const len=Math.sqrt(dx*dx+dy*dy);
+  const ux=dx/len, uy=dy/len;
+  // Offset from center to edge of box
+  const r1 = from==='START'||from==='FINISH' ? {w:32,h:16} : {w:NW/2,h:NH/2};
+  const r2 = to==='START'||to==='FINISH'     ? {w:32,h:16} : {w:NW/2,h:NH/2};
+  const t1 = Math.min(r1.w/Math.abs(ux||.001), r1.h/Math.abs(uy||.001));
+  const t2 = Math.min(r2.w/Math.abs(ux||.001), r2.h/Math.abs(uy||.001));
+  return {
+    x1: p1.x+ux*t1+1, y1: p1.y+uy*t1+1,
+    x2: p2.x-ux*t2-2, y2: p2.y-uy*t2-2,
+  };
+}
+
+function renderEdges(focusNodes, showCrit) {
+  const critNodes = new Set(['B','D','H','J','K']);
+  return EDGES.map(([from,to,isCrit])=>{
+    const ep=edgeEndpoints(from,to);
+    const edgeId=`e-${from}-${to}`;
+    const onCritPath = isCrit;
+    const involvesFocus = focusNodes.length===0 ||
+      focusNodes.includes(from) || focusNodes.includes(to);
+    const dimEdge = focusNodes.length>0 && !involvesFocus;
+    const color = dimEdge ? '#cbd5e1' :
+                  (onCritPath && showCrit) ? '#dc2626' :
+                  onCritPath ? '#e84c1e' : '#4a90d9';
+    const marker = dimEdge ? 'ah-dim' :
+                   (onCritPath && showCrit) ? 'ah-crit' :
+                   onCritPath ? 'ah-crit' : 'ah-blue';
+    const opacity = dimEdge ? 0.25 : 1;
+    const sw = (onCritPath && !dimEdge) ? 2.2 : 1.6;
+    return `<line id="${edgeId}" x1="${ep.x1}" y1="${ep.y1}" x2="${ep.x2}" y2="${ep.y2}"
+      stroke="${color}" stroke-width="${sw}" marker-end="url(#${marker})"
+      opacity="${opacity}" stroke-linecap="round"/>`;
+  }).join('');
+}
+
+function renderNode(id, data, opts) {
+  const {show=new Set(), highlight=false, dim=false, showCrit=false} = opts;
+  const {x,y,es,ef,ls,lf,d,s,crit} = data;
+  const x0=x-NW/2, y0=y-NH/2;
+  const midY=y;
+  const glowing = highlight;
+
+  const centerFill = crit ? '#991b1b' : '#1e3a5f';
+  const leftFill   = highlight ? '#fde68a' : '#d4c4a8';
+  const rightFill  = highlight ? '#fbbf24' : '#f4b942';
+  const stroke     = highlight ? '#d97706' : crit ? '#b91c1c' : '#94a3b8';
+  const sw         = highlight ? 2.5 : crit ? 2 : 1.5;
+  const op         = dim ? 0.18 : 1;
+  const filter     = highlight ? 'filter="url(#glow)"' : '';
+
+  const tv = (v, txt, x, y) =>
+    show.has(v) ? `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle"
+      font-size="10.5" font-weight="700" fill="#1a202c" font-family="DM Sans,system-ui">${txt}</text>` : '';
+
+  const slackColor = s===0 ? '#dc2626' : '#6b7280';
+  const slackW     = s===0 ? '700' : '400';
+
+  return `<g id="node-${id}" opacity="${op}" ${filter}>
+    <rect x="${x0}" y="${y0}" width="${NW}" height="${NH}" rx="4" fill="white" stroke="${stroke}" stroke-width="${sw}"/>
+    <!-- Left col -->
+    <path d="M${x0+3},${y0} H${x0+LC} V${y0+NH} H${x0+3} A3,3 0 0,1 ${x0},${y0+NH-3} V${y0+3} A3,3 0 0,1 ${x0+3},${y0}Z" fill="${leftFill}"/>
+    <!-- Center col -->
+    <rect x="${x0+LC}" y="${y0}" width="${CC}" height="${NH}" fill="${centerFill}"/>
+    <!-- Right col -->
+    <path d="M${x0+LC+CC},${y0} H${x0+NW-3} A3,3 0 0,1 ${x0+NW},${y0+3} V${y0+NH-3} A3,3 0 0,1 ${x0+NW-3},${y0+NH} H${x0+LC+CC}Z" fill="${rightFill}"/>
+    <!-- Dividers -->
+    <line x1="${x0}" y1="${midY}" x2="${x0+NW}" y2="${midY}" stroke="${stroke}" stroke-width=".8"/>
+    <line x1="${x0+LC}" y1="${y0}" x2="${x0+LC}" y2="${y0+NH}" stroke="${stroke}" stroke-width=".8"/>
+    <line x1="${x0+LC+CC}" y1="${y0}" x2="${x0+LC+CC}" y2="${y0+NH}" stroke="${stroke}" stroke-width=".8"/>
+    <!-- Activity letter -->
+    <text x="${x}" y="${midY-8}" text-anchor="middle" dominant-baseline="middle"
+      font-size="16" font-weight="800" fill="white" font-family="DM Sans,system-ui">${id}</text>
+    <!-- Duration -->
+    <text x="${x}" y="${midY+14}" text-anchor="middle" dominant-baseline="middle"
+      font-size="9.5" fill="rgba(255,255,255,.85)" font-family="DM Sans,system-ui">${d} wks</text>
+    <!-- ES EF LS LF -->
+    ${tv('es', es, x0+11, midY-8)}
+    ${tv('ef', ef, x0+LC+CC+11, midY-8)}
+    ${tv('ls', ls, x0+11, midY+14)}
+    ${tv('lf', lf, x0+LC+CC+11, midY+14)}
+    <!-- Slack -->
+    ${show.has('s') ? `<text x="${x}" y="${y0+NH+15}" text-anchor="middle" font-size="10"
+      fill="${slackColor}" font-weight="${slackW}" font-family="DM Sans,system-ui">S = ${s}</text>` : ''}
+  </g>`;
+}
+
+function renderDiagram() {
+  const s = STEPS[step];
+  const revealed = getRevealed(step);
+  const focusSet = new Set(s.focus || []);
+  const dimOthers = s.dimOthers && focusSet.size > 0;
+
+  // Edges
+  document.getElementById('svg-edges').innerHTML =
+    renderEdges(s.focus||[], s.showCrit||false);
+
+  // Start / Finish boxes
+  const startDim = dimOthers && !focusSet.has('START');
+  const finDim   = dimOthers && !focusSet.has('FINISH');
+  const extraNodes = `
+    <g id="node-START" opacity="${startDim?0.18:1}">
+      <rect x="10" y="250" width="65" height="32" rx="6" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
+      <text x="42" y="266" text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="700" fill="white" font-family="DM Sans,system-ui">Start</text>
+    </g>
+    <g id="node-FINISH" opacity="${finDim?0.18:1}">
+      <rect x="858" y="197" width="68" height="32" rx="6" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
+      <text x="892" y="213" text-anchor="middle" dominant-baseline="middle"
+        font-size="13" font-weight="700" fill="white" font-family="DM Sans,system-ui">Finish</text>
+    </g>`;
+
+  // Activity nodes
+  let nodesSVG = extraNodes;
+  for (const [id, data] of Object.entries(ACT)) {
+    const highlight = focusSet.has(id);
+    const dim = dimOthers && !highlight;
+    nodesSVG += renderNode(id, data, {
+      show: revealed[id] || new Set(),
+      highlight, dim,
+      showCrit: s.showCrit||false,
+    });
+  }
+  document.getElementById('svg-nodes').innerHTML = nodesSVG;
+}
+
+// ─────────────────────────────────────────────
+//  Panel rendering
+// ─────────────────────────────────────────────
+const phaseLabel = {intro:'Intro',forward:'Forward Pass',backward:'Backward Pass',critical:'Critical Path'};
+const phaseClass = {intro:'tag-intro',forward:'tag-forward',backward:'tag-backward',critical:'tag-critical'};
+
+function renderPanel() {
+  const s = STEPS[step];
+  const tag = document.getElementById('phase-tag');
+  tag.textContent = phaseLabel[s.phase];
+  tag.className = 'tag ' + phaseClass[s.phase];
+  document.getElementById('step-title').textContent = s.title;
+  document.getElementById('step-body').innerHTML = s.content;
+}
+
+function renderProgress() {
+  const pct = step / (STEPS.length-1) * 100;
+  document.getElementById('pgfill').style.width = pct + '%';
+  document.getElementById('pglbl').textContent = `Step ${step+1} of ${STEPS.length}`;
+  document.getElementById('sctr').textContent = `${step+1} / ${STEPS.length}`;
+  document.getElementById('btn-prev').disabled = step===0;
+  document.getElementById('btn-next').disabled = step===STEPS.length-1;
+  document.getElementById('btn-next').textContent =
+    step===STEPS.length-1 ? '✓ Done' : 'Next →';
+}
+
+function render() {
+  renderPanel();
+  renderDiagram();
+  renderProgress();
+}
+
+function go(dir) {
+  step = Math.max(0, Math.min(STEPS.length-1, step+dir));
+  render();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e=>{
+  if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); go(1); }
+  if (e.key==='ArrowLeft')               { e.preventDefault(); go(-1); }
+});
+
+render();
+</script>
+</body>
+</html>

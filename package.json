@@ -7,7 +7,7 @@
     "dev": "cd tools/spc && npm run dev",
     "dev:slides": "cd slides && npm run dev",
     "dev:ops-strategy": "cd tools/ops-strategy && npm run dev",
-    "build": "npm run build:spc && npm run build:slides && npm run build:ops-strategy && npm run build:ton-mile-center && npm run build:vsm && cp index-root.html dist/index.html",
+    "build": "npm run build:spc && npm run build:slides && npm run build:ops-strategy && npm run build:ton-mile-center && npm run build:vsm && npm run build:pmo && cp index-root.html dist/index.html",
     "build:spc": "cd tools/spc && npm run build",
     "build:slides": "cd slides && npm run build",
     "build:ops-strategy": "cd tools/ops-strategy && npm run build",
@@ -16,7 +16,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "build:ton-mile-center": "cp -R ton-mile-center dist/ton-mile-center",
-    "build:vsm": "cp -R tools/vsm dist/vsm"
+    "build:vsm": "cp -R tools/vsm dist/vsm",
+    "build:pmo": "cp -R tools/pmo dist/pmo"
   },
   "dependencies": {
     "react": "^18.3.1",
