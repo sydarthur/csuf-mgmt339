@@ -333,7 +333,7 @@ const STEPS = [
     <li>Some activities have <em>multiple predecessors</em> (J waits for H, E, and G)</li>
   </ul>
   <div class="callout blue">Duration values are already shown inside each node. We'll fill in ES, EF, LS, LF, and Slack as we go.</div>`,
-  focus:[],newReveal:{},dimOthers:false,showCrit:false
+  focus:[],newReveal:{},clearReveal:{K:['es','ef','ls','lf','s']},dimOthers:false,showCrit:false
 },
 // ── FORWARD PASS ──
 {
@@ -856,6 +856,11 @@ let step = 0;
 function getRevealed(stepIdx) {
   const rev = {};
   for (let i=0; i<=stepIdx; i++) {
+    // Apply clears before new reveals
+    const cr = STEPS[i].clearReveal || {};
+    for (const [id, vals] of Object.entries(cr)) {
+      if (rev[id]) vals.forEach(v => rev[id].delete(v));
+    }
     const nr = STEPS[i].newReveal || {};
     for (const [id, vals] of Object.entries(nr)) {
       if (!rev[id]) rev[id]=new Set();
@@ -899,14 +904,11 @@ function renderEdges(focusNodes, showCrit) {
     const involvesFocus = focusNodes.length===0 ||
       focusNodes.includes(from) || focusNodes.includes(to);
     const dimEdge = focusNodes.length>0 && !involvesFocus;
-    const color = dimEdge ? '#cbd5e1' :
-                  (onCritPath && showCrit) ? '#dc2626' :
-                  onCritPath ? '#e84c1e' : '#4a90d9';
-    const marker = dimEdge ? 'ah-dim' :
-                   (onCritPath && showCrit) ? 'ah-crit' :
-                   onCritPath ? 'ah-crit' : 'ah-blue';
+    const isCritVisible = onCritPath && showCrit;
+    const color = dimEdge ? '#cbd5e1' : isCritVisible ? '#dc2626' : '#4a90d9';
+    const marker = dimEdge ? 'ah-dim' : isCritVisible ? 'ah-crit' : 'ah-blue';
     const opacity = dimEdge ? 0.25 : 1;
-    const sw = (onCritPath && !dimEdge) ? 2.2 : 1.6;
+    const sw = (isCritVisible && !dimEdge) ? 2.2 : 1.6;
     return `<line id="${edgeId}" x1="${ep.x1}" y1="${ep.y1}" x2="${ep.x2}" y2="${ep.y2}"
       stroke="${color}" stroke-width="${sw}" marker-end="url(#${marker})"
       opacity="${opacity}" stroke-linecap="round"/>`;
@@ -920,11 +922,11 @@ function renderNode(id, data, opts) {
   const midY=y;
   const glowing = highlight;
 
-  const centerFill = crit ? '#991b1b' : '#1e3a5f';
+  const centerFill = (crit && showCrit) ? '#991b1b' : '#1e3a5f';
   const leftFill   = highlight ? '#fde68a' : '#d4c4a8';
   const rightFill  = highlight ? '#fbbf24' : '#f4b942';
-  const stroke     = highlight ? '#d97706' : crit ? '#b91c1c' : '#94a3b8';
-  const sw         = highlight ? 2.5 : crit ? 2 : 1.5;
+  const stroke     = highlight ? '#d97706' : (crit && showCrit) ? '#b91c1c' : '#94a3b8';
+  const sw         = highlight ? 2.5 : (crit && showCrit) ? 2 : 1.5;
   const op         = dim ? 0.18 : 1;
   const filter     = highlight ? 'filter="url(#glow)"' : '';
 
