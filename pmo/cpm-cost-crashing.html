@@ -893,12 +893,12 @@ function renderLeft(s) {
         <path d="M 60,50 Q 130,90 200,120 T 260,145" fill="none" stroke="#059669" stroke-width="2.5"/>
         <text x="52" y="48" font-size="9" fill="#059669" font-family="DM Sans" font-weight="700">Indirect</text>
 
-        <!-- Total cost (U-shape) -->
-        <path d="M 60,80 Q 110,65 155,62 T 260,95" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5,3"/>
-        <text x="82" y="57" font-size="9" fill="#2563eb" font-family="DM Sans" font-weight="700">Total</text>
+        <!-- Total cost (U-shape: high-left, minimum-middle, high-right) -->
+        <path d="M 60,55 C 110,55 130,120 155,120 C 180,120 210,55 260,55" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <text x="62" y="50" font-size="9" fill="#2563eb" font-family="DM Sans" font-weight="700">Total</text>
 
         <!-- Optimum marker -->
-        <line x1="155" y1="62" x2="155" y2="155" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="155" y1="120" x2="155" y2="155" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>
         <text x="148" y="170" font-size="8.5" fill="#d97706" font-family="DM Sans" font-weight="700">Optimum</text>
       </svg>
       <div class="callout callout-blue"><p>The <strong style="color:#2563eb">total cost curve</strong> has a minimum — the optimal project duration. Crashing beyond that point costs more than it saves.</p></div>
