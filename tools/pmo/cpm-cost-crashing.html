@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPM Cost–Time Optimization — St. John's Hospital</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #1a202c;
+  --muted: #64748b;
+  --navy: #1e3a5f;
+  --blue: #2563eb;
+  --gold: #d97706;
+  --crit: #dc2626;
+  --crit-light: #fef2f2;
+  --green: #059669;
+  --green-light: #ecfdf5;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --teal: #0891b2;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ── Header ── */
+header {
+  background:var(--navy);
+  color:#fff;
+  padding:10px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+}
+header h1 { font-size:.95rem; font-weight:600; letter-spacing:-.01em; }
+header a  { color:#93c5fd; font-size:.8rem; text-decoration:none; }
+header a:hover { color:#fff; }
+
+/* ── Progress bar ── */
+.prog-wrap {
+  background:var(--navy);
+  padding:0 20px 8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+}
+.prog-track { flex:1; height:5px; background:#2d4e73; border-radius:3px; }
+.prog-fill   { height:100%; background:#f59e0b; border-radius:3px; transition:width .35s ease; }
+.prog-lbl    { color:#94a3b8; font-size:.72rem; min-width:70px; text-align:right; }
+
+/* ── Main layout ── */
+#layout {
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 360px;
+  overflow:hidden;
+}
+
+/* ── Left panel: cost view ── */
+#left-panel {
+  background:#fff;
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#left-header {
+  background:#f8fafc;
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+}
+#left-header h2 { font-size:.8rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.06em; }
+
+#left-body {
+  flex:1;
+  overflow-y:auto;
+  padding:14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* Cost summary bar */
+.cost-bar {
+  background:var(--navy);
+  border-radius:10px;
+  padding:12px 16px;
+  color:#fff;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.cost-bar .citem { text-align:center; }
+.cost-bar .clbl  { font-size:.65rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; display:block; margin-bottom:3px; }
+.cost-bar .cval  { font-family:'JetBrains Mono',monospace; font-size:.95rem; font-weight:600; }
+.cost-bar .cval.savings { color:#4ade80; }
+.cost-bar .cval.total   { color:#fbbf24; }
+.cost-bar .cval.weeks   { color:#93c5fd; }
+
+/* Path table */
+.paths-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:.8rem;
+}
+.paths-table th {
+  background:#f1f5f9;
+  padding:6px 10px;
+  text-align:left;
+  font-size:.68rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+.paths-table td {
+  padding:6px 10px;
+  border-bottom:1px solid var(--border);
+  color:#374151;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;
+  transition:background .2s;
+}
+.paths-table tr.crit td { background:var(--crit-light); }
+.paths-table td.path-name { font-family:'DM Sans',system-ui,sans-serif; font-weight:600; color:var(--navy); font-size:.78rem; }
+.crit-badge {
+  display:inline-block; padding:1px 6px; border-radius:8px;
+  background:#dc2626; color:#fff; font-size:.62rem; font-weight:700;
+  font-family:'DM Sans',system-ui; margin-left:4px;
+}
+
+/* Activity crash table */
+.act-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:.78rem;
+}
+.act-table th {
+  background:#f1f5f9;
+  padding:5px 8px;
+  text-align:center;
+  font-size:.63rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+.act-table th:first-child { text-align:left; }
+.act-table td {
+  padding:5px 8px;
+  border-bottom:1px solid var(--border);
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.76rem;
+  color:#374151;
+}
+.act-table td:first-child { text-align:left; font-family:'DM Sans',system-ui; font-weight:600; color:var(--navy); }
+.act-table tr.crashed td { background:#fff7ed; }
+.act-table tr.best-option td { background:var(--green-light); }
+.act-table tr.best-option td:first-child { color:var(--green); }
+.act-crashed-badge {
+  display:inline-block; padding:1px 5px; border-radius:6px;
+  background:#f97316; color:#fff; font-size:.6rem; font-weight:700;
+  font-family:'DM Sans',system-ui; margin-left:3px;
+}
+.act-best-badge {
+  display:inline-block; padding:1px 5px; border-radius:6px;
+  background:#059669; color:#fff; font-size:.6rem; font-weight:700;
+  font-family:'DM Sans',system-ui; margin-left:3px;
+}
+
+.section-label {
+  font-size:.68rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+/* ── Right panel ── */
+#panel {
+  display:flex;
+  flex-direction:column;
+  background:#f8fafc;
+}
+#panel-body {
+  flex:1;
+  padding:18px 20px;
+  overflow-y:auto;
+}
+
+/* Phase tag */
+.tag {
+  display:inline-block;
+  padding:2px 9px;
+  border-radius:10px;
+  font-size:.68rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:8px;
+}
+.tag-intro    { background:#e2e8f0; color:#475569; }
+.tag-concept  { background:#dbeafe; color:#1d4ed8; }
+.tag-cost     { background:#fef3c7; color:#92400e; }
+.tag-crash    { background:#fee2e2; color:#b91c1c; }
+.tag-optimal  { background:#d1fae5; color:#065f46; }
+
+#step-title {
+  font-size:1rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.3;
+  margin-bottom:10px;
+}
+
+.step-body p  { font-size:.84rem; line-height:1.65; color:#374151; margin-bottom:8px; }
+.step-body ul, .step-body ol { padding-left:16px; margin-bottom:8px; }
+.step-body li { font-size:.84rem; line-height:1.6; color:#374151; margin-bottom:3px; }
+.step-body strong { color:var(--navy); }
+.step-body em { color:var(--muted); }
+
+.formula {
+  background:#fff;
+  border:1.5px solid #c7d2fe;
+  border-radius:7px;
+  padding:10px 14px;
+  margin:10px 0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  color:#312e81;
+}
+.formula .flabel {
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:.68rem;
+  font-weight:700;
+  color:#6366f1;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  display:block;
+  margin-bottom:4px;
+}
+
+.callout {
+  border-left:3px solid #f59e0b;
+  background:#fffbeb;
+  padding:8px 12px;
+  border-radius:0 6px 6px 0;
+  margin:10px 0;
+}
+.callout p { margin-bottom:0; font-size:.82rem; }
+
+.callout-green {
+  border-left:3px solid #059669;
+  background:var(--green-light);
+}
+.callout-red {
+  border-left:3px solid #dc2626;
+  background:var(--crit-light);
+}
+.callout-blue {
+  border-left:3px solid #2563eb;
+  background:#eff6ff;
+}
+.callout-purple {
+  border-left:3px solid #7c3aed;
+  background:var(--purple-light);
+}
+
+/* Cost curve visualization */
+.cost-curve {
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  margin:10px 0;
+}
+
+/* Decision matrix */
+.decision-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  border-radius:6px;
+  margin-bottom:4px;
+  font-size:.8rem;
+}
+.decision-row.good  { background:var(--green-light); }
+.decision-row.bad   { background:var(--crit-light); }
+.decision-row .icon { font-size:1rem; flex-shrink:0; }
+
+/* Stage progress dots */
+.stage-dots {
+  display:flex;
+  gap:6px;
+  margin:8px 0;
+}
+.sdot {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; font-weight:700;
+  border:2px solid var(--border);
+  color:var(--muted);
+  background:#fff;
+  transition:all .25s;
+}
+.sdot.done   { background:#059669; border-color:#059669; color:#fff; }
+.sdot.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+
+/* Navigation */
+#nav {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 20px;
+  border-top:1px solid var(--border);
+  background:#fff;
+  flex-shrink:0;
+}
+.btn {
+  padding:7px 16px;
+  border-radius:7px;
+  font-family:'DM Sans',system-ui;
+  font-size:.82rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:all .2s;
+}
+.btn-ghost { background:#f1f5f9; color:var(--navy); }
+.btn-ghost:hover:not(:disabled) { background:#e2e8f0; }
+.btn-ghost:disabled { opacity:.35; cursor:not-allowed; }
+.btn-primary { background:var(--navy); color:#fff; }
+.btn-primary:hover:not(:disabled) { background:#162d4a; }
+.btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+#sctr { font-size:.75rem; color:var(--muted); }
+
+/* Summary table at end */
+.summary-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:.78rem;
+}
+.summary-table th {
+  background:var(--navy);
+  color:#fff;
+  padding:6px 10px;
+  font-size:.67rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.summary-table td {
+  padding:6px 10px;
+  border-bottom:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.75rem;
+  text-align:right;
+}
+.summary-table td:first-child { text-align:center; font-family:'DM Sans'; font-weight:700; color:var(--navy); }
+.summary-table tr:last-child { background:#f0fdf4; font-weight:700; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📉 CPM Cost–Time Optimization — St. John's Hospital</h1>
+  <a href="cpm-walkthrough.html">← Critical Path Walkthrough</a>
+</header>
+
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="pgfill" style="width:0%"></div></div>
+  <div class="prog-lbl" id="pglbl">Step 1 of 20</div>
+</div>
+
+<div id="layout">
+
+  <!-- ── LEFT: Dynamic cost / path / activity view ── -->
+  <div id="left-panel">
+    <div id="left-header">
+      <h2 id="left-title">Project Overview</h2>
+    </div>
+    <div id="left-body">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Explanatory panel ── -->
+  <div id="panel">
+    <div id="panel-body">
+      <span class="tag tag-intro" id="phase-tag">Intro</span>
+      <div id="step-title">Loading…</div>
+      <div class="step-body" id="step-body"></div>
+    </div>
+    <div id="nav">
+      <button class="btn btn-ghost" id="btn-prev" onclick="go(-1)" disabled>← Prev</button>
+      <span id="sctr">1 / 20</span>
+      <button class="btn btn-primary" id="btn-next" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────
+
+const INDIRECT = 8000;   // per week
+const PENALTY_THRESH = 65;
+const PENALTY = 20000;   // per week beyond 65
+
+const ACTIVITIES = {
+  A: { nt:12, nc:12000,  ct:11, cc:13000  },
+  B: { nt:9,  nc:50000,  ct:7,  cc:64000  },
+  C: { nt:10, nc:4000,   ct:5,  cc:7000   },
+  D: { nt:10, nc:16000,  ct:8,  cc:20000  },
+  E: { nt:24, nc:120000, ct:14, cc:200000 },
+  F: { nt:10, nc:10000,  ct:6,  cc:16000  },
+  G: { nt:35, nc:500000, ct:25, cc:530000 },
+  H: { nt:40, nc:1200000,ct:35, cc:1260000},
+  I: { nt:15, nc:40000,  ct:10, cc:52500  },
+  J: { nt:4,  nc:10000,  ct:1,  cc:13000  },
+  K: { nt:6,  nc:30000,  ct:5,  cc:34000  },
+};
+
+// crash cost per week
+Object.keys(ACTIVITIES).forEach(k => {
+  const a = ACTIVITIES[k];
+  a.maxRed = a.nt - a.ct;
+  a.ccpw = (a.cc - a.nc) / (a.nt - a.ct);
+});
+
+const PATHS_DEF = [
+  { id:'AIK',   acts:['A','I','K'],     label:'A–I–K' },
+  { id:'AFK',   acts:['A','F','K'],     label:'A–F–K' },
+  { id:'ACGJK', acts:['A','C','G','J','K'], label:'A–C–G–J–K' },
+  { id:'BDHIJK',acts:['B','D','H','J','K'], label:'B–D–H–J–K' },
+  { id:'BEJK',  acts:['B','E','J','K'],  label:'B–E–J–K' },
+];
+
+// ─────────────────────────────────────────────
+//  STATE per stage: crashed[act] = weeks crashed so far
+// ─────────────────────────────────────────────
+
+const STAGES = [
+  { crashed:{}, highlight:[], bestOption:[], label:'Normal (no crashing)' },
+  { crashed:{J:3}, highlight:['J'], bestOption:['J'], label:'Stage 1: Crash J by 3 wks' },
+  { crashed:{J:3,D:2}, highlight:['D'], bestOption:['D'], label:'Stage 2: Crash D by 2 wks' },
+  { crashed:{J:3,D:2,K:1}, highlight:['K'], bestOption:['K'], label:'Stage 3: Crash K by 1 wk' },
+  { crashed:{J:3,D:2,K:1,B:2,C:2}, highlight:['B','C'], bestOption:['B','C'], label:'Stage 4: Crash B & C by 2 wks' },
+];
+
+function actDuration(act, crashed) {
+  return ACTIVITIES[act].nt - (crashed[act] || 0);
+}
+
+function pathDuration(path, crashed) {
+  return path.acts.reduce((s, a) => s + actDuration(a, crashed), 0);
+}
+
+function directCost(crashed) {
+  let total = Object.values(ACTIVITIES).reduce((s,a) => s+a.nc, 0);
+  Object.entries(crashed).forEach(([k,w]) => {
+    total += w * ACTIVITIES[k].ccpw;
+  });
+  return total;
+}
+
+function totalCost(crashed) {
+  const dur = maxPathDuration(crashed);
+  const dc = directCost(crashed);
+  const ic = dur * INDIRECT;
+  const pen = Math.max(0, dur - PENALTY_THRESH) * PENALTY;
+  return dc + ic + pen;
+}
+
+function maxPathDuration(crashed) {
+  return Math.max(...PATHS_DEF.map(p => pathDuration(p, crashed)));
+}
+
+function criticalPaths(crashed) {
+  const max = maxPathDuration(crashed);
+  return PATHS_DEF.filter(p => pathDuration(p, crashed) === max).map(p => p.id);
+}
+
+// ─────────────────────────────────────────────
+//  STEPS
+// ─────────────────────────────────────────────
+
+const STEPS = [
+
+// ── CONCEPT INTRO ──────────────────────────────────────────────────────────
+
+{
+  phase:'concept', title:'Why Does Cost Matter in Project Scheduling?',
+  leftMode:'intro',
+  content:`
+    <p>You've already mastered <strong>finding the critical path</strong> — the longest chain of activities that determines how fast a project finishes.</p>
+    <p>But here's the next challenge: <em>finishing faster usually costs more money.</em> And sometimes, finishing slower costs more too — in penalties or lost revenue.</p>
+    <p>The <strong>Cost–Time Trade-off Problem</strong> asks:</p>
+    <div class="callout callout-blue"><p>💡 What is the <strong>minimum total cost</strong> schedule for this project?</p></div>
+    <p>This isn't just "go as fast as possible" — it's about finding the <em>sweet spot</em> between speed and cost.</p>
+  `
+},
+
+{
+  phase:'concept', title:'Two Types of Project Costs',
+  leftMode:'cost-types',
+  content:`
+    <p>Project costs fall into two buckets that <em>move in opposite directions</em> as you shorten project duration:</p>
+    <p><strong>1. Direct Costs</strong> — the cost of doing the actual work (labor, materials, equipment). These <span style="color:var(--crit)">increase</span> when you crash activities (more overtime, more crews).</p>
+    <p><strong>2. Indirect Costs</strong> — overhead costs that accrue over time (admin, facilities, supervision). These <span style="color:var(--green)">decrease</span> the faster you finish.</p>
+    <div class="callout callout-blue"><p>⚖️ <strong>Total Cost = Direct + Indirect (+ Penalty, if any)</strong><br>The optimal schedule minimizes the sum of all three.</p></div>
+  `
+},
+
+{
+  phase:'concept', title:'Normal Time vs. Crash Time',
+  leftMode:'act-table-intro',
+  content:`
+    <p>For each activity, we track four numbers:</p>
+    <ul>
+      <li><strong>Normal Time (NT)</strong> — how long under normal conditions</li>
+      <li><strong>Normal Cost (NC)</strong> — what it costs normally</li>
+      <li><strong>Crash Time (CT)</strong> — the <em>minimum</em> possible duration (max resources)</li>
+      <li><strong>Crash Cost (CC)</strong> — what it costs at crash time</li>
+    </ul>
+    <div class="callout"><p>📐 We assume a <strong>linear relationship</strong> between time and cost. The cost of crashing by one week is constant for each activity.</p></div>
+    <div class="formula">
+      <span class="flabel">Cost to Crash per Week</span>
+      (CC − NC) ÷ (NT − CT)
+    </div>
+    <p>For example, Activity H: (1,260,000 − 1,200,000) ÷ (40 − 35) = <strong>$12,000/week</strong>.</p>
+  `
+},
+
+{
+  phase:'concept', title:'St. John's Hospital: Starting Position',
+  leftMode:'overview',
+  stageIdx: 0,
+  content:`
+    <p>Here's the project at <strong>normal time</strong> — no crashing at all.</p>
+    <p>The critical path is <strong>B–D–H–J–K</strong> at <strong>69 weeks</strong>.</p>
+    <div class="formula">
+      <span class="flabel">Normal Total Cost Calculation</span>
+      Direct: $1,992,000<br>
+      Indirect: 69 × $8,000 = $552,000<br>
+      Penalty: (69−65) × $20,000 = $80,000<br>
+      <strong>Total: $2,624,000</strong>
+    </div>
+    <div class="callout callout-red"><p>🚨 We're paying a <strong>$80,000 penalty</strong> because the project takes 4 weeks longer than 65. There's room to save.</p></div>
+  `
+},
+
+// ── THE PROCEDURE ────────────────────────────────────────────────────────
+
+{
+  phase:'crash', title:'The 4-Step Crashing Procedure',
+  leftMode:'procedure',
+  content:`
+    <p>We use a <strong>greedy algorithm</strong> — crash one week at a time, always choosing the cheapest option on the critical path.</p>
+    <ol>
+      <li>Identify the <strong>critical path(s)</strong>.</li>
+      <li>Find the activity on the critical path with the <strong>lowest crash cost per week</strong>.</li>
+      <li>Crash that activity <em>until</em> it can't be shortened further, <em>or</em> another path becomes critical, <em>or</em> saving stops exceeding cost.</li>
+      <li>Repeat until <strong>total savings < crashing cost</strong>.</li>
+    </ol>
+    <div class="callout callout-blue"><p>💡 If multiple paths become critical simultaneously, you must crash <em>one activity on each critical path</em> — or a shared activity that's on all of them.</p></div>
+  `
+},
+
+// ── STAGE 1 ──────────────────────────────────────────────────────────────
+
+{
+  phase:'crash', title:'Stage 1 — Identify the Cheapest Option',
+  leftMode:'act-table',
+  stageIdx: 0,
+  highlightCrit: true,
+  overrideBest: ['J'],
+  content:`
+    <p>Critical path: <strong>B–D–H–J–K</strong> (69 weeks)</p>
+    <p>Look at the activities on this path and their crash costs per week:</p>
+    <ul>
+      <li>B: $7,000/wk &nbsp;|&nbsp; D: $2,000/wk</li>
+      <li>H: $12,000/wk &nbsp;|&nbsp; J: <strong>$1,000/wk ← cheapest!</strong></li>
+      <li>K: $4,000/wk</li>
+    </ul>
+    <p>Savings per week from crashing = <strong>$8,000</strong> (indirect) + <strong>$20,000</strong> (penalty) = <strong>$28,000/wk</strong>.</p>
+    <div class="callout callout-green"><p>✅ J costs only $1,000/wk to crash. Every week we crash saves a net <strong>$27,000</strong>. Crash J as much as possible.</p></div>
+  `
+},
+
+{
+  phase:'crash', title:'Stage 1 — Crash Activity J',
+  leftMode:'paths',
+  stageIdx: 1,
+  content:`
+    <p>Activity J can be shortened by <strong>3 weeks</strong> (from 4 to 1 week — its crash limit).</p>
+    <p>After crashing J by 3 weeks:</p>
+    <ul>
+      <li>B–D–H–J–K drops from 69 → <strong>66 weeks</strong></li>
+      <li>A–C–G–J–K drops from 67 → <strong>64 weeks</strong></li>
+    </ul>
+    <div class="formula">
+      <span class="flabel">Net Savings — Stage 1</span>
+      3 × $28,000 (savings) − 3 × $1,000 (crash cost)<br>
+      = $84,000 − $3,000 = <strong>$81,000</strong>
+    </div>
+    <div class="formula">
+      <span class="flabel">New Total Cost</span>
+      $2,624,000 − $81,000 = <strong>$2,543,000</strong>
+    </div>
+  `
+},
+
+// ── STAGE 2 ──────────────────────────────────────────────────────────────
+
+{
+  phase:'crash', title:'Stage 2 — Still One Critical Path',
+  leftMode:'act-table',
+  stageIdx: 1,
+  highlightCrit: true,
+  overrideBest: ['D'],
+  content:`
+    <p>After Stage 1, the critical path is still <strong>B–D–H–J–K</strong> at 66 weeks.</p>
+    <p>J is now fully crashed (at its minimum of 1 week). The next cheapest option on the critical path:</p>
+    <ul>
+      <li>B: $7,000/wk &nbsp;|&nbsp; <strong>D: $2,000/wk ← cheapest remaining!</strong></li>
+      <li>H: $12,000/wk &nbsp;|&nbsp; K: $4,000/wk</li>
+    </ul>
+    <p>We're still in the penalty zone (66 > 65). Savings = $8,000 (indirect) + $20,000 (penalty) = $28,000/wk for the first week, then just $8,000/wk after that.</p>
+    <div class="callout callout-green"><p>✅ D is the cheapest crashable activity. Max reduction = 2 weeks.</p></div>
+  `
+},
+
+{
+  phase:'crash', title:'Stage 2 — Crash Activity D',
+  leftMode:'paths',
+  stageIdx: 2,
+  content:`
+    <p>Crash D by <strong>2 weeks</strong> (from 10 → 8 weeks):</p>
+    <ul>
+      <li><strong>Week 1:</strong> Still in penalty zone. Saves $28,000 − $2,000 = $26,000</li>
+      <li><strong>Week 2:</strong> Project is now at 65 weeks — out of penalty. Saves $8,000 − $2,000 = $6,000</li>
+    </ul>
+    <div class="formula">
+      <span class="flabel">Net Savings — Stage 2</span>
+      $26,000 + $6,000 = <strong>$32,000</strong>
+    </div>
+    <div class="formula">
+      <span class="flabel">New Total Cost</span>
+      $2,543,000 − $32,000 = <strong>$2,511,000</strong>
+    </div>
+    <p>New path durations: <strong>B–D–H–J–K = 64 wks</strong> &nbsp;|&nbsp; A–C–G–J–K = 64 wks</p>
+    <div class="callout callout-red"><p>⚠️ Now <em>two paths tie</em> at 64 weeks — we just got a second critical path!</p></div>
+  `
+},
+
+// ── STAGE 3 ──────────────────────────────────────────────────────────────
+
+{
+  phase:'crash', title:'Stage 3 — Two Critical Paths',
+  leftMode:'paths',
+  stageIdx: 2,
+  content:`
+    <p>We now have <strong>two critical paths</strong> at 64 weeks:</p>
+    <ul>
+      <li><strong>A–C–G–J–K</strong></li>
+      <li><strong>B–D–H–J–K</strong></li>
+    </ul>
+    <p>This changes the crashing logic. We must crash <em>both paths simultaneously</em> — which means either:</p>
+    <ol>
+      <li>Pick one activity that appears on <strong>both</strong> paths (like K), <em>or</em></li>
+      <li>Pick one activity from each path and crash them together</li>
+    </ol>
+    <div class="callout callout-blue"><p>💡 The savings from crashing are now just <strong>$8,000/wk</strong> (no more penalty — we're at 64 weeks, below the 65-week threshold).</p></div>
+  `
+},
+
+{
+  phase:'crash', title:'Stage 3 — Find the Cheapest Shared Option',
+  leftMode:'act-table',
+  stageIdx: 2,
+  highlightCrit: true,
+  overrideBest: ['K'],
+  content:`
+    <p>Options to crash both paths at once:</p>
+    <ul>
+      <li><strong>K</strong> is on both paths — $4,000/wk to crash both. ✅ Net = $8,000 − $4,000 = $4,000/wk</li>
+      <li><strong>(C, B)</strong> one from each path — $600 + $7,000 = $7,600/wk. Net = $8,000 − $7,600 = $400/wk</li>
+      <li><strong>(C, D)</strong> — D is exhausted, not viable</li>
+    </ul>
+    <p>K is the cheapest option at $4,000/wk, but K can only be crashed <strong>1 week</strong>.</p>
+    <div class="callout callout-green"><p>✅ Crash K by 1 week. Savings = $8,000 − $4,000 = <strong>$4,000</strong></p></div>
+  `
+},
+
+{
+  phase:'crash', title:'Stage 3 — Results',
+  leftMode:'paths',
+  stageIdx: 3,
+  content:`
+    <p>After crashing K by 1 week (6 → 5 weeks):</p>
+    <ul>
+      <li>A–C–G–J–K = <strong>63 weeks</strong></li>
+      <li>B–D–H–J–K = <strong>63 weeks</strong></li>
+    </ul>
+    <div class="formula">
+      <span class="flabel">Net Savings — Stage 3</span>
+      $8,000 − $4,000 = <strong>$4,000</strong>
+    </div>
+    <div class="formula">
+      <span class="flabel">New Total Cost</span>
+      $2,511,000 − $4,000 = <strong>$2,507,000</strong>
+    </div>
+    <p>K is now fully crashed. Both paths still critical at 63 weeks. Continue…</p>
+  `
+},
+
+// ── STAGE 4 ──────────────────────────────────────────────────────────────
+
+{
+  phase:'crash', title:'Stage 4 — Still Two Critical Paths',
+  leftMode:'act-table',
+  stageIdx: 3,
+  highlightCrit: true,
+  overrideBest: ['B','C'],
+  content:`
+    <p>K is exhausted. What's left on both critical paths?</p>
+    <p><em>A–C–G–J–K:</em> A ($1,000/wk), C ($600/wk), G ($3,000/wk), J (exhausted), K (exhausted)</p>
+    <p><em>B–D–H–J–K:</em> B, D (exhausted), H, J (exhausted), K (exhausted)</p>
+    <p>Viable pairs (one from each path):</p>
+    <ul>
+      <li><strong>(C, B)</strong>: $600 + $7,000 = $7,600/wk → Net savings: $8,000 − $7,600 = <strong>$400/wk</strong> ✅</li>
+      <li>(C, H): $600 + $12,000 = $12,600/wk → Net <em>loss</em> ❌</li>
+      <li>(G, B): $3,000 + $7,000 = $10,000/wk → Net <em>loss</em> ❌</li>
+    </ul>
+    <div class="callout callout-green"><p>✅ Only (C, B) is worth crashing. Net savings = $400/wk.</p></div>
+  `
+},
+
+{
+  phase:'crash', title:'Stage 4 — Crash B and C Together',
+  leftMode:'paths',
+  stageIdx: 4,
+  content:`
+    <p>Crash <strong>B and C simultaneously</strong>, each by 2 weeks (B's maximum remaining reduction).</p>
+    <ul>
+      <li>B: 9 → 7 weeks &nbsp;|&nbsp; C: 10 → 8 weeks</li>
+    </ul>
+    <div class="formula">
+      <span class="flabel">Net Savings — Stage 4</span>
+      2 × ($8,000 − $7,600) = 2 × $400 = <strong>$800</strong>
+    </div>
+    <div class="formula">
+      <span class="flabel">New Total Cost</span>
+      $2,507,000 − $800 = <strong>$2,506,200</strong>
+    </div>
+    <p>B is now at its crash limit (7 weeks) — exhausted. The only remaining crashable activity on B–D–H–J–K is H at $12,000/wk. Is further crashing worthwhile?</p>
+    <div class="callout callout-red"><p>🛑 After this stage, no further crashing reduces total cost. <strong>We've reached the optimum.</strong></p></div>
+  `
+},
+
+// ── WHY STOP ──────────────────────────────────────────────────────────────
+
+{
+  phase:'optimal', title:'Why Do We Stop After Stage 4?',
+  leftMode:'stop-check',
+  stageIdx: 4,
+  content:`
+    <p>After Stage 4, let's check if further crashing is worthwhile:</p>
+    <p>The only remaining viable pair was (C, B). B is now at its crash limit (7 weeks).</p>
+    <p>The next option would be something like (G, H) — but:</p>
+    <div class="decision-row bad"><span class="icon">❌</span> (G, H): $3,000 + $12,000 = $15,000/wk > $8,000 savings. Net <em>loss</em> of $7,000/wk.</div>
+    <div class="decision-row bad"><span class="icon">❌</span> All remaining combinations exceed $8,000/wk.</div>
+    <div class="callout callout-green" style="margin-top:10px"><p>✅ <strong>Stop crashing.</strong> Any further reduction increases total cost. The optimal solution is $2,506,200 at 61 weeks.</p></div>
+  `
+},
+
+// ── SUMMARY ──────────────────────────────────────────────────────────────
+
+{
+  phase:'optimal', title:'Full Summary — All Stages',
+  leftMode:'summary',
+  stageIdx: 4,
+  content:`
+    <p>The table on the left summarizes all four crashing stages.</p>
+    <p>Key takeaways:</p>
+    <ul>
+      <li>Started at $2,624,000 (69 weeks)</li>
+      <li>Saved <strong>$117,800</strong> through systematic crashing</li>
+      <li>Optimal schedule: <strong>61 weeks</strong> at <strong>$2,506,200</strong></li>
+      <li>Saved 8 weeks of project time vs. normal</li>
+    </ul>
+    <div class="callout callout-blue"><p>💡 Most savings came early (Stage 1 alone saved $81,000!) because J had a very low crash cost of $1,000/wk while saving $28,000/wk in indirect + penalty costs.</p></div>
+  `
+},
+
+{
+  phase:'optimal', title:'Key Conceptual Takeaways',
+  leftMode:'takeaways',
+  stageIdx: 4,
+  content:`
+    <p>Before your exam, make sure you can answer these:</p>
+    <ul>
+      <li>Why does crashing only help activities on the <strong>critical path</strong>?</li>
+      <li>What changes your decision when <strong>two paths become critical</strong>?</li>
+      <li>What role do <strong>penalty costs</strong> play in determining savings per week?</li>
+      <li>How do you know when to <strong>stop crashing</strong>?</li>
+    </ul>
+    <div class="callout"><p>📝 The exam may give you a different project with a different indirect cost rate or penalty threshold — the <em>procedure</em> is always the same four steps.</p></div>
+    <div class="callout callout-green"><p>✅ You've completed the CPM Cost–Time Optimization walkthrough!</p></div>
+  `
+},
+
+]; // end STEPS
+
+// ─────────────────────────────────────────────
+//  RENDER LOGIC
+// ─────────────────────────────────────────────
+
+let step = 0;
+
+function fmt(n) {
+  return '$' + n.toLocaleString('en-US');
+}
+
+function renderLeft(s) {
+  const lb = document.getElementById('left-body');
+  const lt = document.getElementById('left-title');
+
+  const idx = s.stageIdx !== undefined ? s.stageIdx : null;
+  const crashed = idx !== null ? STAGES[idx].crashed : {};
+  const crits = criticalPaths(crashed);
+  const duration = maxPathDuration(crashed);
+  const dc = directCost(crashed);
+  const ic = duration * INDIRECT;
+  const pen = Math.max(0, duration - PENALTY_THRESH) * PENALTY;
+  const tc = dc + ic + pen;
+  const savings = 2624000 - tc;
+
+  // ── Intro: just show cost type diagram
+  if (s.leftMode === 'intro') {
+    lt.textContent = 'The Cost Trade-off Concept';
+    lb.innerHTML = `
+      <div class="section-label">As Project Duration Decreases…</div>
+      <svg viewBox="0 0 300 180" style="width:100%;max-width:320px;display:block;margin:0 auto 8px">
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+          </marker>
+        </defs>
+        <!-- Axes -->
+        <line x1="40" y1="20" x2="40" y2="155" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="40" y1="155" x2="280" y2="155" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="20" y="90" font-size="10" fill="#64748b" transform="rotate(-90,20,90)" text-anchor="middle" font-family="DM Sans">Cost ($)</text>
+        <text x="160" y="172" font-size="10" fill="#64748b" text-anchor="middle" font-family="DM Sans">Project Duration (shorter →)</text>
+
+        <!-- Direct cost curve (rising as duration shortens = left to right goes up) -->
+        <path d="M 60,145 Q 120,130 180,110 T 260,60" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+        <text x="262" y="58" font-size="9" fill="#dc2626" font-family="DM Sans" font-weight="700">Direct</text>
+
+        <!-- Indirect cost (falling) -->
+        <path d="M 60,50 Q 130,90 200,120 T 260,145" fill="none" stroke="#059669" stroke-width="2.5"/>
+        <text x="52" y="48" font-size="9" fill="#059669" font-family="DM Sans" font-weight="700">Indirect</text>
+
+        <!-- Total cost (U-shape) -->
+        <path d="M 60,80 Q 110,65 155,62 T 260,95" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <text x="82" y="57" font-size="9" fill="#2563eb" font-family="DM Sans" font-weight="700">Total</text>
+
+        <!-- Optimum marker -->
+        <line x1="155" y1="62" x2="155" y2="155" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="148" y="170" font-size="8.5" fill="#d97706" font-family="DM Sans" font-weight="700">Optimum</text>
+      </svg>
+      <div class="callout callout-blue"><p>The <strong style="color:#2563eb">total cost curve</strong> has a minimum — the optimal project duration. Crashing beyond that point costs more than it saves.</p></div>
+    `;
+    return;
+  }
+
+  // ── Cost types: two cards ──
+  if (s.leftMode === 'cost-types') {
+    lt.textContent = 'Direct vs. Indirect Costs';
+    lb.innerHTML = `
+      <div class="section-label">St. John's Hospital Cost Structure</div>
+      <div style="background:var(--crit-light);border:1.5px solid #fca5a5;border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:#b91c1c;font-size:.85rem;margin-bottom:4px">📈 Direct Costs — Rise when you crash</div>
+        <div style="font-size:.8rem;color:#374151;line-height:1.6">Labor, equipment, materials for each activity.<br>Normal baseline: <strong>$1,992,000</strong><br>Max (all crashed): $2,209,500</div>
+      </div>
+      <div style="background:var(--green-light);border:1.5px solid #6ee7b7;border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:#065f46;font-size:.85rem;margin-bottom:4px">📉 Indirect Costs — Fall when you finish faster</div>
+        <div style="font-size:.8rem;color:#374151;line-height:1.6">Overhead, supervision, admin overhead.<br>Rate: <strong>$8,000 per week</strong><br>At 69 weeks: $552,000</div>
+      </div>
+      <div style="background:var(--amber-light);border:1.5px solid #fcd34d;border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-weight:700;color:#92400e;font-size:.85rem;margin-bottom:4px">⚠️ Penalty Costs — Apply if project runs late</div>
+        <div style="font-size:.8rem;color:#374151;line-height:1.6">Contractual penalties for finishing after week 65.<br>Rate: <strong>$20,000 per week</strong> beyond week 65</div>
+      </div>
+    `;
+    return;
+  }
+
+  // ── Intro activity table ──
+  if (s.leftMode === 'act-table-intro') {
+    lt.textContent = 'Activity Crash Parameters';
+    const acts = Object.entries(ACTIVITIES);
+    lb.innerHTML = `
+      <table class="act-table">
+        <thead>
+          <tr>
+            <th>Act</th>
+            <th>NT</th>
+            <th>NC ($)</th>
+            <th>CT</th>
+            <th>CC ($)</th>
+            <th>$/wk</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${acts.map(([k,a]) => `
+            <tr>
+              <td>${k}</td>
+              <td>${a.nt}</td>
+              <td>${(a.nc/1000).toFixed(0)}k</td>
+              <td>${a.ct}</td>
+              <td>${(a.cc/1000).toFixed(0)}k</td>
+              <td><strong>${a.ccpw.toLocaleString()}</strong></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    return;
+  }
+
+  // ── Procedure ──
+  if (s.leftMode === 'procedure') {
+    lt.textContent = 'The Crashing Procedure';
+    lb.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${[
+          ['1','Find the critical path(s).','var(--blue)','#eff6ff'],
+          ['2','Identify the cheapest activity to crash on the critical path.','#7c3aed','var(--purple-light)'],
+          ['3','Crash it until: max reduction reached, new path goes critical, or savings < cost.','var(--gold)','var(--amber-light)'],
+          ['4','Repeat until all remaining options cost more than they save.','var(--green)','var(--green-light)'],
+        ].map(([n,txt,c,bg]) => `
+          <div style="background:${bg};border:1.5px solid;border-color:${c}20;border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start">
+            <div style="background:${c};color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;margin-top:1px">${n}</div>
+            <div style="font-size:.82rem;color:#374151;line-height:1.55">${txt}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  // ── Overview: cost bar + paths ──
+  if (s.leftMode === 'overview') {
+    lt.textContent = 'Project Status — Normal Time';
+    lb.innerHTML = `
+      <div class="cost-bar">
+        <div class="citem"><span class="clbl">Duration</span><span class="cval weeks">${duration} wks</span></div>
+        <div class="citem"><span class="clbl">Total Cost</span><span class="cval total">${fmt(tc)}</span></div>
+        <div class="citem"><span class="clbl">Savings vs. Normal</span><span class="cval savings">${fmt(savings)}</span></div>
+      </div>
+      <div class="section-label" style="margin-top:4px">All Paths</div>
+      <table class="paths-table">
+        <thead><tr><th>Path</th><th>Duration</th><th>Status</th></tr></thead>
+        <tbody>
+          ${PATHS_DEF.map(p => {
+            const d = pathDuration(p, crashed);
+            const isCrit = crits.includes(p.id);
+            return `<tr class="${isCrit?'crit':''}">
+              <td class="path-name">${p.label}</td>
+              <td>${d} wks</td>
+              <td>${isCrit ? '<span class="crit-badge">CRITICAL</span>' : '<span style="color:var(--muted);font-size:.72rem">slack</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="section-label" style="margin-top:8px">Cost Breakdown</div>
+      <table class="paths-table">
+        <tbody>
+          <tr><td class="path-name">Direct</td><td>${fmt(dc)}</td><td></td></tr>
+          <tr><td class="path-name">Indirect</td><td>${fmt(ic)}</td><td><span style="font-size:.72rem;color:var(--muted)">${duration}×$8k</span></td></tr>
+          <tr><td class="path-name" style="color:#dc2626">Penalty</td><td>${fmt(pen)}</td><td><span style="font-size:.72rem;color:var(--muted)">${Math.max(0,duration-65)}×$20k</span></td></tr>
+          <tr style="background:#f0fdf4"><td class="path-name" style="color:var(--navy)"><strong>Total</strong></td><td><strong>${fmt(tc)}</strong></td><td></td></tr>
+        </tbody>
+      </table>
+    `;
+    return;
+  }
+
+  // ── Activity table with crash status ──
+  if (s.leftMode === 'act-table') {
+    const critSet = new Set(crits.flatMap(cid => PATHS_DEF.find(p=>p.id===cid).acts));
+    const bestSet = new Set(s.overrideBest ? s.overrideBest : (STAGES[idx] ? STAGES[idx].bestOption : []));
+
+    lt.textContent = 'Activity Crash Parameters';
+    const acts = Object.entries(ACTIVITIES);
+    lb.innerHTML = `
+      <div class="cost-bar" style="margin-bottom:4px">
+        <div class="citem"><span class="clbl">Duration</span><span class="cval weeks">${duration} wks</span></div>
+        <div class="citem"><span class="clbl">Total Cost</span><span class="cval total">${fmt(tc)}</span></div>
+        <div class="citem"><span class="clbl">Saved</span><span class="cval savings">${fmt(savings)}</span></div>
+      </div>
+      <table class="act-table">
+        <thead>
+          <tr>
+            <th>Act</th>
+            <th>Curr. Dur</th>
+            <th>Min</th>
+            <th>Left</th>
+            <th>$/wk</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${acts.map(([k,a]) => {
+            const cur = actDuration(k, crashed);
+            const crashedWks = crashed[k] || 0;
+            const remaining = a.maxRed - crashedWks;
+            const isCrit = critSet.has(k);
+            const isBest = bestSet.has(k);
+            const isExhausted = remaining === 0;
+            return `<tr class="${isBest?'best-option':''} ${crashedWks>0&&!isBest?'crashed':''}">
+              <td>${k}${isBest?`<span class="act-best-badge">PICK</span>`:''}</td>
+              <td>${cur} wks${crashedWks>0?`<span class="act-crashed-badge">−${crashedWks}</span>`:''}</td>
+              <td>${a.ct}</td>
+              <td style="color:${isExhausted?'#94a3b8':'inherit'}">${remaining}${isExhausted?' ✗':''}</td>
+              <td style="color:${isCrit&&!isExhausted?'var(--navy)':'var(--muted)'}; font-weight:${isCrit&&!isExhausted?'700':'400'}">${isExhausted?'—':fmt(a.ccpw)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:4px;font-size:.72rem;color:var(--muted)">
+        <span style="display:inline-block;width:10px;height:10px;background:var(--green-light);border:1px solid var(--green);border-radius:2px;margin-right:3px"></span>Best option &nbsp;
+        <span style="display:inline-block;width:10px;height:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:2px;margin-right:3px"></span>Previously crashed
+      </div>
+    `;
+    return;
+  }
+
+  // ── Path durations ──
+  if (s.leftMode === 'paths') {
+    lt.textContent = idx !== null ? STAGES[idx].label : 'Path Durations';
+    lb.innerHTML = `
+      <div class="cost-bar" style="margin-bottom:4px">
+        <div class="citem"><span class="clbl">Duration</span><span class="cval weeks">${duration} wks</span></div>
+        <div class="citem"><span class="clbl">Total Cost</span><span class="cval total">${fmt(tc)}</span></div>
+        <div class="citem"><span class="clbl">Saved</span><span class="cval savings">${fmt(savings)}</span></div>
+      </div>
+      <div class="section-label">Path Durations After This Stage</div>
+      <table class="paths-table">
+        <thead><tr><th>Path</th><th>Duration</th><th>Status</th></tr></thead>
+        <tbody>
+          ${PATHS_DEF.map(p => {
+            const d = pathDuration(p, crashed);
+            const isCrit = crits.includes(p.id);
+            const slk = duration - d;
+            return `<tr class="${isCrit?'crit':''}">
+              <td class="path-name">${p.label}</td>
+              <td>${d} wks</td>
+              <td>${isCrit ? '<span class="crit-badge">CRITICAL</span>' : `<span style="color:var(--green);font-size:.75rem;font-weight:600">+${slk} slack</span>`}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="section-label" style="margin-top:8px">Cost Breakdown</div>
+      <table class="paths-table">
+        <tbody>
+          <tr><td class="path-name">Direct</td><td>${fmt(dc)}</td><td></td></tr>
+          <tr><td class="path-name">Indirect</td><td>${fmt(ic)}</td><td><span style="font-size:.72rem;color:var(--muted)">${duration}×$8k</span></td></tr>
+          <tr><td class="path-name" style="color:${pen>0?'#dc2626':'var(--muted)'}">Penalty</td><td>${fmt(pen)}</td><td><span style="font-size:.72rem;color:var(--muted)">${Math.max(0,duration-65)}×$20k</span></td></tr>
+          <tr style="background:#f0fdf4"><td class="path-name" style="color:var(--navy)"><strong>Total</strong></td><td><strong>${fmt(tc)}</strong></td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="section-label" style="margin-top:8px">Crashed Activities</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${Object.entries(crashed).length === 0 ? '<span style="color:var(--muted);font-size:.8rem">None yet</span>' :
+          Object.entries(crashed).map(([k,w]) => `
+            <span style="background:#fff7ed;border:1.5px solid #fdba74;border-radius:6px;padding:3px 8px;font-size:.78rem;font-weight:600;color:#92400e">
+              ${k}: −${w} wk${w>1?'s':''}
+            </span>
+          `).join('')
+        }
+      </div>
+    `;
+    return;
+  }
+
+  // ── Stop check ──
+  if (s.leftMode === 'stop-check') {
+    lt.textContent = 'Stage 4 — Final State';
+    lb.innerHTML = `
+      <div class="cost-bar" style="margin-bottom:4px">
+        <div class="citem"><span class="clbl">Duration</span><span class="cval weeks">${duration} wks</span></div>
+        <div class="citem"><span class="clbl">Total Cost</span><span class="cval total">${fmt(tc)}</span></div>
+        <div class="citem"><span class="clbl">Total Saved</span><span class="cval savings">${fmt(savings)}</span></div>
+      </div>
+      <div class="section-label">Remaining Crash Options</div>
+      ${[
+        ['(A, H)', '1,000+12,000', 13000, 8000, false],
+        ['(C, H)', '600+12,000', 12600, 8000, false],
+        ['(G, H)', '3,000+12,000', 15000, 8000, false],
+      ].map(([pair, calc, cost, save, ok]) => `
+        <div style="border:1px solid var(--border);border-radius:7px;padding:9px 12px;margin-bottom:6px;background:${ok?'var(--green-light)':'var(--crit-light)'}">
+          <div style="font-weight:700;font-size:.82rem;color:${ok?'var(--green)':'#b91c1c'};margin-bottom:3px">${ok?'✅':'❌'} Crash ${pair}</div>
+          <div style="font-size:.78rem;color:#374151;font-family:'JetBrains Mono',monospace">
+            Cost: $${calc} = $${cost.toLocaleString()}/wk<br>
+            Save: $${save.toLocaleString()}/wk<br>
+            Net: <strong>${ok?'+':''}$${(save-cost).toLocaleString()}/wk</strong>
+          </div>
+        </div>
+      `).join('')}
+      <div class="callout callout-red"><p>All remaining options cost more than they save. <strong>Optimal solution reached.</strong></p></div>
+    `;
+    return;
+  }
+
+  // ── Summary ──
+  if (s.leftMode === 'summary') {
+    lt.textContent = 'Crashing Summary — All Stages';
+    const rows = [
+      { stage:'0 (Normal)', acts:'—', wks:0, sav:0, tot:2624000 },
+      { stage:'1', acts:'J', wks:3, sav:81000, tot:2543000 },
+      { stage:'2', acts:'D', wks:2, sav:32000, tot:2511000 },
+      { stage:'3', acts:'K', wks:1, sav:4000,  tot:2507000 },
+      { stage:'4', acts:'B, C', wks:2, sav:800, tot:2506200 },
+    ];
+    lb.innerHTML = `
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Crashed</th>
+            <th>Wks</th>
+            <th>Savings</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((r,i) => `
+            <tr style="${i===rows.length-1?'background:#f0fdf4':''}">
+              <td>${r.stage}</td>
+              <td style="font-family:'DM Sans';text-align:left">${r.acts}</td>
+              <td>${r.wks}</td>
+              <td style="color:${r.sav>0?'var(--green)':'var(--muted)'}">${r.sav>0?'+$'+r.sav.toLocaleString():'—'}</td>
+              <td>${fmt(r.tot)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:10px;background:var(--navy);border-radius:8px;padding:12px;color:#fff">
+        <div style="font-size:.7rem;color:#94a3b8;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Optimal Schedule</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div><span style="font-size:.72rem;color:#94a3b8;display:block">Duration</span><span style="font-family:'JetBrains Mono';color:#93c5fd;font-size:1rem;font-weight:600">61 weeks</span></div>
+          <div><span style="font-size:.72rem;color:#94a3b8;display:block">Total Cost</span><span style="font-family:'JetBrains Mono';color:#fbbf24;font-size:1rem;font-weight:600">$2,506,200</span></div>
+          <div><span style="font-size:.72rem;color:#94a3b8;display:block">Saved vs Normal</span><span style="font-family:'JetBrains Mono';color:#4ade80;font-size:1rem;font-weight:600">$117,800</span></div>
+          <div><span style="font-size:.72rem;color:#94a3b8;display:block">Weeks Shortened</span><span style="font-family:'JetBrains Mono';color:#4ade80;font-size:1rem;font-weight:600">8 weeks</span></div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // ── Takeaways ──
+  if (s.leftMode === 'takeaways') {
+    lt.textContent = 'Crashing Decision Logic';
+    lb.innerHTML = `
+      <div class="section-label">When Is It Worth Crashing?</div>
+      <div class="decision-row good"><span class="icon">✅</span><span>Crash cost/wk &lt; savings/wk (indirect + penalty)</span></div>
+      <div class="decision-row bad"><span class="icon">❌</span><span>Crash cost/wk &gt; savings/wk → Stop. You've passed the optimum.</span></div>
+      <div style="margin-top:10px" class="section-label">How Savings Change Over Time</div>
+      ${[
+        ['While > 65 weeks', '$8,000 + $20,000 = $28,000/wk', 'var(--amber-light)', '#92400e'],
+        ['Once ≤ 65 weeks', '$8,000/wk (indirect only)', '#eff6ff', '#1d4ed8'],
+        ['No penalty, one path', 'Crash cheapest on critical path', 'var(--green-light)', '#065f46'],
+        ['Two critical paths', 'Must crash both — find cheapest combo', 'var(--purple-light)', '#6d28d9'],
+      ].map(([when,rule,bg,c]) => `
+        <div style="background:${bg};border-radius:7px;padding:8px 10px;margin-bottom:6px">
+          <div style="font-size:.72rem;font-weight:700;color:${c};text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">${when}</div>
+          <div style="font-size:.8rem;color:#374151">${rule}</div>
+        </div>
+      `).join('')}
+    `;
+    return;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Panel rendering
+// ─────────────────────────────────────────────
+
+const phaseLabel = { concept:'Concept', crash:'Crashing', optimal:'Optimal Solution', intro:'Introduction' };
+const phaseClass = { concept:'tag-concept', crash:'tag-crash', optimal:'tag-optimal', intro:'tag-intro' };
+
+function renderPanel() {
+  const s = STEPS[step];
+  const tag = document.getElementById('phase-tag');
+  tag.textContent = phaseLabel[s.phase] || s.phase;
+  tag.className = 'tag ' + (phaseClass[s.phase] || 'tag-intro');
+  document.getElementById('step-title').textContent = s.title;
+  document.getElementById('step-body').innerHTML = s.content;
+}
+
+function renderProgress() {
+  const pct = step / (STEPS.length - 1) * 100;
+  document.getElementById('pgfill').style.width = pct + '%';
+  document.getElementById('pglbl').textContent = `Step ${step+1} of ${STEPS.length}`;
+  document.getElementById('sctr').textContent = `${step+1} / ${STEPS.length}`;
+  document.getElementById('btn-prev').disabled = step === 0;
+  document.getElementById('btn-next').disabled = step === STEPS.length - 1;
+  document.getElementById('btn-next').textContent = step === STEPS.length-1 ? '✓ Done' : 'Next →';
+}
+
+function render() {
+  renderPanel();
+  renderLeft(STEPS[step]);
+  renderProgress();
+}
+
+function go(dir) {
+  step = Math.max(0, Math.min(STEPS.length - 1, step + dir));
+  render();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+});
+
+render();
+</script>
+</body>
+</html>
