@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Economic Order Quantity — A Visual Walkthrough</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #f5f8fa;
+    --text: #111827;
+    --text-muted: #4b5563;
+    --accent: #0e7490;
+    --accent-light: #e0f2f7;
+    --blue: #1d4ed8;
+    --blue-light: #dbeafe;
+    --green: #15803d;
+    --green-light: #dcfce7;
+    --amber: #b45309;
+    --amber-light: #fef3c7;
+    --red: #b91c1c;
+    --red-light: #fee2e2;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === NAVIGATION HEADER === */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(245,248,250,0.93);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    color: var(--accent);
+  }
+  .nav-steps { display: flex; gap: 4px; align-items: center; }
+  .nav-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border); cursor: pointer;
+    transition: all 0.3s; border: none;
+  }
+  .nav-dot.active { background: var(--accent); width: 28px; border-radius: 5px; }
+  .nav-dot:hover { background: var(--text-muted); }
+  .nav-badge {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    background: var(--amber-light); padding: 3px 10px; border-radius: 12px;
+  }
+
+  /* === PROGRESS BAR === */
+  .progress-bar {
+    position: fixed; top: 52px; left: 0;
+    height: 3px; background: var(--accent);
+    z-index: 101; transition: width 0.4s ease;
+  }
+
+  /* === SECTIONS === */
+  .section {
+    min-height: 100vh;
+    padding: 80px 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .section-inner { max-width: 840px; width: 100%; }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    color: var(--accent); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 12px; opacity: 0.7;
+  }
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.2; margin-bottom: 20px; color: var(--text);
+  }
+  .section h2 em { color: var(--accent); font-style: italic; }
+  .section p {
+    font-size: 17px; color: var(--text);
+    margin-bottom: 16px; max-width: 660px;
+  }
+  .section p.muted { color: var(--text-muted); font-size: 15px; }
+
+  /* === HERO === */
+  .hero {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 60%, #0891b2 100%);
+    color: #fff; min-height: 100vh;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 5.5vw, 56px);
+    line-height: 1.15; margin-bottom: 20px;
+  }
+  .hero h1 em { color: #fcd34d; font-style: italic; }
+  .hero p { color: #bae6fd; }
+  .hero .start-btn {
+    display: inline-block; margin-top: 24px;
+    padding: 12px 28px; background: #fcd34d; color: #0c4a6e;
+    border: none; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  .hero .start-btn:hover { transform: translateY(-2px); }
+
+  /* === CALLOUT CARDS === */
+  .callout {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+    margin: 20px 0; box-shadow: var(--shadow);
+  }
+  .callout.accent  { border-color: var(--accent);  background: var(--accent-light); }
+  .callout.blue    { border-color: var(--blue);    background: var(--blue-light); }
+  .callout.green   { border-color: var(--green);   background: var(--green-light); }
+  .callout.amber   { border-color: var(--amber);   background: var(--amber-light); }
+  .callout.red     { border-color: var(--red);     background: var(--red-light); }
+  .callout.purple  { border-color: var(--purple);  background: var(--purple-light); }
+
+  .callout-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .callout.accent .callout-label { color: var(--accent); }
+  .callout.blue   .callout-label { color: var(--blue); }
+  .callout.green  .callout-label { color: var(--green); }
+  .callout.amber  .callout-label { color: var(--amber); }
+  .callout.red    .callout-label { color: var(--red); }
+  .callout.purple .callout-label { color: var(--purple); }
+
+  .callout-title  { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .callout-body   { font-size: 15px; color: var(--text); line-height: 1.6; }
+
+  /* === FORMULA BOX === */
+  .formula-box {
+    background: #fff; border: 2px solid #c7d2fe;
+    border-radius: 10px; padding: 18px 22px; margin: 18px 0;
+  }
+  .formula-label {
+    font-size: 11px; font-weight: 700; color: #4f46e5;
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  .formula-body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem; color: #312e81; line-height: 1.7;
+  }
+  .formula-body .big {
+    font-size: 1.4rem; font-weight: 600; color: #1e40af;
+    display: block; margin: 6px 0;
+  }
+
+  /* === ICC TABLE === */
+  .icc-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 15px; margin: 16px 0;
+  }
+  .icc-table th {
+    background: #f1f5f9; padding: 8px 14px;
+    text-align: left; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-muted); border-bottom: 2px solid var(--border);
+  }
+  .icc-table td {
+    padding: 8px 14px; border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  }
+  .icc-table td:first-child { font-family: 'DM Sans'; font-weight: 600; color: var(--text); }
+  .icc-table tr.total-row td { background: #f0fdf4; font-weight: 700; color: var(--green); }
+
+  /* === TWO-COLUMN LAYOUT === */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 16px 0;
+  }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* === DIAGRAM CONTAINER === */
+  .diagram-container {
+    margin: 28px 0; background: var(--card);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .diagram-header {
+    padding: 10px 18px; background: #f1f5f9;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .diagram-body { padding: 20px; }
+
+  /* === STEP PILL === */
+  .step-pill {
+    display: inline-block; padding: 3px 12px;
+    background: var(--accent-light); color: var(--accent);
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+  }
+
+  /* === WORKED EXAMPLE TABLE === */
+  .ex-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+  .ex-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+  .ex-table td:first-child { color: var(--text-muted); font-size: 13px; }
+  .ex-table td:last-child {
+    font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text);
+    text-align: right;
+  }
+  .ex-table tr.highlight td { background: var(--accent-light); color: var(--accent); }
+  .ex-table tr.highlight td:last-child { color: var(--accent); }
+
+  /* === ASSUMPTION LIST === */
+  .assume-list { list-style: none; padding: 0; margin: 12px 0; }
+  .assume-list li {
+    padding: 7px 0 7px 28px; border-bottom: 1px solid var(--border);
+    font-size: 15px; position: relative;
+  }
+  .assume-list li::before {
+    content: "✓"; position: absolute; left: 4px;
+    color: var(--green); font-weight: 700;
+  }
+
+  /* === HIGHLIGHT BOX === */
+  .hl-box {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; margin: 12px 0;
+    box-shadow: var(--shadow);
+  }
+  .hl-box .hl-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+  .hl-box .hl-text { font-size: 15px; line-height: 1.6; }
+  .hl-box .hl-text strong { display: block; font-size: 16px; margin-bottom: 2px; }
+
+  /* === DARK SECTION === */
+  .dark-section { background: #0f172a; }
+  .dark-section .section-num { color: #7dd3fc; }
+  .dark-section h2 { color: #f1f5f9; }
+  .dark-section h2 em { color: #fcd34d; }
+  .dark-section p { color: #94a3b8; }
+
+  /* === SUMMARY SECTION === */
+  .summary-section { background: #f0fdf4; }
+  .formula-card {
+    background: #fff; border: 1.5px solid #bbf7d0;
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 12px;
+  }
+  .formula-card .fc-label {
+    font-size: 11px; font-weight: 700; color: var(--green);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
+  }
+  .formula-card .fc-formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem; color: #166534;
+  }
+
+  @media (max-width: 640px) {
+    .section { padding: 70px 20px 40px; }
+    .nav { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Economic Order Quantity</div>
+  <div class="nav-steps" id="navSteps"></div>
+  <div class="nav-badge">MGMT 339</div>
+</nav>
+<div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<div class="section hero" data-step="0">
+  <div class="section-inner">
+    <div class="section-num" style="color:#7dd3fc;opacity:0.6">Inventory Management</div>
+    <h1>How much should<br>you <em>order</em>?</h1>
+    <p>Order too little and you're constantly reordering — burning time and money on paperwork. Order too much and you're drowning in carrying costs. There's a sweet spot. This is how you find it.</p>
+    <p class="muted">Slides 17–31 · St. John's Hospital Cost Crashing analogy · MGMT 339</p>
+    <button class="start-btn" onclick="document.querySelector('[data-step=\\'1\\']').scrollIntoView({behavior:'smooth'})">Start with the cost of holding →</button>
+  </div>
+</div>
+
+<!-- ─── SECTION 1: Inventory Carrying Cost ───────────────── -->
+<div class="section" data-step="1">
+  <div class="section-inner">
+    <div class="section-num">The First Cost</div>
+    <h2>Holding inventory <em>isn't free</em></h2>
+    <p>Every unit sitting in your warehouse is costing you money right now. This is called the <strong>Inventory Carrying Cost (ICC)</strong> — and it adds up fast.</p>
+    <p>Take an inkjet printer worth <strong>$100</strong>. Here's what it actually costs to hold one unit for a year:</p>
+
+    <div class="diagram-container">
+      <div class="diagram-header">ICC Breakdown — Inkjet Printer ($100/unit)</div>
+      <div class="diagram-body">
+        <table class="icc-table">
+          <thead>
+            <tr><th>Cost Component</th><th>How It's Calculated</th><th>Rate</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Capital (opportunity cost)</td>
+              <td>Money tied up in inventory can't earn returns elsewhere</td>
+              <td>25.0%</td>
+            </tr>
+            <tr>
+              <td>Storage space</td>
+              <td>$12/pallet/mo to store + $10 in + $10 out → $3.20/unit</td>
+              <td>3.2%</td>
+            </tr>
+            <tr>
+              <td>Inventory service</td>
+              <td>Taxes (1.5%) + Insurance (0.5%)</td>
+              <td>2.0%</td>
+            </tr>
+            <tr>
+              <td>Inventory risk</td>
+              <td>Historical shrinkage, obsolescence, damage</td>
+              <td>1.0%</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total ICC Rate (H)</td>
+              <td>31.2% × $100/unit = <strong>$31.20/unit/year</strong></td>
+              <td>31.2%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <div class="callout-label">Bottom Line</div>
+      <div class="callout-body">It costs <strong>$31.20/year</strong> to hold a single $100 printer. If your average inventory is 2,500 units, that's <strong>$78,000/year</strong> just to keep them on the shelf.</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">ICC per Year</div>
+      <div class="formula-body">
+        ICC/yr = (Q/2) × H<br>
+        <span style="color:#6b7280;font-size:.88rem">where Q/2 = average inventory, H = holding cost per unit per year</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 2: Ordering Cost ─────────────────────────── -->
+<div class="section" style="background:#fff" data-step="2">
+  <div class="section-inner">
+    <div class="section-num">The Second Cost</div>
+    <h2>Every order <em>costs money</em> to place</h2>
+    <p>Ordering isn't free either. Every purchase order triggers a chain of work: someone analyzes inventory, creates the PO, coordinates with the vendor, receives the shipment, and processes payment.</p>
+
+    <div class="two-col">
+      <div class="hl-box">
+        <div class="hl-icon">📋</div>
+        <div class="hl-text">
+          <strong>Ordering Costs (S)</strong>
+          PO creation, systems costs, receiving, vendor payment, inventory analysis. Fixed cost per order placed.
+        </div>
+      </div>
+      <div class="hl-box">
+        <div class="hl-icon">🔧</div>
+        <div class="hl-text">
+          <strong>Setup Costs (S)</strong>
+          For manufacturing: changeover time when production switches from one product to another.
+        </div>
+      </div>
+    </div>
+
+    <p>The key insight: <strong>order quantity (Q) and order frequency move in opposite directions.</strong></p>
+
+    <div class="callout blue">
+      <div class="callout-label">The Tradeoff</div>
+      <div class="callout-body">
+        <strong>Order more at once (larger Q):</strong> fewer orders per year → lower ordering cost. But average inventory is higher → higher carrying cost.<br><br>
+        <strong>Order less at once (smaller Q):</strong> more orders per year → higher ordering cost. But average inventory is lower → lower carrying cost.
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Order Cost per Year</div>
+      <div class="formula-body">
+        Order Cost/yr = (D/Q) × S<br>
+        <span style="color:#6b7280;font-size:.88rem">where D/Q = number of orders per year, S = cost per order</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 3: Total Annual Cost Curve ───────────────── -->
+<div class="section" data-step="3">
+  <div class="section-inner">
+    <div class="section-num">The Core Insight</div>
+    <h2>The costs pull in <em>opposite directions</em></h2>
+    <p>As order quantity Q increases, carrying cost rises and ordering cost falls. Their sum — Total Annual Cost — forms a <strong>U-shaped curve with a flat bottom</strong>. The minimum of that curve is the EOQ.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-header">Total Annual Cost Curve</div>
+      <div class="diagram-body" style="padding:16px">
+        <svg viewBox="0 0 380 220" style="width:100%;max-width:440px;display:block;margin:0 auto">
+          <defs>
+            <marker id="arrowhead" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
+            </marker>
+          </defs>
+          <!-- Axes -->
+          <line x1="50" y1="185" x2="350" y2="185" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <line x1="50" y1="185" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <!-- Axis labels -->
+          <text x="195" y="205" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Order Quantity (Q)</text>
+          <text x="18" y="105" font-size="11" fill="#64748b" transform="rotate(-90,18,105)" text-anchor="middle" font-family="DM Sans">Annual Cost ($)</text>
+
+          <!-- ICC curve: rises left to right (low cost at small Q, high cost at large Q) -->
+          <!-- In SVG: starts bottom-left (large y), ends top-right (small y) -->
+          <path d="M 70,178 Q 180,150 340,48" fill="none" stroke="#b91c1c" stroke-width="2.2"/>
+          <text x="343" y="46" font-size="10" fill="#b91c1c" font-family="DM Sans" font-weight="700">Carrying Cost</text>
+
+          <!-- Order cost: falls left to right -->
+          <!-- In SVG: starts top-left (small y), ends bottom-right (large y) -->
+          <path d="M 70,38 Q 130,95 340,168" fill="none" stroke="#059669" stroke-width="2.2"/>
+          <text x="343" y="170" font-size="10" fill="#059669" font-family="DM Sans" font-weight="700">Order Cost</text>
+
+          <!-- TAC: U-shape (inverted ∩ in SVG = U in cost terms) -->
+          <!-- Starts high-left, dips at EOQ (~x=195), rises high-right -->
+          <path d="M 70,52 C 120,52 160,118 195,118 C 230,118 270,62 340,62" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="68" y="48" font-size="10" fill="#1d4ed8" font-family="DM Sans" font-weight="700">Total Cost</text>
+
+          <!-- EOQ marker -->
+          <line x1="195" y1="118" x2="195" y2="185" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <circle cx="195" cy="118" r="5" fill="#d97706"/>
+          <text x="195" y="198" font-size="10" fill="#d97706" font-family="DM Sans" font-weight="700" text-anchor="middle">EOQ</text>
+
+          <!-- At EOQ: ICC = Order Cost annotation -->
+          <text x="205" y="108" font-size="9" fill="#64748b" font-family="DM Sans">← minimum</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Total Annual Cost (TAC)</div>
+      <div class="formula-body">
+        TAC = (Q/2)·H &nbsp;+&nbsp; (D/Q)·S
+        <div style="margin-top:8px;font-size:.82rem;color:#6b7280">
+          Carrying cost term &nbsp;+&nbsp; Ordering cost term
+        </div>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">Key Property</div>
+      <div class="callout-body">At the EOQ, <strong>carrying cost equals ordering cost</strong>. This isn't a coincidence — it's a mathematical consequence of minimizing their sum.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 4: EOQ Formula ───────────────────────────── -->
+<div class="section" style="background:#fff" data-step="4">
+  <div class="section-inner">
+    <div class="section-num">The Formula</div>
+    <h2>Solving for the <em>optimal Q</em></h2>
+    <p>To find the minimum of TAC, take the derivative with respect to Q and set it to zero. The result is remarkably clean:</p>
+
+    <div class="formula-box" style="border-color:#a5b4fc;background:#eef2ff;text-align:center;padding:28px">
+      <div class="formula-label" style="color:#4338ca">Economic Order Quantity</div>
+      <div class="formula-body big" style="font-size:1.8rem;color:#1e1b4b;display:block;text-align:center">
+        EOQ = √( 2DS / H )
+      </div>
+      <div style="margin-top:12px;font-size:.85rem;color:#4338ca;font-family:'DM Sans',sans-serif;line-height:1.8">
+        D = Annual demand (units/yr) &nbsp;|&nbsp; S = Cost per order ($/order)<br>
+        H = Holding cost ($/unit/yr) = unit cost × ICC rate
+      </div>
+    </div>
+
+    <p>The logic: a larger D means you need bigger batches to spread ordering cost. A larger S means ordering is expensive, so order more each time. A larger H means holding is expensive, so order less each time.</p>
+
+    <div class="two-col">
+      <div class="hl-box">
+        <div class="hl-icon">📈</div>
+        <div class="hl-text">
+          <strong>D or S goes up →</strong>
+          EOQ increases. Demand is high or ordering is expensive, so batch larger.
+        </div>
+      </div>
+      <div class="hl-box">
+        <div class="hl-icon">📦</div>
+        <div class="hl-text">
+          <strong>H goes up →</strong>
+          EOQ decreases. Holding is expensive, so carry less inventory at a time.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout accent">
+      <div class="callout-label">Assumptions of the Simple EOQ Model</div>
+      <ul class="assume-list" style="margin-top:8px">
+        <li>Demand is continuous, constant, and known</li>
+        <li>Lead time is constant and known</li>
+        <li>All demand is satisfied (no stockouts)</li>
+        <li>Price per unit is constant (no quantity discounts)</li>
+        <li>Only carrying cost and ordering cost are considered</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 5: Worked Example ────────────────────────── -->
+<div class="section dark-section" data-step="5">
+  <div class="section-inner">
+    <div class="section-num">Worked Example</div>
+    <h2>Let's calculate the <em>actual numbers</em></h2>
+    <p>St. John's Hospital needs to order a medical supply. Here are the parameters:</p>
+
+    <div class="diagram-container" style="border-color:#334155">
+      <div class="diagram-header" style="background:#1e293b;color:#94a3b8">Given Information</div>
+      <div class="diagram-body" style="background:#1e293b;padding:16px">
+        <table class="ex-table" style="color:#e2e8f0">
+          <tr><td>Annual Demand (D)</td><td style="color:#7dd3fc">10,800 units/yr</td></tr>
+          <tr><td>Unit Cost (C)</td><td style="color:#7dd3fc">$160/unit</td></tr>
+          <tr><td>Holding Cost Rate</td><td style="color:#7dd3fc">25%</td></tr>
+          <tr><td>H = 25% × $160</td><td style="color:#fcd34d">$40/unit/yr</td></tr>
+          <tr><td>Ordering Cost (S)</td><td style="color:#7dd3fc">$250/order</td></tr>
+          <tr><td>Lead Time (L)</td><td style="color:#7dd3fc">6 days</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 1: Calculate EOQ</div>
+      <div class="formula-body" style="color:#e2e8f0">
+        EOQ = √( 2 × 10,800 × 250 / 40 )<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= √( 5,400,000 / 40 )<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= √135,000<br>
+        <span class="big" style="color:#fcd34d">≈ 367 units</span>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 2: Verify Costs Balance at EOQ</div>
+      <div class="formula-body" style="color:#e2e8f0;font-size:.9rem">
+        Carrying cost &nbsp;= (367/2) × $40 &nbsp;&nbsp;&nbsp;= <strong style="color:#4ade80">$7,340/yr</strong><br>
+        Ordering cost = (10,800/367) × $250 = <strong style="color:#4ade80">$7,357/yr</strong><br>
+        <span style="color:#94a3b8;font-size:.82rem">(rounding difference — they're equal at the true EOQ ✓)</span><br><br>
+        TAC &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= $7,340 + $7,357 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <strong style="color:#fcd34d">$14,697/yr</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 6: Continuous Review System ──────────────── -->
+<div class="section" data-step="6">
+  <div class="section-inner">
+    <div class="section-num">When to Reorder</div>
+    <h2>The <em>Continuous Review</em> System</h2>
+    <p>EOQ tells you <em>how much</em> to order. But you also need to know <em>when</em>. The continuous review system (also called a fixed-Q system) watches your inventory in real time and triggers an order when it drops to a threshold called the <strong>Reorder Point (R)</strong>.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-header">Inventory Level Over Time — Sawtooth Pattern</div>
+      <div class="diagram-body" style="padding:16px">
+        <svg viewBox="0 0 420 200" style="width:100%;max-width:480px;display:block;margin:0 auto">
+          <defs>
+            <marker id="arr2" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
+            </marker>
+            <marker id="arrDown" markerWidth="7" markerHeight="7" refX="3.5" refY="6" orient="auto">
+              <polygon points="0,0 7,0 3.5,7" fill="#d97706"/>
+            </marker>
+            <marker id="arrUp" markerWidth="7" markerHeight="7" refX="3.5" refY="1" orient="auto">
+              <polygon points="0,7 7,7 3.5,0" fill="#d97706"/>
+            </marker>
+          </defs>
+          <!-- Axes -->
+          <line x1="45" y1="170" x2="400" y2="170" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <line x1="45" y1="170" x2="45" y2="15" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <text x="220" y="188" font-size="10" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
+          <text x="16" y="95" font-size="10" fill="#64748b" transform="rotate(-90,16,95)" text-anchor="middle" font-family="DM Sans">Inventory</text>
+
+          <!-- Q level label -->
+          <text x="48" y="32" font-size="10" fill="#0e7490" font-family="DM Sans" font-weight="700">Q (367)</text>
+
+          <!-- Reorder point line -->
+          <line x1="45" y1="115" x2="395" y2="115" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <text x="398" y="118" font-size="10" fill="#d97706" font-family="DM Sans" font-weight="700">R (180)</text>
+
+          <!-- Sawtooth 1 -->
+          <!-- Vertical jump from 0 to Q -->
+          <line x1="60" y1="170" x2="60" y2="28" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+          <!-- Diagonal drop from Q to 0 -->
+          <line x1="60" y1="28" x2="175" y2="170" stroke="#0e7490" stroke-width="2.2"/>
+
+          <!-- Sawtooth 2 -->
+          <line x1="175" y1="170" x2="175" y2="28" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+          <line x1="175" y1="28" x2="290" y2="170" stroke="#0e7490" stroke-width="2.2"/>
+
+          <!-- Sawtooth 3 (partial) -->
+          <line x1="290" y1="170" x2="290" y2="28" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+          <line x1="290" y1="28" x2="395" y2="138" stroke="#0e7490" stroke-width="2.2"/>
+
+          <!-- Reorder point hit markers -->
+          <circle cx="135" cy="115" r="4" fill="#d97706"/>
+          <circle cx="250" cy="115" r="4" fill="#d97706"/>
+
+          <!-- Lead time arrow on first cycle -->
+          <line x1="135" y1="145" x2="175" y2="145" stroke="#d97706" stroke-width="1.5"/>
+          <line x1="135" y1="140" x2="135" y2="150" stroke="#d97706" stroke-width="1.5"/>
+          <line x1="175" y1="140" x2="175" y2="150" stroke="#d97706" stroke-width="1.5"/>
+          <text x="155" y="160" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle" font-weight="600">Lead time</text>
+
+          <!-- Annotation: "Order placed" -->
+          <text x="138" y="110" font-size="9" fill="#d97706" font-family="DM Sans">Order placed</text>
+        </svg>
+      </div>
+    </div>
+
+    <p>Each time inventory hits R, a fixed order of <strong>Q = 367 units</strong> is placed. The order arrives exactly one lead time later, replenishing stock back to Q.</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Reorder Point (Constant Demand)</div>
+      <div class="formula-body">
+        R = d × L<br>
+        <span style="color:#6b7280;font-size:.88rem">d = daily demand rate, L = lead time in days</span>
+      </div>
+    </div>
+
+    <div class="callout accent">
+      <div class="callout-label">Hospital Example</div>
+      <div class="callout-body">
+        Daily demand = 10,800 ÷ 360 = <strong>30 units/day</strong><br>
+        Lead time = 6 days<br>
+        R = 30 × 6 = <strong>180 units</strong><br><br>
+        When stock drops to 180 units, place an order for 367 units.
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <div class="callout-label">Inventory Position (IP)</div>
+      <div class="callout-body">
+        IP = On-Hand + Scheduled Receipts − Backorders<br><br>
+        You track IP (not just on-hand) because an order may already be in transit. This prevents double-ordering.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 7: Reorder Point with Safety Stock ───────── -->
+<div class="section" style="background:#fff" data-step="7">
+  <div class="section-inner">
+    <div class="section-num">When Demand Varies</div>
+    <h2>Safety stock protects <em>against uncertainty</em></h2>
+    <p>The simple model assumes perfectly constant demand. In reality, demand fluctuates. If demand spikes during lead time, you can run out before your order arrives. <strong>Safety stock</strong> is a buffer against this.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-header">Reorder Point with Variable Demand</div>
+      <div class="diagram-body" style="padding:16px">
+        <svg viewBox="0 0 420 210" style="width:100%;max-width:480px;display:block;margin:0 auto">
+          <defs>
+            <marker id="arr3" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
+            </marker>
+          </defs>
+          <!-- Axes -->
+          <line x1="45" y1="175" x2="400" y2="175" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr3)"/>
+          <line x1="45" y1="175" x2="45" y2="15" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr3)"/>
+          <text x="220" y="193" font-size="10" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
+          <text x="16" y="100" font-size="10" fill="#64748b" transform="rotate(-90,16,100)" text-anchor="middle" font-family="DM Sans">Inventory</text>
+
+          <!-- Safety stock floor -->
+          <line x1="45" y1="148" x2="395" y2="148" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <text x="398" y="151" font-size="9" fill="#7c3aed" font-family="DM Sans" font-weight="700">Safety</text>
+          <text x="398" y="161" font-size="9" fill="#7c3aed" font-family="DM Sans" font-weight="700">Stock</text>
+
+          <!-- Reorder point line (above safety stock) -->
+          <line x1="45" y1="115" x2="395" y2="115" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <text x="398" y="118" font-size="9" fill="#d97706" font-family="DM Sans" font-weight="700">R = d̄L + SS</text>
+
+          <!-- Sawtooth with safety stock floor -->
+          <!-- Cycle 1: normal demand -->
+          <line x1="65" y1="175" x2="65" y2="35" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+          <line x1="65" y1="35" x2="160" y2="148" stroke="#0e7490" stroke-width="2.2"/>
+          <!-- Order replenishes back to Q from safety stock level -->
+          <line x1="160" y1="148" x2="160" y2="35" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+
+          <!-- Cycle 2: higher demand (steeper slope, hits safety stock) -->
+          <line x1="160" y1="35" x2="240" y2="148" stroke="#b91c1c" stroke-width="2.2"/>
+          <circle cx="120" cy="115" r="4" fill="#d97706"/>
+          <text x="82" y="108" font-size="9" fill="#d97706" font-family="DM Sans">order placed</text>
+
+          <!-- Cycle 2 replenishment -->
+          <line x1="240" y1="148" x2="240" y2="35" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
+
+          <!-- Cycle 3: lower demand -->
+          <line x1="240" y1="35" x2="355" y2="148" stroke="#059669" stroke-width="2.2"/>
+          <circle cx="200" cy="115" r="4" fill="#d97706"/>
+
+          <!-- Brace for safety stock -->
+          <line x1="370" y1="148" x2="370" y2="175" stroke="#7c3aed" stroke-width="1.5"/>
+          <line x1="367" y1="148" x2="373" y2="148" stroke="#7c3aed" stroke-width="1.5"/>
+          <line x1="367" y1="175" x2="373" y2="175" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="378" y="165" font-size="9" fill="#7c3aed" font-family="DM Sans">SS</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Reorder Point with Safety Stock</div>
+      <div class="formula-body">
+        R = d̄·L + z·σ<sub style="font-size:.85em">dL</sub><br>
+        <span style="color:#6b7280;font-size:.85rem">
+          d̄ = avg daily demand &nbsp;|&nbsp; L = lead time<br>
+          z = service level z-score &nbsp;|&nbsp; σ<sub>dL</sub> = std dev of demand during lead time
+        </span>
+      </div>
+    </div>
+
+    <div class="callout purple">
+      <div class="callout-label">How to Find Safety Stock</div>
+      <div class="callout-body">
+        <strong>1. Choose a service level</strong> (e.g., 95% → z = 1.65)<br>
+        <strong>2. Identify the demand distribution</strong> during lead time<br>
+        <strong>3. Safety Stock</strong> = z × σ<sub>dL</sub><br><br>
+        Higher service level = more safety stock = more carrying cost. It's a tradeoff.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 8: Summary ───────────────────────────────── -->
+<div class="section summary-section" data-step="8">
+  <div class="section-inner">
+    <div class="section-num" style="color:var(--green)">Summary</div>
+    <h2>The <em>complete picture</em></h2>
+    <p>The EOQ framework answers two fundamental inventory questions: how much to order, and when to order.</p>
+
+    <div class="two-col" style="margin-top:20px">
+      <div>
+        <div class="formula-card">
+          <div class="fc-label">Holding Cost per Year</div>
+          <div class="fc-formula">ICC/yr = (Q/2) × H</div>
+        </div>
+        <div class="formula-card">
+          <div class="fc-label">Ordering Cost per Year</div>
+          <div class="fc-formula">OC/yr = (D/Q) × S</div>
+        </div>
+        <div class="formula-card">
+          <div class="fc-label">Total Annual Cost</div>
+          <div class="fc-formula">TAC = (Q/2)H + (D/Q)S</div>
+        </div>
+      </div>
+      <div>
+        <div class="formula-card" style="border-color:#a5b4fc;background:#eef2ff">
+          <div class="fc-label" style="color:#4338ca">EOQ Formula</div>
+          <div class="fc-formula" style="color:#1e1b4b;font-size:1.1rem;font-weight:700">EOQ = √(2DS/H)</div>
+        </div>
+        <div class="formula-card">
+          <div class="fc-label">Reorder Point (fixed demand)</div>
+          <div class="fc-formula">R = d × L</div>
+        </div>
+        <div class="formula-card">
+          <div class="fc-label">Reorder Point (variable demand)</div>
+          <div class="fc-formula">R = d̄·L + z·σ<sub style="font-size:.85em">dL</sub></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout green" style="margin-top:20px">
+      <div class="callout-label">Hospital Example — Final Answer</div>
+      <div class="callout-body">
+        D = 10,800 &nbsp;|&nbsp; H = $40 &nbsp;|&nbsp; S = $250 &nbsp;|&nbsp; L = 6 days<br><br>
+        <strong>Order 367 units</strong> each time inventory drops to <strong>180 units</strong>.<br>
+        Total annual cost ≈ <strong>$14,697/year</strong>.
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:20px">← <a href="../vsm/index.html" style="color:var(--accent)">VSM Tools</a> &nbsp;|&nbsp; <a href="../../index.html" style="color:var(--accent)">All Tools</a></p>
+  </div>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const navSteps = document.getElementById('navSteps');
+  const progressBar = document.getElementById('progressBar');
+
+  sections.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.setAttribute('aria-label', 'Go to section ' + (i + 1));
+    dot.onclick = () => sections[i].scrollIntoView({ behavior: 'smooth' });
+    navSteps.appendChild(dot);
+  });
+
+  const dots = document.querySelectorAll('.nav-dot');
+
+  function onScroll() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docHeight > 0 ? scrollTop / docHeight * 100 : 0) + '%';
+
+    let active = 0;
+    sections.forEach((sec, i) => {
+      if (sec.getBoundingClientRect().top <= window.innerHeight * 0.4) active = i;
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+</body>
+</html>
