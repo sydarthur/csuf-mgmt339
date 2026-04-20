@@ -1,31 +1,364 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSUF MGMT339 - Redirecting...</title>
-  <script>
-    // Redirect to SPC module
-    window.location.replace('./spc/');
-  </script>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      text-align: center;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MGMT 339 — Operations Management · CSUF</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  :root {
+    --bg: #f9fafb;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --navy: #1e3a5f;
+    --shadow: 0 1px 6px rgba(0,0,0,0.07);
+    --shadow-hover: 0 6px 24px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--navy);
+    padding: 3rem 2rem 2.5rem;
+  }
+  .site-header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #93c5fd;
+    margin-bottom: .75rem;
+  }
+  .site-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    color: #f9fafb;
+    line-height: 1.15;
+    margin-bottom: .75rem;
+  }
+  .site-header h1 em { color: #fcd34d; font-style: italic; }
+  .site-header .subtitle {
+    font-size: 1rem;
+    color: #94a3b8;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* ── Main ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2.8rem 0 1rem;
+    padding-bottom: .4rem;
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label span { font-size: .95rem; }
+
+  /* ── Card grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 14px;
+  }
+  .grid-wide {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  /* ── Tool card ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+    box-shadow: var(--shadow);
+  }
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+    border-color: var(--accent-color, #6366f1);
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .card-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+  .card-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-walkthrough { background: #dbeafe; color: #1d4ed8; }
+  .badge-interactive { background: #dcfce7; color: #15803d; }
+  .badge-game        { background: #f5f3ff; color: #6d28d9; }
+  .badge-slides      { background: #fef9c3; color: #92400e; }
+  .badge-tool        { background: #fff7ed; color: #c2410c; }
+
+  .card-title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .card-arrow {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-top: auto;
+    padding-top: 8px;
+    transition: color .2s;
+  }
+  .card:hover .card-arrow { color: var(--accent-color, #6366f1); }
+
+  /* Per-topic accent colors on hover */
+  .acc-blue   { --accent-color: #2563eb; }
+  .acc-teal   { --accent-color: #0e7490; }
+  .acc-red    { --accent-color: #c0442a; }
+  .acc-amber  { --accent-color: #d97706; }
+  .acc-navy   { --accent-color: #1e3a5f; }
+  .acc-purple { --accent-color: #7c3aed; }
+  .acc-green  { --accent-color: #15803d; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: .8rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    main { padding: 2rem 1.25rem 4rem; }
+    .site-header { padding: 2rem 1.25rem 2rem; }
+  }
+</style>
 </head>
 <body>
-  <div>
-    <p>Redirecting to SPC Tools...</p>
-    <p>If not redirected, <a href="./spc/" style="color: white; text-decoration: underline;">click here</a>.</p>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="eyebrow">MGMT 339 · CSUF · Spring 2026</div>
+    <h1>Operations <em>Management</em></h1>
+    <p class="subtitle">Interactive walkthroughs, tools, and simulations for every major topic in the course.</p>
   </div>
+</header>
+
+<main>
+
+  <!-- ── LEAN / PROCESS IMPROVEMENT ── -->
+  <div class="section-label"><span>🏭</span> Lean &amp; Process Improvement</div>
+  <div class="grid">
+
+    <a class="card acc-red" href="/csuf-mgmt339/vsm/vsm-walkthrough-in-n-out.html">
+      <div class="card-top">
+        <div class="card-icon">🍔</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">VSM — In-N-Out Burger</div>
+      <div class="card-desc">Learn Value Stream Mapping through In-N-Out's kitchen: cycle time, lead time, and WIP explained visually.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+    <a class="card acc-red" href="/csuf-mgmt339/vsm/vsm-suncrest-bakery.html">
+      <div class="card-top">
+        <div class="card-icon">🥐</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">VSM — Suncrest Bakery</div>
+      <div class="card-desc">A second VSM case: map the current state, identify waste, and design a future state for a bakery operation.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+    <a class="card acc-red" href="/csuf-mgmt339/vsm/kanban-walkthrough.html">
+      <div class="card-top">
+        <div class="card-icon">📋</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">Kanban Systems</div>
+      <div class="card-desc">How pull-based replenishment works, kanban card calculation, and the difference between push and pull.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+    <a class="card acc-red" href="/csuf-mgmt339/vsm/lean-to-toc-walkthrough.html">
+      <div class="card-top">
+        <div class="card-icon">🔗</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">Lean → Theory of Constraints</div>
+      <div class="card-desc">An animated comparison: how Lean and TOC both attack waste but through different lenses.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+    <a class="card acc-red" href="/csuf-mgmt339/vsm/line-balancing-walkthrough.html">
+      <div class="card-top">
+        <div class="card-icon">⚖️</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">Line Balancing</div>
+      <div class="card-desc">Step-by-step: calculate takt time, assign tasks to workstations, and measure efficiency.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+  </div>
+
+  <!-- ── INVENTORY MANAGEMENT ── -->
+  <div class="section-label"><span>📦</span> Inventory Management</div>
+  <div class="grid">
+
+    <a class="card acc-teal" href="/csuf-mgmt339/eoq/eoq-walkthrough.html">
+      <div class="card-top">
+        <div class="card-icon">📐</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">Economic Order Quantity (EOQ)</div>
+      <div class="card-desc">Carrying cost vs. ordering cost, the TAC curve, the EOQ formula, and reorder points with safety stock.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+  </div>
+
+  <!-- ── PROJECT MANAGEMENT ── -->
+  <div class="section-label"><span>📅</span> Project Management (CPM)</div>
+  <div class="grid">
+
+    <a class="card acc-navy" href="/csuf-mgmt339/pmo/cpm-walkthrough.html">
+      <div class="card-top">
+        <div class="card-icon">🗺️</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">Critical Path Method</div>
+      <div class="card-desc">Forward pass (ES/EF), backward pass (LF/LS), slack, and critical path identification — St. John's Hospital.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+    <a class="card acc-navy" href="/csuf-mgmt339/pmo/cpm-cost-crashing.html">
+      <div class="card-top">
+        <div class="card-icon">📉</div>
+        <span class="card-badge badge-walkthrough">Walkthrough</span>
+      </div>
+      <div class="card-title">CPM Cost–Time Optimization</div>
+      <div class="card-desc">Greedy crashing algorithm: crash cost per week, penalty costs, and finding the optimal project duration.</div>
+      <div class="card-arrow">Read →</div>
+    </a>
+
+  </div>
+
+  <!-- ── QUALITY ── -->
+  <div class="section-label"><span>📊</span> Quality Management</div>
+  <div class="grid">
+
+    <a class="card acc-blue" href="/csuf-mgmt339/spc/">
+      <div class="card-top">
+        <div class="card-icon">📈</div>
+        <span class="card-badge badge-interactive">Interactive</span>
+      </div>
+      <div class="card-title">Statistical Process Control (SPC)</div>
+      <div class="card-desc">Build X̄ and R control charts from real data, detect out-of-control signals, and interpret process variation.</div>
+      <div class="card-arrow">Open tool →</div>
+    </a>
+
+  </div>
+
+  <!-- ── FACILITY LOCATION ── -->
+  <div class="section-label"><span>📍</span> Facility Location</div>
+  <div class="grid">
+
+    <a class="card acc-green" href="/csuf-mgmt339/ton-mile-center/">
+      <div class="card-top">
+        <div class="card-icon">🗺️</div>
+        <span class="card-badge badge-interactive">Interactive</span>
+      </div>
+      <div class="card-title">Center of Gravity / Ton-Mile</div>
+      <div class="card-desc">Plot demand locations on a map, weight by volume, and find the cost-minimizing facility location.</div>
+      <div class="card-arrow">Open tool →</div>
+    </a>
+
+  </div>
+
+  <!-- ── SIMULATIONS ── -->
+  <div class="section-label"><span>🎮</span> Simulations &amp; Games</div>
+  <div class="grid">
+
+    <a class="card acc-purple" href="/csuf-mgmt339/ops-strategy/">
+      <div class="card-top">
+        <div class="card-icon">🏢</div>
+        <span class="card-badge badge-game">Game</span>
+      </div>
+      <div class="card-title">The Great Tech Reckoning</div>
+      <div class="card-desc">Ops strategy role-card simulation. Six companies, competing priorities, one industry disruption.</div>
+      <div class="card-arrow">Play →</div>
+    </a>
+
+  </div>
+
+  <!-- ── SLIDES ── -->
+  <div class="section-label"><span>🎞️</span> Lecture Slides</div>
+  <div class="grid">
+
+    <a class="card acc-amber" href="/csuf-mgmt339/slides/">
+      <div class="card-top">
+        <div class="card-icon">📑</div>
+        <span class="card-badge badge-slides">Slides</span>
+      </div>
+      <div class="card-title">Course Slide Deck</div>
+      <div class="card-desc">Reveal.js presentation slides for MGMT 339 lectures.</div>
+      <div class="card-arrow">View →</div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  MGMT 339 · Operations Management · California State University, Fullerton · Instructor: Sid Yamalakonda
+</footer>
+
 </body>
 </html>
