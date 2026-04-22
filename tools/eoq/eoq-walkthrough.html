@@ -917,9 +917,9 @@
 <!-- ─── SECTION 9: Reorder Point ──────────────────────────── -->
 <div class="section" style="background:#fff" data-step="9">
   <div class="section-inner">
-    <div class="section-num">When to Reorder</div>
+    <div class="section-num">When to Reorder — The Q System</div>
     <h2>The <em>Continuous Review</em> System</h2>
-    <p>EOQ tells you <em>how much</em> to order. But you also need to know <em>when</em>. The continuous review system (also called a fixed-Q system) watches inventory in real time and triggers an order when stock drops to a threshold called the <strong>Reorder Point (R)</strong>.</p>
+    <p>EOQ tells you <em>how much</em> to order. But you also need to know <em>when</em>. The continuous review system — also called the <strong>Q system</strong> or fixed-order-quantity system — watches inventory in real time and triggers an order when stock drops to a threshold called the <strong>Reorder Point (R)</strong>. The order quantity is always the same (Q = EOQ); what floats is <em>when</em> you place it.</p>
 
     <div class="diagram-container">
       <div class="diagram-header">
@@ -1107,8 +1107,228 @@
   </div>
 </div>
 
-<!-- ─── SECTION 11: When EOQ Breaks ───────────────────────── -->
+<!-- ─── SECTION 11: Periodic Review (P System) ────────────── -->
 <div class="section" style="background:#fff" data-step="11">
+  <div class="section-inner">
+    <div class="section-num">A Different Approach — The P System</div>
+    <h2>The <em>Periodic Review</em> System</h2>
+    <p>The Q system watches inventory continuously. That requires real-time tracking, which isn't always practical — especially when you manage thousands of SKUs, coordinate orders from a single supplier, or operate on a weekly delivery schedule. The <strong>periodic review system</strong> (P system) flips the logic: instead of watching inventory and triggering on a threshold, you check inventory on a <em>fixed schedule</em> and order however much it takes to top back up to a target level.</p>
+
+    <div class="callout accent">
+      <div class="callout-label">The Key Contrast</div>
+      <div class="callout-body">
+        <strong>Q system:</strong> same amount every time, flexible timing (order when IP hits R).<br>
+        <strong>P system:</strong> fixed schedule, flexible amount (order up to T every P days).<br><br>
+        Both respond to demand variability — they just use different levers.
+      </div>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:24px;margin-bottom:8px">The protection interval</h3>
+    <p>Here's the critical concept. In the Q system, once you trigger an order, you only had to survive L days — the lead time. In the P system, the vulnerable window is longer. Imagine you just reviewed and placed an order. When is the next moment you can react to unexpectedly high demand? Not until the next review P days from now — and then you wait another L days for that order to arrive. So the exposure window is <strong>P + L days</strong>, called the <strong>protection interval</strong>.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-header">P System — Fixed Reviews, Variable Order Sizes</div>
+      <div class="diagram-body" style="padding:16px">
+        <svg viewBox="0 0 620 280" style="width:100%;display:block;margin:0 auto">
+          <defs>
+            <marker id="p-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
+            </marker>
+          </defs>
+          <!-- Axes -->
+          <line x1="60" y1="220" x2="600" y2="220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#p-arr)"/>
+          <line x1="60" y1="220" x2="60" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#p-arr)"/>
+          <text x="330" y="270" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
+          <text x="22" y="125" font-size="11" fill="#64748b" transform="rotate(-90,22,125)" text-anchor="middle" font-family="DM Sans">Inventory</text>
+
+          <!-- Target level T -->
+          <line x1="60" y1="40" x2="595" y2="40" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <text x="600" y="43" font-size="11" fill="#b91c1c" font-family="DM Sans" font-weight="700">T</text>
+
+          <!-- Review periods P -->
+          <line x1="120" y1="220" x2="120" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
+          <line x1="300" y1="220" x2="300" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
+          <line x1="480" y1="220" x2="480" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
+          <text x="120" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 1</text>
+          <text x="300" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 2</text>
+          <text x="480" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 3</text>
+
+          <!-- P brackets at bottom -->
+          <line x1="120" y1="238" x2="300" y2="238" stroke="#0e7490" stroke-width="1.5"/>
+          <line x1="120" y1="233" x2="120" y2="243" stroke="#0e7490" stroke-width="1.5"/>
+          <line x1="300" y1="233" x2="300" y2="243" stroke="#0e7490" stroke-width="1.5"/>
+          <text x="210" y="251" font-size="10" fill="#0e7490" font-family="DM Sans" text-anchor="middle" font-weight="700">P</text>
+          <line x1="300" y1="238" x2="480" y2="238" stroke="#0e7490" stroke-width="1.5"/>
+          <line x1="480" y1="233" x2="480" y2="243" stroke="#0e7490" stroke-width="1.5"/>
+          <text x="390" y="251" font-size="10" fill="#0e7490" font-family="DM Sans" text-anchor="middle" font-weight="700">P</text>
+
+          <!-- Inventory line going down, with jumps at arrivals -->
+          <!-- IP at review 1 = 100 (down from 180 start) -->
+          <!-- Period 1: moderate drop -->
+          <line x1="60" y1="70" x2="120" y2="120" stroke="#1e3a8a" stroke-width="2"/>
+          <!-- Order placed at R1 (dashed up to new IP) -->
+          <line x1="120" y1="120" x2="120" y2="55" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- Continue draining during L (lead time) -->
+          <line x1="120" y1="120" x2="170" y2="160" stroke="#1e3a8a" stroke-width="2"/>
+          <!-- Order arrives (jump up to top-up) -->
+          <line x1="170" y1="160" x2="170" y2="55" stroke="#1e3a8a" stroke-width="2.5"/>
+          <!-- Drain to review 2 -->
+          <line x1="170" y1="55" x2="300" y2="170" stroke="#1e3a8a" stroke-width="2"/>
+          <!-- Order placed at R2 -->
+          <line x1="300" y1="170" x2="300" y2="40" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <!-- Drain during L -->
+          <line x1="300" y1="170" x2="350" y2="200" stroke="#1e3a8a" stroke-width="2"/>
+          <!-- Order arrives -->
+          <line x1="350" y1="200" x2="350" y2="70" stroke="#1e3a8a" stroke-width="2.5"/>
+          <!-- Drain to review 3 -->
+          <line x1="350" y1="70" x2="480" y2="130" stroke="#1e3a8a" stroke-width="2"/>
+          <line x1="480" y1="130" x2="480" y2="60" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="480" y1="130" x2="530" y2="170" stroke="#1e3a8a" stroke-width="2"/>
+          <line x1="530" y1="170" x2="530" y2="65" stroke="#1e3a8a" stroke-width="2.5"/>
+          <line x1="530" y1="65" x2="590" y2="120" stroke="#1e3a8a" stroke-width="2"/>
+
+          <!-- Order-placed markers -->
+          <circle cx="120" cy="120" r="5" fill="#d97706"/>
+          <circle cx="300" cy="170" r="5" fill="#d97706"/>
+          <circle cx="480" cy="130" r="5" fill="#d97706"/>
+
+          <!-- Order-received markers -->
+          <circle cx="170" cy="55" r="5" fill="#059669"/>
+          <circle cx="350" cy="70" r="5" fill="#059669"/>
+          <circle cx="530" cy="65" r="5" fill="#059669"/>
+
+          <!-- Q labels -->
+          <text x="145" y="90" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₁</text>
+          <text x="325" y="120" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₂ (bigger)</text>
+          <text x="505" y="95" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₃</text>
+
+          <!-- Lead time bracket on first cycle -->
+          <line x1="120" y1="180" x2="170" y2="180" stroke="#d97706" stroke-width="1.2"/>
+          <line x1="120" y1="175" x2="120" y2="185" stroke="#d97706" stroke-width="1.2"/>
+          <line x1="170" y1="175" x2="170" y2="185" stroke="#d97706" stroke-width="1.2"/>
+          <text x="145" y="195" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle" font-weight="600">L</text>
+
+          <!-- Protection interval highlight (P + L, from review 1 to arrival after review 2) -->
+          <line x1="120" y1="258" x2="350" y2="258" stroke="#b91c1c" stroke-width="2"/>
+          <line x1="120" y1="253" x2="120" y2="263" stroke="#b91c1c" stroke-width="2"/>
+          <line x1="350" y1="253" x2="350" y2="263" stroke="#b91c1c" stroke-width="2"/>
+          <text x="235" y="272" font-size="10" fill="#b91c1c" font-family="DM Sans" text-anchor="middle" font-weight="700">Protection interval = P + L</text>
+        </svg>
+        <p class="muted" style="text-align:center;font-size:12px;margin:8px 0 0">Reviews happen on a fixed schedule (every P days). At each review, the order quantity Q adjusts to bring inventory position back up to target T.</p>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Target Inventory Level (T)</div>
+      <div class="formula-body">
+        T = d̄(P + L) + z·σ<sub style="font-size:.85em">P+L</sub><br>
+        Order Quantity at review: Q = T − IP<br>
+        <span style="color:#6b7280;font-size:.85rem">
+          P = review period &nbsp;|&nbsp; L = lead time &nbsp;|&nbsp; IP = inventory position at review<br>
+          σ<sub>P+L</sub> = std dev of demand over the protection interval
+        </span>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:24px;margin-bottom:8px">Coffee pods — the P-system version</h3>
+    <p>You decide to check your pod drawer every Sunday (P = 7 days). Shipping still takes 3 days (L = 3). You drink about 2 pods/day. The protection interval is P + L = 10 days, so your target is <strong>T = 2 × 10 = 20 pods</strong>. Whatever you count on Sunday, you order up to 20.</p>
+
+    <div class="two-col">
+      <div class="callout blue" style="margin:0">
+        <div class="callout-label">Busy Week</div>
+        <div class="callout-body">
+          Friends over all week. Sunday count: <strong>6 pods.</strong><br>
+          Order quantity Q = 20 − 6 = <strong>14 pods</strong>
+        </div>
+      </div>
+      <div class="callout green" style="margin:0">
+        <div class="callout-label">Slow Week</div>
+        <div class="callout-body">
+          You traveled Tue–Fri. Sunday count: <strong>14 pods.</strong><br>
+          Order quantity Q = 20 − 14 = <strong>6 pods</strong>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:14px">Same day. Same target T. Different order size. The review day never moves — the order quantity floats with whatever demand actually did.</p>
+
+    <div class="callout purple">
+      <div class="callout-label">Why P Needs More Safety Stock than Q</div>
+      <div class="callout-body">The protection interval P + L is longer than just L, so accumulated demand uncertainty is larger. The <strong>√(P+L)</strong> term in safety stock is strictly bigger than the <strong>√L</strong> term in the Q system. Practically: for the same service level and demand variability, the P system always carries more safety stock. You're paying for operational simplicity with a slightly larger inventory buffer.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 12: P-System Worked Example (Petromax) ────── -->
+<div class="section dark-section" data-step="12">
+  <div class="section-inner">
+    <div class="section-num" style="color:#7dd3fc">Worked Example — P System</div>
+    <h2>Petromax Enterprises — <em>target inventory level</em></h2>
+    <p>Petromax uses a periodic review system for a key product. Here are the parameters:</p>
+
+    <div class="diagram-container" style="border-color:#334155">
+      <div class="diagram-header" style="background:#1e293b;color:#94a3b8">Given Information</div>
+      <div class="diagram-body" style="background:#1e293b;padding:18px">
+        <table style="width:100%;color:#e2e8f0;font-size:14px;border-collapse:collapse">
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Weekly demand (d̄)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">92 units/week</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Ordering cost (S)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">$90/order</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Holding cost (H)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">$18/unit/yr</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Operating weeks</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">50 weeks/yr</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Lead time (L)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">1 week</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Weekly demand std dev (σ<sub>d</sub>)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">23 units</td></tr>
+          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Service level / z</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">92% / z ≈ 1.41</td></tr>
+          <tr><td style="color:#94a3b8;padding:8px 10px">EOQ (given)</td><td style="color:#fcd34d;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">214 units</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 1: Find the review period P</div>
+      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
+        P is chosen so each review matches the EOQ cycle: P = EOQ / d̄<br>
+        P = 214 / 92 ≈ <span style="color:#fcd34d">2.33 weeks</span>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 2: Protection interval</div>
+      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
+        P + L = 2.33 + 1 = <span style="color:#fcd34d">3.33 weeks</span><br>
+        <span style="color:#94a3b8;font-size:.82rem">This is the vulnerable window the target must cover.</span>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 3: Safety stock</div>
+      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
+        SS = z · σ<sub>d</sub> · √(P + L)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;= 1.41 × 23 × √3.33<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;= 1.41 × 23 × 1.824<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;≈ <span style="color:#fcd34d">59 units</span>
+      </div>
+    </div>
+
+    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
+      <div class="formula-label" style="color:#7dd3fc">Step 4: Target inventory level T</div>
+      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
+        T = d̄(P + L) + SS<br>
+        &nbsp;&nbsp;&nbsp;= 92 × 3.33 + 59<br>
+        &nbsp;&nbsp;&nbsp;= 306 + 59<br>
+        <span class="big" style="color:#fcd34d">T ≈ 365 units</span>
+      </div>
+    </div>
+
+    <div class="callout accent" style="background:rgba(14,116,144,0.15);border-color:#0e7490;color:#e2e8f0">
+      <div class="callout-label" style="color:#7dd3fc">Interpretation</div>
+      <div class="callout-body" style="color:#cbd5e1">
+        Every 2.33 weeks (the review period), Petromax counts inventory position and orders up to 365 units. If IP = 200 at a review, order 165. If IP = 80, order 285. The target stays fixed at 365; <strong>the order quantity floats with whatever demand did since last review.</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 13: When EOQ Breaks ───────────────────────── -->
+<div class="section" style="background:#fff" data-step="13">
   <div class="section-inner">
     <div class="section-num">Limits of the Model</div>
     <h2>When EOQ <em>doesn't apply</em></h2>
@@ -1152,14 +1372,15 @@
   </div>
 </div>
 
-<!-- ─── SECTION 12: Summary ───────────────────────────────── -->
-<div class="section summary-section" data-step="12">
+<!-- ─── SECTION 14: Summary ───────────────────────────────── -->
+<div class="section summary-section" data-step="14">
   <div class="section-inner">
     <div class="section-num" style="color:var(--green)">Summary</div>
     <h2>The <em>complete picture</em></h2>
     <p>The EOQ framework answers two fundamental inventory questions: how much to order, and when to order. Here are all the pieces in one place.</p>
 
-    <div class="two-col" style="margin-top:20px">
+    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:16px;margin-bottom:8px;color:var(--green)">Costs & EOQ</h3>
+    <div class="two-col">
       <div>
         <div class="formula-card">
           <div class="fc-label">Holding Cost per Year</div>
@@ -1180,9 +1401,25 @@
           <div class="fc-formula" style="color:#1e1b4b;font-size:1.1rem;font-weight:700">EOQ = √(2DS/H)</div>
         </div>
         <div class="formula-card">
+          <div class="fc-label">Orders per Year</div>
+          <div class="fc-formula">N = D / EOQ</div>
+        </div>
+        <div class="formula-card">
+          <div class="fc-label">Cycle Time</div>
+          <div class="fc-formula">Cycle = EOQ / D</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:22px;margin-bottom:8px;color:var(--green)">Q System — Continuous Review</h3>
+    <div class="two-col">
+      <div>
+        <div class="formula-card">
           <div class="fc-label">Reorder Point (fixed demand)</div>
           <div class="fc-formula">R = d × L</div>
         </div>
+      </div>
+      <div>
         <div class="formula-card">
           <div class="fc-label">Reorder Point (variable demand)</div>
           <div class="fc-formula">R = d̄·L + z·σ<sub style="font-size:.85em">dL</sub></div>
@@ -1190,7 +1427,23 @@
       </div>
     </div>
 
-    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:28px;margin-bottom:10px">Five big takeaways</h3>
+    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:22px;margin-bottom:8px;color:var(--green)">P System — Periodic Review</h3>
+    <div class="two-col">
+      <div>
+        <div class="formula-card">
+          <div class="fc-label">Target Inventory Level</div>
+          <div class="fc-formula">T = d̄(P + L) + z·σ<sub style="font-size:.85em">P+L</sub></div>
+        </div>
+      </div>
+      <div>
+        <div class="formula-card">
+          <div class="fc-label">Order Quantity at Review</div>
+          <div class="fc-formula">Q = T − IP</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:28px;margin-bottom:10px">Six big takeaways</h3>
     <div class="hl-box">
       <div class="hl-icon">⚖️</div>
       <div class="hl-text"><strong>Two costs in tension.</strong> Holding cost rises with Q, ordering cost falls with Q. EOQ sits where they balance.</div>
@@ -1206,6 +1459,10 @@
     <div class="hl-box">
       <div class="hl-icon">🔔</div>
       <div class="hl-text"><strong>Safety stock is for uncertainty.</strong> Variable demand or lead times require a buffer — and higher service levels get expensive fast.</div>
+    </div>
+    <div class="hl-box">
+      <div class="hl-icon">🔄</div>
+      <div class="hl-text"><strong>Q vs P.</strong> Q system: same amount, flexible timing. P system: fixed schedule, flexible amount. Pick based on tracking capability and supplier schedule.</div>
     </div>
     <div class="hl-box">
       <div class="hl-icon">🚫</div>
