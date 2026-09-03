@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background-color: #f6efe0;
+  background-image: radial-gradient(circle, rgba(36, 31, 24, 0.09) 1px, transparent 1px);
+  background-size: 20px 20px;
+}

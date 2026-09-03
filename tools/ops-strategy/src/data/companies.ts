@@ -21,6 +21,7 @@ export interface Company {
   hasAllocationColumn: boolean
   negotiationNotes: string[]
   accentColor: string
+  icon: string
 }
 
 export const companies: Company[] = [
@@ -84,6 +85,7 @@ export const companies: Company[] = [
       'Partnership is stable but forces you to share upside with SoftCom.',
     ],
     accentColor: 'purple',
+    icon: '📱',
   },
   {
     id: 'softcom',
@@ -144,6 +146,7 @@ export const companies: Company[] = [
       'Staying pure software is safest early, but decays over time.',
     ],
     accentColor: 'red',
+    icon: '☁️',
   },
   {
     id: 'amerishop',
@@ -200,6 +203,7 @@ export const companies: Company[] = [
       'You can punish a manufacturer with Private Label, but that can destabilize the ecosystem.',
     ],
     accentColor: 'yellow',
+    icon: '🛒',
   },
   {
     id: 'corpsolutions',
@@ -256,6 +260,7 @@ export const companies: Company[] = [
       'Migration Agent is a powerful disruption tool that can swing outcomes.',
     ],
     accentColor: 'gray',
+    icon: '🏛️',
   },
   {
     id: 'openai',
@@ -312,6 +317,7 @@ export const companies: Company[] = [
       'Staying exclusive to SoftCom becomes less valuable over time.',
     ],
     accentColor: 'green',
+    icon: '🧠',
   },
   {
     id: 'silicore',
@@ -372,5 +378,6 @@ export const companies: Company[] = [
       'Under capacity shocks, your power spikes dramatically.',
     ],
     accentColor: 'blue',
+    icon: '⚙️',
   },
 ]
