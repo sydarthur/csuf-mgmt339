@@ -63,7 +63,7 @@
         },
         "EnterprisePivot": {
           "cost": 5,
-          "base_revenue": 22,
+          "base_revenue": 26,
           "chips_needed": 30,
           "risk_table": "standard",
           "requires": {
@@ -88,7 +88,7 @@
       "options": {
         "HardwareBlitz": {
           "cost": 8,
-          "base_revenue": 25,
+          "base_revenue": 40,
           "chips_needed": 40,
           "risk_table": "standard",
           "requires": {
@@ -147,7 +147,7 @@
         },
         "HardwareIntegration": {
           "cost": 4,
-          "base_revenue": 20,
+          "base_revenue": 26,
           "risk_table": "hw_integration",
           "requires": {
             "pearcom_option": "EnterprisePivot"

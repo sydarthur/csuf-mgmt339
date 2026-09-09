@@ -14,6 +14,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 **Dice and Yield Rolls**
 - Risky strategies roll a d6 each round and apply a revenue multiplier.
 - Silicore Split Fab rolls for **yield**: on rolls `1-3`, total chip capacity drops to **60 units** for that round.
+- Silicore's own revenue scales with actual capacity (`capacity / 100`) every round — a yield failure or Shock A cuts Silicore's own take, not just the chips it allocates to customers. At full capacity this has no effect.
 
 **Round 2 Shock (GM Roll)**
 - After Round 1 strategies are revealed, the GM rolls a d6:
@@ -44,14 +45,14 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | Option | Gross Revenue | Upfront Cost | Base Net | Chips Needed | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- | --- |
 | Fortress | 12 | 3 | 9 | 90 | None | Chips must be >=45 to avoid failure. |
-| EnterprisePivot | 22 | 5 | 17 | 30 | Standard | Requires CorpSolutions Integrator_PearCom **and** AI access (SoftCom AIArmsDealer or OpenAIco OpenModel/HardwareIntegration). Chips must be >=15. Enterprise-tagged. |
+| EnterprisePivot | 26 | 5 | 21 | 30 | Standard | Requires CorpSolutions Integrator_PearCom **and** AI access (SoftCom AIArmsDealer or OpenAIco OpenModel/HardwareIntegration). Chips must be >=15. Enterprise-tagged. |
 | PartnerSoftCom | 8 | 1 | 7 | 0 | None | Requires SoftCom AIArmsDealer. Net profit split 50/50 with SoftCom. |
 
 ## SoftCom
 
 | Option | Gross Revenue | Upfront Cost | Base Net | Chips Needed | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- | --- |
-| HardwareBlitz | 25 | 8 | 17 | 40 | Standard | Requires AmeriShop PremiumPartner_SoftCom. Chips must be >=20. Enterprise-tagged. |
+| HardwareBlitz | 40 | 8 | 32 | 40 | Standard | Requires AmeriShop PremiumPartner_SoftCom. Chips must be >=20. Enterprise-tagged. |
 | AIArmsDealer | 10 | 2 | 8 | 0 | Standard | Requires PearCom EnterprisePivot **or** PartnerSoftCom. |
 | StaySoftware | 6 → 5 → 4 | 0 | 6 → 5 → 4 | 0 | None | Declines by 1 per round. |
 
@@ -69,7 +70,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | --- | --- | --- | --- | --- | --- |
 | SoftComExclusive | 4 → 3 → 2 | 0 | 4 → 3 → 2 | None | Revenue declines each round. |
 | OpenModel | 12 | 2 | 10 | OpenModel | Uses OpenModel dice table. |
-| HardwareIntegration | 20 | 4 | 16 | HW Integration | Requires PearCom EnterprisePivot. |
+| HardwareIntegration | 26 | 4 | 22 | HW Integration | Requires PearCom EnterprisePivot. |
 
 ## AmeriShop
 
@@ -89,10 +90,10 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 
 # Example Scenarios (from output)
 
-These are 3-round totals from `strategy/out/scenarios_spot-highest_bidder_lockin-off.csv`.
+These are 3-round totals from `strategy/out/scenarios_spot-highest_bidder_lockin-off_shock-none.csv`.
 
 | Scenario | Options | Notes | Expected Profits (3 rounds) |
 | --- | --- | --- | --- |
-| All dependencies satisfied | PearCom EnterprisePivot; SoftCom AIArmsDealer; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Integrator_PearCom | OK | PearCom 22.125, SoftCom 16.5, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 9.375 |
-| SoftCom Blitz with retailer | PearCom Fortress; SoftCom HardwareBlitz; Silicore SplitFab; OpenAIco SoftComExclusive; AmeriShop PremiumPartner_SoftCom; CorpSolutions Agnostic | CorpSolutions_BundlePenalty | PearCom 9.0, SoftCom 32.25, Silicore 36.0, OpenAIco 9.0, AmeriShop 21.75, CorpSolutions 0.0 |
+| All dependencies satisfied | PearCom EnterprisePivot; SoftCom AIArmsDealer; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Integrator_PearCom | OK | PearCom 28.875, SoftCom 16.5, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 14.625 |
+| SoftCom Blitz with retailer | PearCom Fortress; SoftCom HardwareBlitz; Silicore SplitFab; OpenAIco SoftComExclusive; AmeriShop PremiumPartner_SoftCom; CorpSolutions Agnostic | CorpSolutions_BundlePenalty | PearCom 9.0, SoftCom 66.0, Silicore 27.0, OpenAIco 9.0, AmeriShop 33.0, CorpSolutions 0.0 |
 | Dependency failure | PearCom EnterprisePivot; SoftCom HardwareBlitz; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Agnostic | PearCom_NoCorpIntegrator;PearCom_NoAI;SoftCom_NoRetailer;CorpSolutions_BundlePenalty | PearCom -15.0, SoftCom -24.0, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 6.0 |

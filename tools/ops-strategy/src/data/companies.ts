@@ -44,7 +44,7 @@ export const companies: Company[] = [
     superPower: {
       name: 'Lock-In',
       effect:
-        'You can veto Silicore from selling chips to SoftCom this round. Effect: SoftCom gets 0 chips; Silicore loses 2B revenue.',
+        'You can veto Silicore from selling chips to SoftCom this round. Effect: SoftCom gets 0 chips; Silicore loses $2 billion in revenue.',
       type: 'nuclear',
       reason: 'If used twice, SoftCom is mathematically eliminated.',
     },
@@ -53,25 +53,25 @@ export const companies: Company[] = [
         name: 'Fortress',
         upfrontCost: 3,
         chipsNeeded: 90,
-        grossRevenue: '12B',
+        grossRevenue: '$12 billion',
         die: 'None',
         dependencies:
-          'Safe. Needs >=45 chips to avoid failure. Shock B gives +1 to die if any roll is used.',
+          'Safe. Needs at least 45 chips to avoid failure. Shock B gives a +1 bonus to the dice roll if any roll is used.',
       },
       {
         name: 'Enterprise Pivot',
         upfrontCost: 5,
         chipsNeeded: 30,
-        grossRevenue: '22B',
+        grossRevenue: '$26 billion',
         die: 'Standard',
         dependencies:
-          'Requires CorpSolutions Integrator and AI access (SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration). Needs >=15 chips. Enterprise-tagged. Shock B gives -2 die roll.',
+          'Requires CorpSolutions Integrator and AI access (SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration). Needs at least 15 chips. Enterprise-tagged. Shock B gives a -2 penalty to the dice roll.',
       },
       {
-        name: 'Partner w/ SoftCom',
+        name: 'Partner with SoftCom',
         upfrontCost: 1,
         chipsNeeded: 0,
-        grossRevenue: '8B',
+        grossRevenue: '$8 billion',
         die: 'None',
         dependencies:
           'Requires SoftCom AI Arms Dealer. Net profit split 50/50 with SoftCom.',
@@ -106,7 +106,7 @@ export const companies: Company[] = [
     superPower: {
       name: 'The Bundle',
       effect:
-        'If CorpSolutions refuses to sell your hardware, their revenue is cut by 3B (cloud license pressure). Applies when you choose Hardware Blitz and CorpSolutions is not Integrator_SoftCom.',
+        'If CorpSolutions refuses to sell your hardware, their revenue is cut by $3 billion (cloud license pressure). Applies when you choose Hardware Blitz and CorpSolutions has not chosen Integrator with SoftCom.',
       type: 'regenerating',
       reason: "It's just pricing leverage.",
     },
@@ -115,25 +115,25 @@ export const companies: Company[] = [
         name: 'Hardware Blitz',
         upfrontCost: 8,
         chipsNeeded: 40,
-        grossRevenue: '25B',
+        grossRevenue: '$40 billion',
         die: 'Standard',
         dependencies:
-          'Requires AmeriShop PremiumPartner_SoftCom. Needs >=20 chips. Enterprise-tagged. Shock B gives -2 die roll.',
+          'Requires AmeriShop to choose Premium Partner with SoftCom. Needs at least 20 chips. Enterprise-tagged. Shock B gives a -2 penalty to the dice roll.',
       },
       {
         name: 'AI Arms Dealer',
         upfrontCost: 2,
         chipsNeeded: 0,
-        grossRevenue: '10B',
+        grossRevenue: '$10 billion',
         die: 'Standard',
         dependencies:
-          'Requires PearCom Enterprise Pivot or Partner w/ SoftCom.',
+          'Requires PearCom Enterprise Pivot or Partner with SoftCom.',
       },
       {
         name: 'Stay Software',
         upfrontCost: 0,
         chipsNeeded: 0,
-        grossRevenue: '6B -> 5B -> 4B',
+        grossRevenue: '$6 billion → $5 billion → $4 billion',
         die: 'None',
         dependencies: 'Declines by 1 per round (melting ice cube).',
       },
@@ -167,7 +167,7 @@ export const companies: Company[] = [
     superPower: {
       name: 'The Algorithm',
       effect:
-        'You can boost or bury one manufacturer\'s die roll (+1 or -1) by adjusting search ranking. Baked into Premium Partner (+1) and Private Label (-1).',
+        "You can boost or bury one manufacturer's dice roll (+1 or -1) by adjusting search ranking. Baked into Premium Partner (+1) and Private Label (-1).",
       type: 'regenerating',
       reason: "It's just software.",
     },
@@ -175,25 +175,25 @@ export const companies: Company[] = [
       {
         name: 'Open Market',
         upfrontCost: 0,
-        grossRevenue: '4B',
+        grossRevenue: '$4 billion',
         die: 'None',
         dependencies: 'Safe baseline.',
       },
       {
         name: 'Private Label',
         upfrontCost: 2,
-        grossRevenue: '8B',
+        grossRevenue: '$8 billion',
         die: 'None',
         dependencies:
-          'Target (PearCom or SoftCom) loses 3B gross and -1 die roll.',
+          'Target (PearCom or SoftCom) loses $3 billion in gross revenue and takes a -1 penalty on its dice roll.',
       },
       {
         name: 'Premium Partner',
         upfrontCost: 1,
-        grossRevenue: '2B + 25% of target gross',
+        grossRevenue: "$2 billion + 25% of the target's gross revenue",
         die: 'None',
         dependencies:
-          'Target loses 25% of gross but gains +1 die roll. Required for SoftCom Hardware Blitz.',
+          'Target loses 25% of its gross revenue but gains a +1 bonus on its dice roll. Required for SoftCom Hardware Blitz.',
       },
     ],
     hasChipsColumn: false,
@@ -210,7 +210,7 @@ export const companies: Company[] = [
     name: 'CorpSolutions',
     tagline: 'The Enterprise Kingmaker',
     description:
-      'You are the enterprise integration kingmaker. CIOs and governments depend on you for secure deployments. Your certification can make or break an enterprise strategy.',
+      'You are the enterprise integration kingmaker. Chief Information Officers (CIOs) and governments depend on you for secure deployments. Your certification can make or break an enterprise strategy.',
     advantages: [
       'Trusted by enterprise buyers and regulators',
       'Deep history with SoftCom enterprise stack',
@@ -232,22 +232,22 @@ export const companies: Company[] = [
       {
         name: 'Agnostic',
         upfrontCost: 0,
-        grossRevenue: '3B (or 5B if PearCom Enterprise Pivot)',
+        grossRevenue: '$3 billion (or $5 billion if PearCom chooses Enterprise Pivot)',
         die: 'None',
         dependencies: 'Neutral stance, modest revenue.',
       },
       {
         name: 'Migration Agent',
         upfrontCost: 0,
-        grossRevenue: '6B',
+        grossRevenue: '$6 billion',
         die: 'None',
         dependencies:
-          'Target pays 5B bounty and receives 8B bonus; opposing manufacturer loses 5B and has enterprise strategy vetoed.',
+          'Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion and has its enterprise strategy vetoed.',
       },
       {
         name: 'Integrator',
         upfrontCost: 0,
-        grossRevenue: '25% of target gross',
+        grossRevenue: "25% of the target's gross revenue",
         die: 'None',
         dependencies:
           'Grants enterprise access to target. Subject to Shock C fine.',
@@ -289,31 +289,31 @@ export const companies: Company[] = [
       {
         name: 'SoftCom Exclusive',
         upfrontCost: 0,
-        grossRevenue: '4B -> 3B -> 2B',
+        grossRevenue: '$4 billion → $3 billion → $2 billion',
         die: 'None',
         dependencies: 'Safe but declining each round. Subject to Shock C fine.',
       },
       {
         name: 'Open Model',
         upfrontCost: 2,
-        grossRevenue: '12B',
-        die: 'OpenModel (1=0x, 2-3=0.5x, 4-6=1.0x)',
-        dependencies: 'Shock B gives -2 die roll.',
+        grossRevenue: '$12 billion',
+        die: 'Open Model Roll (1 = 0x, 2-3 = 0.5x, 4-6 = 1.0x)',
+        dependencies: 'Shock B gives a -2 penalty to the dice roll.',
       },
       {
         name: 'Hardware Integration',
         upfrontCost: 4,
-        grossRevenue: '20B',
-        die: 'HW Integration (1-3=0x, 4-6=1.0x)',
+        grossRevenue: '$26 billion',
+        die: 'Hardware Integration Roll (1-3 = 0x, 4-6 = 1.0x)',
         dependencies:
-          'Requires PearCom Enterprise Pivot. Shock B gives -2 die roll.',
+          'Requires PearCom Enterprise Pivot. Shock B gives a -2 penalty to the dice roll.',
       },
     ],
     hasChipsColumn: false,
     hasAllocationColumn: false,
     negotiationNotes: [
       'Open Model is the balanced play with moderate upside and controlled risk.',
-      'Hardware Integration is boom or bust and depends on PearCom\'s pivot.',
+      "Hardware Integration is boom or bust and depends on PearCom's pivot.",
       'Staying exclusive to SoftCom becomes less valuable over time.',
     ],
     accentColor: 'green',
@@ -334,11 +334,12 @@ export const companies: Company[] = [
       'Capacity constraints create hard trade-offs',
       'Breaking exclusivity damages long-term contracts',
       'High capital costs to scale',
+      "Your own revenue scales with actual chip output — a yield failure or supply shock cuts your take too, not just your customers' supply",
     ],
     superPower: {
       name: 'Allocation Priority',
       effect:
-        'In a shortage, you choose who gets chips. You can demand bribes to prioritize a customer (GM adjudication).',
+        'In a shortage, you choose who gets chips. You can demand bribes to prioritize a customer (subject to Game Master approval).',
       type: 'nuclear',
       reason: 'Doing this repeatedly destroys your reputation as a "neutral" supplier.',
     },
@@ -346,25 +347,25 @@ export const companies: Company[] = [
       {
         name: 'PearCom Exclusive',
         upfrontCost: 2,
-        grossRevenue: '10B',
-        allocation: '90 Pear / 10 Soft',
+        grossRevenue: '$10 billion',
+        allocation: '90 to PearCom / 10 to SoftCom',
         die: 'None',
         dependencies:
-          'Stable. SoftCom is starved. Shock B gives +1 die roll if any roll is used.',
+          'Stable. SoftCom is starved. Shock B gives a +1 bonus to the dice roll if any roll is used.',
       },
       {
         name: 'Split Fab',
         upfrontCost: 3,
-        grossRevenue: '15B',
-        allocation: '50 Pear / 50 Soft',
+        grossRevenue: '$15 billion',
+        allocation: '50 to PearCom / 50 to SoftCom',
         die: 'Yield Roll',
         dependencies:
-          'On yield fail (roll 1-3), capacity drops to 60 for the round.',
+          "On yield fail (roll 1-3), capacity drops to 60 for the round — your own revenue drops proportionally too, along with your customers' chip supply.",
       },
       {
         name: 'Spot Market',
         upfrontCost: 0,
-        grossRevenue: '8B',
+        grossRevenue: '$8 billion',
         allocation: 'Auction',
         die: 'None',
         dependencies:

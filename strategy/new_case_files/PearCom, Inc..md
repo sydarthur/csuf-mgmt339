@@ -22,7 +22,7 @@ You are the consumer king. Your brand stands for premium design, privacy, and se
 | Option | Upfront Cost | Chips Needed | Gross Revenue | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- |
 | Fortress | 3 | 90 | 12 | None | Safe. Needs >=45 chips to avoid failure. Shock B gives +1 to die if any roll is used. |
-| Enterprise Pivot | 5 | 30 | 22 | Standard | Requires CorpSolutions Integrator_PearCom and AI access (SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration). Needs >=15 chips. Enterprise-tagged. Shock B gives -2 die roll. |
+| Enterprise Pivot | 5 | 30 | 26 | Standard | Requires CorpSolutions Integrator_PearCom and AI access (SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration). Needs >=15 chips. Enterprise-tagged. Shock B gives -2 die roll. |
 | Partner w/ SoftCom | 1 | 0 | 8 | None | Requires SoftCom AI Arms Dealer. Net profit split 50/50 with SoftCom. |
 
 ## Notes for Negotiation

@@ -101,11 +101,11 @@ export default function MarketAnalysis() {
               <div className="space-y-3">
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Premium Partner</div>
-                  <div className="text-xs text-stone-600 mt-1">Takes 25% of target gross revenue. Gives target +1 die roll.</div>
+                  <div className="text-xs text-stone-600 mt-1">Takes 25% of the target&apos;s gross revenue. Gives the target a +1 bonus on its dice roll.</div>
                 </div>
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Private Label</div>
-                  <div className="text-xs text-stone-600 mt-1">Target loses 3B gross and -1 die roll.</div>
+                  <div className="text-xs text-stone-600 mt-1">Target loses $3 billion in gross revenue and takes a -1 penalty on its dice roll.</div>
                 </div>
               </div>
             </div>
@@ -114,11 +114,11 @@ export default function MarketAnalysis() {
               <div className="space-y-3">
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Integrator</div>
-                  <div className="text-xs text-stone-600 mt-1">Takes 25% of target gross revenue. Grants enterprise access.</div>
+                  <div className="text-xs text-stone-600 mt-1">Takes 25% of the target&apos;s gross revenue. Grants enterprise access.</div>
                 </div>
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Migration Agent</div>
-                  <div className="text-xs text-stone-600 mt-1">Target pays 5B bounty and receives 8B bonus; opposing manufacturer loses 5B. Vetoes opposing enterprise strategy.</div>
+                  <div className="text-xs text-stone-600 mt-1">Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion. Vetoes the opposing enterprise strategy.</div>
                 </div>
               </div>
             </div>
@@ -147,12 +147,12 @@ export default function MarketAnalysis() {
                 <tr className="border-b border-stone-100 bg-parchment/60">
                   <td className="py-3 px-3 text-amber-700 font-bold font-mono">Deepfake Scandal</td>
                   <td className="py-3 px-3 text-stone-700 font-mono">3-4</td>
-                  <td className="py-3 px-3 text-stone-700">AI-heavy strategies get -2 roll; privacy-first get +1</td>
+                  <td className="py-3 px-3 text-stone-700">AI-heavy strategies get a -2 dice roll penalty; privacy-first strategies get a +1 bonus</td>
                 </tr>
                 <tr className="bg-white">
                   <td className="py-3 px-3 text-violet-700 font-bold font-mono">Antitrust Decree</td>
                   <td className="py-3 px-3 text-stone-700 font-mono">5-6</td>
-                  <td className="py-3 px-3 text-stone-700">3B fine for exclusive/partner strategies</td>
+                  <td className="py-3 px-3 text-stone-700">$3 billion fine for exclusive or partner strategies</td>
                 </tr>
               </tbody>
             </table>

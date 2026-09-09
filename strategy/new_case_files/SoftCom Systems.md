@@ -21,7 +21,7 @@ You are the enterprise giant. You dominate cloud, productivity, and AI via OpenA
 
 | Option | Upfront Cost | Chips Needed | Gross Revenue | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- |
-| Hardware Blitz | 8 | 40 | 25 | Standard | Requires AmeriShop PremiumPartner_SoftCom. Needs >=20 chips. Enterprise-tagged. Shock B gives -2 die roll. |
+| Hardware Blitz | 8 | 40 | 40 | Standard | Requires AmeriShop PremiumPartner_SoftCom. Needs >=20 chips. Enterprise-tagged. Shock B gives -2 die roll. |
 | AI Arms Dealer | 2 | 0 | 10 | Standard | Requires PearCom Enterprise Pivot or Partner w/ SoftCom. |
 | Stay Software | 0 | 0 | 6 -> 5 -> 4 | None | Declines by 1 per round (melting ice cube). |
 

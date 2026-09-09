@@ -98,7 +98,7 @@ export default function CompanyPage({ company }: { company: Company }) {
                   {company.hasAllocationColumn && (
                     <th className="py-3 px-3 text-left font-mono font-medium uppercase text-xs tracking-wider">Allocation</th>
                   )}
-                  <th className="py-3 px-3 text-left font-mono font-medium uppercase text-xs tracking-wider">Die</th>
+                  <th className="py-3 px-3 text-left font-mono font-medium uppercase text-xs tracking-wider">Dice Roll</th>
                   <th className="py-3 px-3 text-left font-mono font-medium uppercase text-xs tracking-wider">Dependencies / Effects</th>
                 </tr>
               </thead>
@@ -106,7 +106,7 @@ export default function CompanyPage({ company }: { company: Company }) {
                 {company.strategies.map((s, i) => (
                   <tr key={i} className={`border-b border-stone-100 last:border-b-0 ${i % 2 === 1 ? 'bg-parchment/60' : 'bg-white'} hover:bg-amber-50 transition-colors`}>
                     <td className={`py-3 px-3 font-bold font-mono ${accent.text}`}>{s.name}</td>
-                    <td className="py-3 px-3 text-stone-700 font-mono">{s.upfrontCost}B</td>
+                    <td className="py-3 px-3 text-stone-700 font-mono">${s.upfrontCost} billion</td>
                     {company.hasChipsColumn && (
                       <td className="py-3 px-3 text-stone-700 font-mono">{s.chipsNeeded}</td>
                     )}

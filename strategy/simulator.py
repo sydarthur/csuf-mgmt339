@@ -225,6 +225,13 @@ def compute_round_expected(scenario_opts, config, round_idx, spot_method, lock_i
                     break
             gross[team] = base_rev * multiplier
 
+        # Silicore's own revenue is tied to actual production capacity: a yield
+        # failure (Split Fab) or a supply shock (Shock A) cuts their own output,
+        # not just what customers receive. At full capacity this is a no-op.
+        full_capacity = float(rules.get("chip_capacity", 100))
+        if full_capacity > 0:
+            gross["Silicore"] *= capacity / full_capacity
+
         # Handle CorpSolutions agnostic conditional revenue
         corp_opt = scenario_opts["CorpSolutions"]
         if corp_opt["base_name"] == "Agnostic":

@@ -35,6 +35,7 @@ Shocks apply only in Round 2.
 
 ## Shock A: Supply Chain Fracture
 - Silicore capacity forced to 60 units for the round.
+- Silicore's own revenue drops proportionally too, not just the chip supply it allocates to customers.
 - Starvation rule still applies.
 
 ## Shock B: Deepfake Scandal

@@ -22,7 +22,7 @@ You are the AI brain trust. Your models power the next wave of enterprise and co
 | --- | --- | --- | --- | --- |
 | SoftCom Exclusive | 0 | 4 -> 3 -> 2 | None | Safe but declining each round. Subject to Shock C fine. |
 | Open Model | 2 | 12 | OpenModel | Roll table: 1=0x, 2-3=0.5x, 4-6=1.0x. Shock B gives -2 die roll. |
-| Hardware Integration | 4 | 20 | HW Integration | Roll table: 1-3=0x, 4-6=1.0x. Requires PearCom Enterprise Pivot. Shock B gives -2 die roll. |
+| Hardware Integration | 4 | 26 | HW Integration | Roll table: 1-3=0x, 4-6=1.0x. Requires PearCom Enterprise Pivot. Shock B gives -2 die roll. |
 
 ## Notes for Negotiation
 - Open Model is the balanced play with moderate upside and controlled risk.

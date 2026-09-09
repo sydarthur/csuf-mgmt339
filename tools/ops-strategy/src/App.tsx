@@ -34,7 +34,7 @@ function App() {
       {/* Navigation Bar */}
       <nav className="bg-parchment/95 backdrop-blur-sm border-b-2 border-ink sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-3">
-          <div className="flex justify-between items-center gap-4">
+          <div className="flex justify-between items-center gap-4 flex-wrap">
             <button
               onClick={() => navigate('home')}
               className="flex items-center gap-2 font-display italic text-xl sm:text-2xl text-ink hover:text-rose-600 transition-colors shrink-0"
@@ -42,7 +42,7 @@ function App() {
               <span aria-hidden>🎲</span>
               <span>The Great Tech Reckoning</span>
             </button>
-            <div className="flex items-center gap-1.5 overflow-x-auto">
+            <div className="flex items-center gap-1.5 flex-wrap justify-end">
               <button
                 onClick={() => navigate('home')}
                 className={`px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap transition-all border-2 ${

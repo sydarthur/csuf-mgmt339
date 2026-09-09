@@ -57,7 +57,7 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
           <ul className="space-y-2 text-stone-700">
             <li>Each team selects one option each round.</li>
             <li>Options may require partners or minimum chip allocation.</li>
-            <li>Risky options use a <strong className="text-ink">d6 multiplier</strong>:</li>
+            <li>Risky options use a roll of a six-sided <strong className="text-ink">die (d6)</strong> to multiply revenue:</li>
           </ul>
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {dice.map((d) => (
@@ -69,7 +69,7 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
             ))}
           </div>
           <p className="text-stone-500 mt-4 text-sm">
-            Chip starvation rule: If a manufacturer receives &lt;50% of required chips, its revenue is 0.
+            Chip starvation rule: if a manufacturer receives less than 50% of the chips it required, its revenue drops to $0.
           </p>
         </div>
 
@@ -77,14 +77,14 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
         <div className="bg-white rounded-2xl p-6 sm:p-8 mb-6 border-2 border-ink shadow-card">
           <FileLabel>File 03 &mdash; Wildcards</FileLabel>
           <h2 className="font-display text-3xl mb-4 text-ink">Round 2 Shocks</h2>
-          <p className="text-stone-700 mb-4">After Round 1 strategies are revealed, the GM rolls a d6:</p>
+          <p className="text-stone-700 mb-4">After Round 1 strategies are revealed, the Game Master (GM) rolls a six-sided die (d6):</p>
           <div className="space-y-4">
             <div className="bg-parchment rounded-xl p-4 border-l-4 border-rose-500">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-sm font-mono text-stone-500">Roll 1-2</span>
                 <h3 className="font-semibold text-ink">Shock A: Supply Chain Fracture</h3>
               </div>
-              <p className="text-stone-600 text-sm">Silicore capacity forced to 60 units for the round. Starvation rule still applies.</p>
+              <p className="text-stone-600 text-sm">Silicore capacity forced to 60 units for the round, cutting Silicore's own revenue proportionally too. Starvation rule still applies.</p>
             </div>
             <div className="bg-parchment rounded-xl p-4 border-l-4 border-amber-500">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -92,8 +92,8 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
                 <h3 className="font-semibold text-ink">Shock B: Deepfake Scandal</h3>
               </div>
               <div className="text-stone-600 text-sm space-y-1">
-                <p>-2 to SoftCom Hardware Blitz, PearCom Enterprise Pivot, all OpenAIco options</p>
-                <p>+1 to PearCom Fortress, Silicore PearCom Exclusive</p>
+                <p>-2 dice roll penalty for SoftCom Hardware Blitz, PearCom Enterprise Pivot, and all OpenAIco options</p>
+                <p>+1 dice roll bonus for PearCom Fortress and Silicore PearCom Exclusive</p>
               </div>
             </div>
             <div className="bg-parchment rounded-xl p-4 border-l-4 border-violet-500">
@@ -102,7 +102,7 @@ export default function HomePage({ navigate }: { navigate: (page: string) => voi
                 <h3 className="font-semibold text-ink">Shock C: Antitrust Decree</h3>
               </div>
               <div className="text-stone-600 text-sm">
-                <p>$3B fine in Round 2 for: Silicore PearCom Exclusive, OpenAIco SoftCom Exclusive, AmeriShop Premium Partner, CorpSolutions Integrator</p>
+                <p>$3 billion fine in Round 2 for: Silicore PearCom Exclusive, OpenAIco SoftCom Exclusive, AmeriShop Premium Partner, CorpSolutions Integrator</p>
               </div>
             </div>
           </div>
