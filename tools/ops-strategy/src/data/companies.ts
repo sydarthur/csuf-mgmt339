@@ -190,10 +190,10 @@ export const companies: Company[] = [
       {
         name: 'Premium Partner',
         upfrontCost: 1,
-        grossRevenue: "$2 billion + 25% of the target's gross revenue",
+        grossRevenue: "$3 billion + 30% of the target's gross revenue",
         die: 'None',
         dependencies:
-          'Target loses 25% of its gross revenue but gains a +1 bonus on its dice roll. Required for SoftCom Hardware Blitz.',
+          'Target loses 30% of its gross revenue but gains a +1 bonus on its dice roll. Required for SoftCom Hardware Blitz.',
       },
     ],
     hasChipsColumn: false,
@@ -247,7 +247,7 @@ export const companies: Company[] = [
       {
         name: 'Integrator',
         upfrontCost: 0,
-        grossRevenue: "25% of the target's gross revenue",
+        grossRevenue: "$2 billion + 36% of the target's gross revenue",
         die: 'None',
         dependencies:
           'Grants enterprise access to target. Subject to Shock C fine.',

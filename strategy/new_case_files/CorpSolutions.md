@@ -23,7 +23,7 @@ You are the enterprise integration kingmaker. CIOs and governments depend on you
 | --- | --- | --- | --- | --- |
 | Agnostic | 0 | 3 (or 5 if PearCom Enterprise Pivot) | None | Neutral stance, modest revenue. |
 | Migration Agent (target PearCom or SoftCom) | 0 | 6 | None | Target pays 5B bounty, gains +8B revenue; opposing manufacturer loses 5B and has enterprise strategy vetoed. |
-| Integrator (target PearCom or SoftCom) | 0 | 25% of target gross | None | Grants enterprise access to target. Subject to Shock C fine. |
+| Integrator (target PearCom or SoftCom) | 0 | 2 + 36% of target gross | None | Grants enterprise access to target. Subject to Shock C fine. |
 
 ## Notes for Negotiation
 - Integrator is the key gate for enterprise pivots.

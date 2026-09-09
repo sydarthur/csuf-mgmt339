@@ -29,12 +29,12 @@
 
 ## Retail Leverage
 - AmeriShop Premium Partner:
-  - Takes 25% of target gross revenue
+  - Takes 30% of target gross revenue
   - Gives target +1 die roll
 - AmeriShop Private Label:
   - Target loses 3B gross and -1 die roll
 - CorpSolutions Integrator:
-  - Takes 25% of target gross revenue
+  - Takes 36% of target gross revenue
   - Grants enterprise access
 - CorpSolutions Migration Agent:
   - Target pays 5B bounty, gains +8B revenue

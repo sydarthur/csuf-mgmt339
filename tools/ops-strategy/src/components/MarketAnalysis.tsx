@@ -101,7 +101,7 @@ export default function MarketAnalysis() {
               <div className="space-y-3">
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Premium Partner</div>
-                  <div className="text-xs text-stone-600 mt-1">Takes 25% of the target&apos;s gross revenue. Gives the target a +1 bonus on its dice roll.</div>
+                  <div className="text-xs text-stone-600 mt-1">Takes 30% of the target&apos;s gross revenue. Gives the target a +1 bonus on its dice roll.</div>
                 </div>
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Private Label</div>
@@ -114,7 +114,7 @@ export default function MarketAnalysis() {
               <div className="space-y-3">
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Integrator</div>
-                  <div className="text-xs text-stone-600 mt-1">Takes 25% of the target&apos;s gross revenue. Grants enterprise access.</div>
+                  <div className="text-xs text-stone-600 mt-1">Takes 36% of the target&apos;s gross revenue. Grants enterprise access.</div>
                 </div>
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Migration Agent</div>

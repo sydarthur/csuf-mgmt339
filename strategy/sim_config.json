@@ -173,10 +173,10 @@
         },
         "PremiumPartner": {
           "cost": 1,
-          "base_revenue": 2,
+          "base_revenue": 3,
           "target_choices": ["PearCom", "SoftCom"],
           "effects": {
-            "share_of_target_gross": 0.25,
+            "share_of_target_gross": 0.30,
             "roll_mod_to_target": 1
           }
         }
@@ -205,10 +205,10 @@
         },
         "Integrator": {
           "cost": 0,
-          "base_revenue": 0,
+          "base_revenue": 2,
           "target_choices": ["PearCom", "SoftCom"],
           "effects": {
-            "share_of_target_gross": 0.25,
+            "share_of_target_gross": 0.36,
             "grants_enterprise_access": true
           }
         }

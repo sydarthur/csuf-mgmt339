@@ -23,7 +23,7 @@ You are the dominant consumer retailer. You control demand visibility, logistics
 | --- | --- | --- | --- | --- |
 | Open Market | 0 | 4 | None | Safe baseline. |
 | Private Label (target PearCom or SoftCom) | 2 | 8 | None | Target loses 3B gross and -1 die roll. |
-| Premium Partner (target PearCom or SoftCom) | 1 | 2 + 25% of target gross | None | Target loses 25% of gross but gains +1 die roll. Required for SoftCom Hardware Blitz. |
+| Premium Partner (target PearCom or SoftCom) | 1 | 3 + 30% of target gross | None | Target loses 30% of gross but gains +1 die roll. Required for SoftCom Hardware Blitz. |
 
 ## Notes for Negotiation
 - You can profit most by extracting a revenue share.
