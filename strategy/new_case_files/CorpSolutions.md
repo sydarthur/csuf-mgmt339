@@ -14,15 +14,15 @@ You are the enterprise integration kingmaker. CIOs and governments depend on you
 - Heavy dependence on partner hardware
 
 ## Super Power: The Veto
-- You can refuse to certify a device, cutting its enterprise revenue to 0 for the round.
-- In the simulator, this is modeled via Migration Agent against the opposing manufacturer.
+- Once per game, you can refuse to certify a device, cutting its enterprise revenue to 0 for that round.
+- Modeled as the enterprise-strategy veto on your first Migration Agent play; further Migration Agent plays still pay out but no longer veto.
 
 ## Strategic Options
 
 | Option | Upfront Cost | Gross Revenue | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- |
 | Agnostic | 0 | 3 (or 5 if PearCom Enterprise Pivot) | None | Neutral stance, modest revenue. |
-| Migration Agent (target PearCom or SoftCom) | 0 | 6 | None | Target pays 5B bounty, gains +8B revenue; opposing manufacturer loses 5B and has enterprise strategy vetoed. |
+| Migration Agent (target PearCom or SoftCom) | 0 | 6 | None | Target pays 5B bounty, gains +8B revenue; opposing manufacturer loses 5B. First play only: also vetoes the opposing manufacturer's enterprise strategy. |
 | Integrator (target PearCom or SoftCom) | 0 | 2 + 36% of target gross | None | Grants enterprise access to target. Subject to Shock C fine. |
 
 ## Notes for Negotiation

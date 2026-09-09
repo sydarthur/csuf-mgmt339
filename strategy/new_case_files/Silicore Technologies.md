@@ -24,7 +24,7 @@ You are the chokepoint of secure hardware. Regulations make your chips the only 
 | --- | --- | --- | --- | --- | --- |
 | PearCom Exclusive | 2 | 10 | 90 Pear / 10 Soft | None | Stable. SoftCom is starved. Shock B gives +1 die roll if any roll is used. |
 | Split Fab | 3 | 15 | 50 Pear / 50 Soft | Yield Roll | On yield fail (roll 1-3), capacity drops to 60 for the round — your own revenue drops proportionally too, along with your customers' chip supply. |
-| Spot Market | 0 | 8 | Auction | None | Allocation by spot market; methods are proportional or highest-bidder in the simulator. |
+| Spot Market | 0 | 8 | Highest Bidder | None | Each manufacturer's implicit bid is its own revenue divided by chips needed; the higher bid gets served first, capped at what it asked for. |
 
 ## Notes for Negotiation
 - Your allocation can make or break both giants.

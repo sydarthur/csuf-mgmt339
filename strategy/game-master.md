@@ -7,7 +7,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 - Chip failure rule: If a manufacturer receives **<50%** of required chips, their revenue is **$0** for that round.
 - AmeriShop Algorithm: Private Label gives target `-1` to its die roll; Premium Partner gives target `+1` to its die roll.
 - OpenAIco Degradation: If OpenAIco is **not** SoftComExclusive, SoftCom’s die roll gets **-2 in Round 2**.
-- CorpSolutions Veto: Migration Agent zeros the **opposing manufacturer’s enterprise-tagged strategy** in that round.
+- CorpSolutions Veto: **once per game** — Migration Agent zeros the **opposing manufacturer's enterprise-tagged strategy** only the first time a team plays it. If they play Migration Agent again in a later round, it still pays out the bounty/bonus/penalty below, but no longer vetoes.
 - SoftCom Bundle: If SoftCom chooses Hardware Blitz and CorpSolutions is **not** Integrator_SoftCom, CorpSolutions suffers **-3B** that round.
 - Lock-In (optional run mode): If on, SoftCom gets **0 chips** and Silicore loses **$2B** revenue that round.
 
@@ -45,7 +45,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | Option | Gross Revenue | Upfront Cost | Base Net | Chips Needed | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- | --- |
 | Fortress | 12 | 3 | 9 | 90 | None | Chips must be >=45 to avoid failure. |
-| EnterprisePivot | 26 | 5 | 21 | 30 | Standard | Requires CorpSolutions Integrator_PearCom **and** AI access (SoftCom AIArmsDealer or OpenAIco OpenModel/HardwareIntegration). Chips must be >=15. Enterprise-tagged. |
+| EnterprisePivot | 30 | 5 | 25 | 30 | Standard | Requires CorpSolutions Integrator_PearCom **and** AI access (SoftCom AIArmsDealer or OpenAIco OpenModel/HardwareIntegration). Chips must be >=15. Enterprise-tagged. |
 | PartnerSoftCom | 8 | 1 | 7 | 0 | None | Requires SoftCom AIArmsDealer. Net profit split 50/50 with SoftCom. |
 
 ## SoftCom
@@ -62,7 +62,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | --- | --- | --- | --- | --- | --- | --- |
 | PearComExclusive | 10 | 2 | 8 | 90 Pear / 10 Soft | None | Fixed allocation. |
 | SplitFab | 15 | 3 | 12 | 50 Pear / 50 Soft | Yield Roll | On yield fail (roll 1-3), capacity drops to 60 total. |
-| SpotMarket | 8 | 0 | 8 | Auction | None | Allocation uses either proportional or highest-bidder method. |
+| SpotMarket | 8 | 0 | 8 | Highest Bidder | None | Each manufacturer's implicit bid is its own revenue / chips needed; higher bid gets served first, capped at what it asked for. |
 
 ## OpenAIco
 
@@ -85,7 +85,7 @@ All amounts are in **$B per round**. CSV outputs show **3-round totals** (sum of
 | Option | Gross Revenue | Upfront Cost | Base Net | Die | Dependencies / Effects |
 | --- | --- | --- | --- | --- | --- |
 | Agnostic | 3 (or 5 if PearCom EnterprisePivot) | 0 | 3 (or 5) | None | Conditional revenue boost if PearCom pivots. |
-| MigrationAgent_PearCom / MigrationAgent_SoftCom | 6 | 0 | 6 | None | Other manufacturer loses -5B. Target pays -5B bounty and gains +8B revenue. Veto opposing enterprise-tagged strategy. |
+| MigrationAgent_PearCom / MigrationAgent_SoftCom | 6 | 0 | 6 | None | Other manufacturer loses -5B. Target pays -5B bounty and gains +8B revenue. First play only: also vetoes the opposing enterprise-tagged strategy. |
 | Integrator_PearCom / Integrator_SoftCom | 2 + 36% of target gross | 0 | Varies | None | Target gross reduced by 36%. Grants enterprise access to target. |
 
 # Example Scenarios (from output)
@@ -94,6 +94,6 @@ These are 3-round totals from `strategy/out/scenarios_spot-highest_bidder_lockin
 
 | Scenario | Options | Notes | Expected Profits (3 rounds) |
 | --- | --- | --- | --- |
-| All dependencies satisfied | PearCom EnterprisePivot; SoftCom AIArmsDealer; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Integrator_PearCom | OK | PearCom 22.44, SoftCom 16.5, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 27.06 |
+| All dependencies satisfied | PearCom EnterprisePivot; SoftCom AIArmsDealer; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Integrator_PearCom | OK | PearCom 28.2, SoftCom 16.5, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 30.3 |
 | SoftCom Blitz with retailer | PearCom Fortress; SoftCom HardwareBlitz; Silicore SplitFab; OpenAIco SoftComExclusive; AmeriShop PremiumPartner_SoftCom; CorpSolutions Agnostic | CorpSolutions_BundlePenalty | PearCom 9.0, SoftCom 60.0, Silicore 27.0, OpenAIco 9.0, AmeriShop 42.0, CorpSolutions 0.0 |
 | Dependency failure | PearCom EnterprisePivot; SoftCom HardwareBlitz; Silicore PearComExclusive; OpenAIco SoftComExclusive; AmeriShop OpenMarket; CorpSolutions Agnostic | PearCom_NoCorpIntegrator;PearCom_NoAI;SoftCom_NoRetailer;CorpSolutions_BundlePenalty | PearCom -15.0, SoftCom -24.0, Silicore 24.0, OpenAIco 9.0, AmeriShop 12.0, CorpSolutions 6.0 |

@@ -75,6 +75,9 @@ export default function CompanyPage({ company }: { company: Company }) {
             }`}>
               {company.superPower.type === 'nuclear' ? '\u{1F4A5} Once Per Game' : '\u{267B}️ Once Per Round'}
             </span>
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-full uppercase tracking-widest border-2 border-ink/30 bg-white/60 text-ink">
+              {company.superPower.trigger === 'automatic' ? '\u{2699}\u{FE0F} Automatic' : '\u{1F91A} Manual — GM Approval'}
+            </span>
           </div>
           <p className="text-stone-700 leading-relaxed">{company.superPower.effect}</p>
           <p className="text-stone-500 text-sm mt-3 italic font-mono">&ldquo;{company.superPower.reason}&rdquo;</p>

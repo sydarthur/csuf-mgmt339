@@ -63,7 +63,7 @@
         },
         "EnterprisePivot": {
           "cost": 5,
-          "base_revenue": 26,
+          "base_revenue": 30,
           "chips_needed": 30,
           "risk_table": "standard",
           "requires": {

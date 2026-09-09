@@ -299,8 +299,16 @@ def compute_round_expected(scenario_opts, config, round_idx, spot_method, lock_i
             if pear_opt["base_name"] != "EnterprisePivot":
                 gross["OpenAIco"] = 0.0
 
-        # CorpSolutions veto (via Migration Agent)
-        if corp_opt["base_name"] == "MigrationAgent" and corp_opt.get("effects", {}).get("veto_target_enterprise"):
+        # CorpSolutions veto (via Migration Agent) — the veto itself is a
+        # once-per-game power (The Veto), not a per-round effect of the
+        # strategy: it only fires the first time CorpSolutions plays
+        # Migration Agent. Later plays still pay out the bounty/bonus/
+        # penalty below, just without zeroing the rival's enterprise play.
+        if (
+            corp_opt["base_name"] == "MigrationAgent"
+            and corp_opt.get("effects", {}).get("veto_target_enterprise")
+            and round_idx == 0
+        ):
             target = corp_opt.get("target")
             victim = "SoftCom" if target == "PearCom" else "PearCom"
             if "enterprise" in scenario_opts[victim].get("tags", []):

@@ -15,7 +15,7 @@ export interface Company {
   description: string
   advantages: string[]
   disadvantages: string[]
-  superPower: { name: string; effect: string; type: 'nuclear' | 'regenerating'; reason: string }
+  superPower: { name: string; effect: string; type: 'nuclear' | 'regenerating'; trigger: 'automatic' | 'manual'; reason: string }
   strategies: StrategyOption[]
   hasChipsColumn: boolean
   hasAllocationColumn: boolean
@@ -46,6 +46,7 @@ export const companies: Company[] = [
       effect:
         'You can veto Silicore from selling chips to SoftCom this round. Effect: SoftCom gets 0 chips; Silicore loses $2 billion in revenue.',
       type: 'nuclear',
+      trigger: 'manual',
       reason: 'If used twice, SoftCom is mathematically eliminated.',
     },
     strategies: [
@@ -62,7 +63,7 @@ export const companies: Company[] = [
         name: 'Enterprise Pivot',
         upfrontCost: 5,
         chipsNeeded: 30,
-        grossRevenue: '$26 billion',
+        grossRevenue: '$30 billion',
         die: 'Standard',
         dependencies:
           'Requires CorpSolutions Integrator and AI access (SoftCom AI Arms Dealer or OpenAIco Open Model/Hardware Integration). Needs at least 15 chips. Enterprise-tagged. Shock B gives a -2 penalty to the dice roll.',
@@ -108,6 +109,7 @@ export const companies: Company[] = [
       effect:
         'If CorpSolutions refuses to sell your hardware, their revenue is cut by $3 billion (cloud license pressure). Applies when you choose Hardware Blitz and CorpSolutions has not chosen Integrator with SoftCom.',
       type: 'regenerating',
+      trigger: 'automatic',
       reason: "It's just pricing leverage.",
     },
     strategies: [
@@ -169,6 +171,7 @@ export const companies: Company[] = [
       effect:
         "You can boost or bury one manufacturer's dice roll (+1 or -1) by adjusting search ranking. Baked into Premium Partner (+1) and Private Label (-1).",
       type: 'regenerating',
+      trigger: 'automatic',
       reason: "It's just software.",
     },
     strategies: [
@@ -224,8 +227,9 @@ export const companies: Company[] = [
     superPower: {
       name: 'The Veto',
       effect:
-        'You can refuse to certify a device, cutting its enterprise revenue to 0 for the round. Modeled via Migration Agent against the opposing manufacturer.',
+        'Once per game, you can refuse to certify a device, cutting its enterprise revenue to 0 for that round. Modeled as the enterprise-strategy veto on your first Migration Agent play; further Migration Agent plays still pay out but no longer veto.',
       type: 'nuclear',
+      trigger: 'manual',
       reason: 'Blocking revenue repeatedly forces the manufacturer to fire you, destroying the partnership dynamic.',
     },
     strategies: [
@@ -242,7 +246,7 @@ export const companies: Company[] = [
         grossRevenue: '$6 billion',
         die: 'None',
         dependencies:
-          'Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion and has its enterprise strategy vetoed.',
+          "Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion. The first time you play this, it also vetoes the opposing manufacturer's enterprise strategy to $0 — later plays still pay out but no longer veto.",
       },
       {
         name: 'Integrator',
@@ -283,6 +287,7 @@ export const companies: Company[] = [
       effect:
         "If you switch partners, the old partner's next die roll suffers a -2 penalty. Applies in Round 2 if you are not SoftCom Exclusive.",
       type: 'regenerating',
+      trigger: 'automatic',
       reason: 'Happens automatically every time they switch.',
     },
     strategies: [
@@ -341,6 +346,7 @@ export const companies: Company[] = [
       effect:
         'In a shortage, you choose who gets chips. You can demand bribes to prioritize a customer (subject to Game Master approval).',
       type: 'nuclear',
+      trigger: 'manual',
       reason: 'Doing this repeatedly destroys your reputation as a "neutral" supplier.',
     },
     strategies: [
@@ -366,10 +372,10 @@ export const companies: Company[] = [
         name: 'Spot Market',
         upfrontCost: 0,
         grossRevenue: '$8 billion',
-        allocation: 'Auction',
+        allocation: 'Highest Bidder',
         die: 'None',
         dependencies:
-          'Allocation by spot market; methods are proportional or highest-bidder.',
+          "Allocation by highest bidder: each manufacturer's implicit bid is its own revenue divided by the chips it needs, so whoever's strategy is more chip-efficient gets served first; the other gets what's left, capped at what it asked for.",
       },
     ],
     hasChipsColumn: false,

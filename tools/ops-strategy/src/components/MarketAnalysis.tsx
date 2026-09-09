@@ -118,7 +118,7 @@ export default function MarketAnalysis() {
                 </div>
                 <div className="bg-parchment rounded-lg p-3 border-2 border-ink/10">
                   <div className="text-sm font-semibold text-ink">Migration Agent</div>
-                  <div className="text-xs text-stone-600 mt-1">Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion. Vetoes the opposing enterprise strategy.</div>
+                  <div className="text-xs text-stone-600 mt-1">Target pays a $5 billion bounty and receives an $8 billion bonus; the opposing manufacturer loses $5 billion. First play only, also vetoes the opposing enterprise strategy to $0.</div>
                 </div>
               </div>
             </div>
