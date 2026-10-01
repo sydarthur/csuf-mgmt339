@@ -212,3 +212,7 @@ pandoc MGMT_339_-_Exam_N_vX.md -o MGMT_339_-_Exam_N_vX.pdf \
 - **Apostrophes in JS strings**: use double quotes for strings containing apostrophes (e.g. `"St. John's Hospital"`) — single-quoted strings with apostrophes cause silent parse errors that break the whole page
 - **SVG cost curves**: y-axis increases downward in SVG, so a U-shaped cost curve (expensive→cheap→expensive) requires an inverted-∩ path in screen coordinates. Use cubic bezier: `M x1,y_high C ... x_mid,y_low ... x2,y_high`
 - **Static walkthrough design language**: Instrument Serif (headings) + DM Sans (body) + JetBrains Mono (formulas/code), scroll-based sections with IntersectionObserver nav dots, progress bar fixed at top
+
+## Status tracking
+
+`status/` is how this course reports its state to Sid's control tower. Follow `status/CLAUDE.md`. In short: at the end of every working session where something meaningful changed, add a dated entry to `status/project_timeline.md` if warranted, then rewrite `status/STATUS.md` and set `updated:` to today.
