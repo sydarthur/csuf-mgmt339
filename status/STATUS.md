@@ -4,29 +4,31 @@ type: teaching
 stage: in-session
 target: MGMT 339 Operations Management, CSUF, Fall 2026
 draft: true
-updated: 2026-09-18
+updated: 2026-10-07
 ---
 ## Now
-- Fall 26 in session. Exam 1 exists as DRAFT, STUDENT_COPY, and PDF (untracked in git)
-- The Great Tech Reckoning ops-strategy game has run live. Refinements 09-03 to 09-18: UI redesign, economics rebalance, Veto scarcity, Spot Market
-- Course site tools: EOQ, CPM/crashing, VSM, SPC, ton-mile, TOC homepage
-- Spring 26 Exams 1-3 are complete; the Exam 2 BUILD_NOTES.md is the reference build pattern
+- Week 7: quality and SPC lectures (X̄/R, p, c, Cp/Cpk); In-Class Exercises 2.2 and 2.3 built
+- Assignment 2.1 (VeloShip SPC case, Aug 2026 data) due Sun Oct 18
+- SPC site tool updated for Fall 26 (four-lines recipe, new Capability tab) on branch fall26-spc-guide
+- The Great Tech Reckoning ops-strategy game has run live; Spring 26 Exam 2 BUILD_NOTES.md is the reference build pattern
 
 ## Next
-- Draft Fall 26 Exams 2-6, each going Workspace.md → Build/ with BUILD_NOTES.md
-- Game content pass: company backstories, plain-language strategy glosses, "who needs whom" dependency map, plain-English round recaps
+- Merge fall26-spc-guide to main so the site deploys
+- Step-by-step guides for In-Class Exercises 2.2 and 2.3; refresh SPC Playground to coffee-bag data
+- Draft Fall 26 Exam 2 (quality, lean, capacity, TOC), due Oct 28
 - Commit the untracked exam folders and the CLAUDE.md change
 
 ## Blocked on
+- Pushing from cloud sessions: Claude GitHub App not installed for this repo
 - Digital pick-and-resolve game interface needs a backend decision (Firebase vs Supabase free tier)
-- 339 Agent needs a check with CSUF IT / academic tech on AI tool policy before students use it
+- 339 Agent needs a check with CSUF IT / academic tech on AI tool policy
 
 ## Ideas / loose threads
-- Digital game interface: a GitHub Pages app with team signup, structured picks, resolve-time dependency checks, and a GM copilot screen
-- 339 Agent: a syllabus/logistics chatbot (v1: no tutoring, keys, or grades). Hosting is open (GCP?), and it may share infrastructure with the game interface
-- CLAUDE.md layout is out of date (lists a nonexistent research/ folder; 339_agent/, strategy/, grading/ are undocumented)
+- Delete unused tools/spc/src/ProcessChartsGuide.tsx (v1)
+- Digital game interface: GitHub Pages app with team signup, picks, and a GM copilot screen
+- CLAUDE.md layout is out of date (lists a nonexistent research/ folder; 339_agent/, strategy/, grading/ undocumented)
 
 ## Connects to
 - Ops-strategy game (Python simulator plus React role cards)
-- Canvas; pandoc/xelatex exam PDF export
+- Canvas quizzes and in-class exercises; pandoc/xelatex exam PDF export
 - AI-assisted course tooling (339 Agent)

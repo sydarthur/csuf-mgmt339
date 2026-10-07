@@ -2,9 +2,10 @@ import { useState } from 'react'
 import ProcessChartsGuide from './ProcessChartsGuide_v2'
 import Playground from './Playground'
 import VideoSummary from './VideoSummary'
+import Capability from './Capability'
 
 function App() {
-  const [currentView, setCurrentView] = useState<'guide' | 'playground' | 'video'>('guide')
+  const [currentView, setCurrentView] = useState<'guide' | 'capability' | 'playground' | 'video'>('guide')
 
   return (
     <div>
@@ -23,6 +24,16 @@ function App() {
                 }`}
               >
                 📚 Guide
+              </button>
+              <button
+                onClick={() => setCurrentView('capability')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                  currentView === 'capability'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                📐 Capability
               </button>
               <button
                 onClick={() => setCurrentView('playground')}
@@ -50,7 +61,7 @@ function App() {
       </nav>
 
       {/* Content */}
-      {currentView === 'guide' ? <ProcessChartsGuide /> : currentView === 'playground' ? <Playground /> : <VideoSummary />}
+      {currentView === 'guide' ? <ProcessChartsGuide /> : currentView === 'capability' ? <Capability /> : currentView === 'playground' ? <Playground /> : <VideoSummary />}
 
       {/* Footer */}
       <footer className="bg-gray-100 border-t border-gray-200 py-3">

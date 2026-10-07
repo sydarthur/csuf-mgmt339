@@ -94,6 +94,12 @@ Deployment is automatic via `.github/workflows/deploy.yml` on every push to `mai
 
 ---
 
+## SPC Tool (`tools/spc/`)
+
+React/Vite app with four tabs: 📚 Guide (`ProcessChartsGuide_v2.tsx`), 📐 Capability (`Capability.tsx`), 🎮 Playground (`Playground.tsx`), 🎥 Video Summary. **Read `tools/spc/FALL26_NOTES.md` first**: it records the Fall 2026 update (same-four-lines recipe, this term's verified example data, new Capability tab) and what is still open.
+
+---
+
 ## VSM Tools (`tools/vsm/`)
 
 All files are plain HTML. Just drop a new `.html` file in `tools/vsm/` and add a card to `tools/vsm/index.html`. The `build:vsm` script copies the whole folder.

@@ -6,41 +6,43 @@ type ChartType = 'xbar' | 'r' | 'p' | 'c';
 const ProcessChartsGuide = () => {
   const [activeChart, setActiveChart] = useState<ChartType>('xbar');
 
-  // Sample data for demonstrations
+  // Sample data — Fall 2026 lecture examples (verified)
+  // X-bar / R: coffee bags, 5 samples of n = 4 (In-Class Exercise 2.2, Q1)
   const xbarData = [
-    { sample: 1, mean: 50.2, UCL: 52, LCL: 48, target: 50 },
-    { sample: 2, mean: 49.8, UCL: 52, LCL: 48, target: 50 },
-    { sample: 3, mean: 51.1, UCL: 52, LCL: 48, target: 50 },
-    { sample: 4, mean: 50.5, UCL: 52, LCL: 48, target: 50 },
-    { sample: 5, mean: 49.3, UCL: 52, LCL: 48, target: 50 },
-    { sample: 6, mean: 52.5, UCL: 52, LCL: 48, target: 50 },
-    { sample: 7, mean: 50.8, UCL: 52, LCL: 48, target: 50 },
+    { sample: 1, mean: 501.44, CL: 498.86, UCL: 503.44, LCL: 494.28 },
+    { sample: 2, mean: 498.57, CL: 498.86, UCL: 503.44, LCL: 494.28 },
+    { sample: 3, mean: 493.63, CL: 498.86, UCL: 503.44, LCL: 494.28 },
+    { sample: 4, mean: 499.41, CL: 498.86, UCL: 503.44, LCL: 494.28 },
+    { sample: 5, mean: 501.24, CL: 498.86, UCL: 503.44, LCL: 494.28 },
   ];
 
   const rChartData = [
-    { sample: 1, range: 3.2, UCL: 5, LCL: 0 },
-    { sample: 2, range: 2.8, UCL: 5, LCL: 0 },
-    { sample: 3, range: 4.1, UCL: 5, LCL: 0 },
-    { sample: 4, range: 3.5, UCL: 5, LCL: 0 },
-    { sample: 5, range: 2.3, UCL: 5, LCL: 0 },
-    { sample: 6, range: 5.5, UCL: 5, LCL: 0 },
-    { sample: 7, range: 3.8, UCL: 5, LCL: 0 },
+    { sample: 1, range: 5.45, CL: 6.28, UCL: 14.34, LCL: 0 },
+    { sample: 2, range: 8.73, CL: 6.28, UCL: 14.34, LCL: 0 },
+    { sample: 3, range: 9.09, CL: 6.28, UCL: 14.34, LCL: 0 },
+    { sample: 4, range: 4.16, CL: 6.28, UCL: 14.34, LCL: 0 },
+    { sample: 5, range: 3.99, CL: 6.28, UCL: 14.34, LCL: 0 },
   ];
 
+  // p: same coffee bags as pass/fail (under 495 g?), 5 samples of n = 100
   const pChartData = [
-    { day: 'Mon', proportion: 0.03, UCL: 0.06, LCL: 0 },
-    { day: 'Tue', proportion: 0.04, UCL: 0.06, LCL: 0 },
-    { day: 'Wed', proportion: 0.02, UCL: 0.06, LCL: 0 },
-    { day: 'Thu', proportion: 0.05, UCL: 0.06, LCL: 0 },
-    { day: 'Fri', proportion: 0.08, UCL: 0.06, LCL: 0 },
+    { sample: 1, proportion: 0.04, CL: 0.05, UCL: 0.115, LCL: 0 },
+    { sample: 2, proportion: 0.03, CL: 0.05, UCL: 0.115, LCL: 0 },
+    { sample: 3, proportion: 0.02, CL: 0.05, UCL: 0.115, LCL: 0 },
+    { sample: 4, proportion: 0.12, CL: 0.05, UCL: 0.115, LCL: 0 },
+    { sample: 5, proportion: 0.04, CL: 0.05, UCL: 0.115, LCL: 0 },
   ];
 
+  // c: SkyView Drones, defects found on each of 8 drones
   const cChartData = [
-    { day: 'Mon', defects: 5, UCL: 12, LCL: 0 },
-    { day: 'Tue', defects: 7, UCL: 12, LCL: 0 },
-    { day: 'Wed', defects: 4, UCL: 12, LCL: 0 },
-    { day: 'Thu', defects: 6, UCL: 12, LCL: 0 },
-    { day: 'Fri', defects: 15, UCL: 12, LCL: 0 },
+    { drone: 1, defects: 3, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 2, defects: 5, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 3, defects: 2, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 4, defects: 6, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 5, defects: 4, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 6, defects: 3, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 7, defects: 5, CL: 4, UCL: 10, LCL: 0 },
+    { drone: 8, defects: 4, CL: 4, UCL: 10, LCL: 0 },
   ];
 
   const chartInfo = {
@@ -59,10 +61,10 @@ const ProcessChartsGuide = () => {
         'Want to monitor if the process average is stable'
       ],
       example: {
-        scenario: 'Coffee Shop Example',
-        description: 'A coffee shop wants to ensure espresso shots are consistent. Every hour, they measure 5 espresso shots.',
-        measurements: 'Shot volumes: 28ml, 30ml, 29ml, 31ml, 27ml → Average = 29ml',
-        insight: 'If the average shifts from 29ml to 33ml, the machine may need recalibration'
+        scenario: 'Coffee Bag Example',
+        description: 'A coffee company weighs 4 bags from the packaging line in each sample, for 5 samples.',
+        measurements: 'Sample 1 bags: 503.44, 497.99, 501.77, 502.54 g → Average = 501.44 g',
+        insight: 'Sample 3 averages 493.63 g, below the LCL of 494.28 g. The filler drifted low: an assignable cause to investigate.'
       },
       formula: {
         equation: 'UCL = X̄̄ + A₂R̄  |  LCL = X̄̄ - A₂R̄',
@@ -71,27 +73,27 @@ const ProcessChartsGuide = () => {
             name: 'X-double-bar (Grand Mean)',
             meaning: 'The average of all sample averages',
             calculation: 'Add up all your sample means, then divide by number of samples',
-            example: 'If Day 1 avg = 29ml, Day 2 avg = 30ml, Day 3 avg = 28ml → X̄̄ = (29+30+28)/3 = 29ml'
+            example: 'Coffee bags: (501.44 + 498.57 + 493.63 + 499.41 + 501.24) / 5 = 498.86 g'
           },
           'A₂': {
             name: 'Control Chart Constant',
             meaning: 'Adjusts control limits based on sample size',
             calculation: 'Look up in table based on your sample size (n)',
-            example: 'For n=5 measurements per sample, A₂ = 0.577 (from table)'
+            example: 'For n = 4 bags per sample, A₂ = 0.729. For n = 5, A₂ = 0.577. Always match n!'
           },
           'R̄': {
             name: 'R-bar (Average Range)',
             meaning: 'The average spread within samples',
             calculation: 'For each sample, find range (max-min), then average all ranges',
-            example: 'Day 1 range = 4ml, Day 2 range = 5ml, Day 3 range = 3ml → R̄ = (4+5+3)/3 = 4ml'
+            example: 'Coffee bags: (5.45 + 8.73 + 9.09 + 4.16 + 3.99) / 5 = 6.284 g'
           }
         },
         quickExample: {
-          setup: 'You have 3 days of data, 5 measurements per day',
-          data: 'Day 1: [28,30,29,31,27] avg=29, range=4\nDay 2: [29,32,30,31,28] avg=30, range=4\nDay 3: [27,29,28,30,26] avg=28, range=4',
-          calculations: 'X̄̄ = (29+30+28)/3 = 29ml\nR̄ = (4+4+4)/3 = 4ml\nA₂ = 0.577 (for n=5)',
-          limits: 'UCL = 29 + (0.577)(4) = 31.3ml\nLCL = 29 - (0.577)(4) = 26.7ml',
-          interpretation: 'Any daily average above 31.3ml or below 26.7ml signals process has shifted'
+          setup: '5 samples of coffee bags, n = 4 bags per sample (In-Class Exercise 2.2)',
+          data: 'Sample 1: 503.44, 497.99, 501.77, 502.54  → X̄ = 501.44, R = 5.45\nSample 2: 495.50, 495.19, 499.68, 503.92  → X̄ = 498.57, R = 8.73\nSample 3: 490.98, 490.22, 494.00, 499.31  → X̄ = 493.63, R = 9.09\nSample 4: 498.92, 498.78, 502.05, 497.89  → X̄ = 499.41, R = 4.16\nSample 5: 503.22, 502.39, 500.12, 499.23  → X̄ = 501.24, R = 3.99',
+          calculations: 'X̄̄ = 2494.29 / 5 = 498.86 g\nR̄ = 31.42 / 5 = 6.284 g\nA₂ = 0.729 (for n = 4)\nA₂R̄ = 0.729 × 6.284 = 4.58',
+          limits: 'UCL = 498.86 + 4.58 = 503.44 g\nLCL = 498.86 − 4.58 = 494.28 g',
+          interpretation: 'Sample 3 (493.63) is below the LCL: out of control. The other four samples are common-cause variation.'
         }
       },
       lookingFor: 'Points outside control limits indicate the process average has shifted'
@@ -111,10 +113,10 @@ const ProcessChartsGuide = () => {
         'Detect if the process is becoming more or less consistent'
       ],
       example: {
-        scenario: 'Coffee Shop Example (continued)',
-        description: 'Using the same 5 shots, calculate the range (highest - lowest)',
-        measurements: 'Shots: 28, 30, 29, 31, 27ml → Range = 31 - 27 = 4ml',
-        insight: 'If range suddenly increases to 10ml, the machine is becoming inconsistent'
+        scenario: 'Coffee Bag Example (continued)',
+        description: 'Same 5 samples of 4 bags. For each sample, range = heaviest bag − lightest bag.',
+        measurements: 'Sample 1: 503.44 − 497.99 = 5.45 g',
+        insight: 'All five ranges fall inside the limits. The filler is consistent; it was the average that drifted (see the X-bar chart).'
       },
       formula: {
         equation: 'UCL = D₄R̄  |  LCL = D₃R̄',
@@ -123,27 +125,27 @@ const ProcessChartsGuide = () => {
             name: 'R-bar (Average Range)',
             meaning: 'The typical spread within your samples',
             calculation: 'Calculate range for each sample (max-min), then average them',
-            example: 'Day 1 range = 4ml, Day 2 range = 5ml, Day 3 range = 3ml → R̄ = (4+5+3)/3 = 4ml'
+            example: 'Coffee bags: (5.45 + 8.73 + 9.09 + 4.16 + 3.99) / 5 = 6.284 g'
           },
           'D₄': {
             name: 'Upper Control Chart Constant',
             meaning: 'Sets the upper limit for acceptable variation',
             calculation: 'Look up in table based on sample size (n)',
-            example: 'For n=5, D₄ = 2.115 (from table)'
+            example: 'For n = 4, D₄ = 2.282. For n = 5, D₄ = 2.114.'
           },
           'D₃': {
             name: 'Lower Control Chart Constant',
             meaning: 'Sets the lower limit (often zero for small samples)',
             calculation: 'Look up in table based on sample size (n)',
-            example: 'For n=5, D₃ = 0 (ranges cannot be negative, so LCL = 0)'
+            example: 'For n ≤ 6, D₃ = 0 (a range can never be negative, so LCL = 0)'
           }
         },
         quickExample: {
-          setup: 'Same 3 days of espresso data',
-          data: 'Day 1: range = 31-27 = 4ml\nDay 2: range = 32-28 = 4ml\nDay 3: range = 30-26 = 4ml',
-          calculations: 'R̄ = (4+4+4)/3 = 4ml\nD₄ = 2.115, D₃ = 0 (for n=5)',
-          limits: 'UCL = (2.115)(4) = 8.46ml\nLCL = (0)(4) = 0ml',
-          interpretation: 'Any daily range above 8.46ml means variability has increased—process becoming inconsistent'
+          setup: 'Same 5 samples of coffee bags, n = 4',
+          data: 'Ranges: 5.45, 8.73, 9.09, 4.16, 3.99 g',
+          calculations: 'R̄ = 31.42 / 5 = 6.284 g\nD₄ = 2.282, D₃ = 0 (for n = 4)',
+          limits: 'UCL = 2.282 × 6.284 = 14.34 g\nLCL = 0 × 6.284 = 0 g',
+          interpretation: 'All ranges are inside 0 to 14.34: spread is stable. Together with the X-bar chart: consistent, but the average drifted in Sample 3.'
         }
       },
       lookingFor: 'Increasing ranges mean the process is becoming less consistent'
@@ -163,10 +165,10 @@ const ProcessChartsGuide = () => {
         'Want to track defect rates or error rates'
       ],
       example: {
-        scenario: 'Order Fulfillment Example',
-        description: 'A warehouse inspects daily shipments for wrong items',
-        measurements: 'Monday: 5 wrong items out of 200 orders = 5/200 = 2.5% defective',
-        insight: 'If Friday shows 16/200 = 8% defective (above control limit), investigate what happened'
+        scenario: 'Coffee Bags, Now Pass/Fail',
+        description: 'Same coffee line, but now each bag is just judged: is it under 495 g? 100 bags inspected per sample.',
+        measurements: 'Sample 1: 4 underweight out of 100 → p = 0.04',
+        insight: 'Sample 4 has 12 of 100 underweight (0.12), above the UCL of 0.115. Something changed in that sample.'
       },
       formula: {
         equation: 'UCL = p̄ + 3√(p̄(1-p̄)/n)  |  LCL = p̄ - 3√(p̄(1-p̄)/n)',
@@ -191,11 +193,11 @@ const ProcessChartsGuide = () => {
           }
         },
         quickExample: {
-          setup: '3 days of order inspection data',
-          data: 'Mon: 6 defects in 200 orders = 6/200 = 0.03\nTue: 5 defects in 200 orders = 5/200 = 0.025\nWed: 12 defects in 200 orders = 12/200 = 0.06',
-          calculations: 'p̄ = (6+5+12)/(200+200+200) = 23/600 = 0.0383 or 3.83%\n\nFor Monday (n=200):\nσ = √(0.0383(1-0.0383)/200) = √(0.000184) = 0.0136',
-          limits: 'UCL = 0.0383 + 3(0.0136) = 0.079 or 7.9%\nLCL = 0.0383 - 3(0.0136) = -0.003 → set to 0%\n(Proportions cannot be negative)',
-          interpretation: 'Monday 3% is in control. If a day shows 9% defective, it exceeds UCL—special cause event'
+          setup: '5 samples of 100 coffee bags; count bags under 495 g',
+          data: 'Underweight: 4, 3, 2, 12, 4  (out of 100 each)\nProportions: 0.04, 0.03, 0.02, 0.12, 0.04',
+          calculations: 'p̄ = 25 / 500 = 0.05\nσp = √(0.05 × 0.95 / 100) = √0.000475 = 0.0218',
+          limits: 'UCL = 0.05 + 3(0.0218) = 0.115\nLCL = 0.05 − 3(0.0218) = −0.015 → set to 0\n(Proportions cannot be negative)',
+          interpretation: 'Sample 4 (0.12) is above the UCL: assignable cause. No constants table needed for p charts.'
         }
       },
       lookingFor: 'Spikes in proportion indicate specific periods with quality issues'
@@ -215,10 +217,10 @@ const ProcessChartsGuide = () => {
         'Examples: scratches on a car, errors in a document'
       ],
       example: {
-        scenario: 'Packaging Quality Example',
-        description: 'Count defects (scratches, dents, tears) on each batch of 100 boxes',
-        measurements: 'Monday: 5 defects, Tuesday: 7 defects, Friday: 15 defects',
-        insight: 'Friday spike of 15 defects (above UCL of 12) suggests a problem occurred that day'
+        scenario: 'SkyView Drones Example',
+        description: 'Inspectors count every defect (scratches, loose screws, misaligned props) on each finished drone.',
+        measurements: 'Drone 1: 3 defects, Drone 2: 5 defects, Drone 4: 6 defects',
+        insight: 'All 8 drones fall between 0 and 10: in control, predictable at about 4 defects per drone. Whether 4 is acceptable is a capability question.'
       },
       formula: {
         equation: 'UCL = c̄ + 3√c̄  |  LCL = c̄ - 3√c̄',
@@ -243,76 +245,41 @@ const ProcessChartsGuide = () => {
           }
         },
         quickExample: {
-          setup: 'Inspect 100 packages daily for defects (tears, dents, scratches, missing labels)',
-          data: 'Mon: 12 defects\nTue: 15 defects\nWed: 18 defects\nThu: 14 defects\nFri: 35 defects',
-          calculations: 'c̄ = (12+15+18+14+35)/5 = 94/5 = 18.8 defects\n√c̄ = √18.8 = 4.34',
-          limits: 'UCL = 18.8 + 3(4.34) = 18.8 + 13.02 = 31.8 defects\nLCL = 18.8 - 3(4.34) = 18.8 - 13.02 = 5.78 defects',
-          interpretation: 'Friday with 35 defects exceeds UCL of 31.8—special cause event. Investigate what happened Friday.'
+          setup: 'SkyView Drones: defects counted on each of 8 drones',
+          data: 'Defects: 3, 5, 2, 6, 4, 3, 5, 4  (total 32)',
+          calculations: 'c̄ = 32 / 8 = 4 defects per drone\n√c̄ = √4 = 2',
+          limits: 'UCL = 4 + 3(2) = 10\nLCL = 4 − 3(2) = −2 → set to 0',
+          interpretation: 'Every drone is inside 0 to 10: only common-cause variation. In control means predictable, not necessarily good.'
         }
       },
       lookingFor: 'Unusual counts indicate special causes affecting quality'
     }
   };
 
+  // One renderer for every chart: the same four lines (data, CL, UCL, LCL)
+  const chartConfig: Record<ChartType, { data: Record<string, number>[]; xKey: string; xLabel: string; yKey: string; yLabel: string; yDomain: [number, number]; color: string; name: string }> = {
+    xbar: { data: xbarData, xKey: 'sample', xLabel: 'Sample Number', yKey: 'mean', yLabel: 'Mean (g)', yDomain: [490, 506], color: '#3b82f6', name: 'Sample Mean' },
+    r: { data: rChartData, xKey: 'sample', xLabel: 'Sample Number', yKey: 'range', yLabel: 'Range (g)', yDomain: [0, 16], color: '#8b5cf6', name: 'Sample Range' },
+    p: { data: pChartData, xKey: 'sample', xLabel: 'Sample Number', yKey: 'proportion', yLabel: 'Proportion', yDomain: [0, 0.14], color: '#f59e0b', name: 'Proportion' },
+    c: { data: cChartData, xKey: 'drone', xLabel: 'Drone Number', yKey: 'defects', yLabel: 'Defects', yDomain: [0, 12], color: '#10b981', name: 'Defect Count' },
+  };
+
   const renderChart = () => {
-    switch(activeChart) {
-      case 'xbar':
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={xbarData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="sample" label={{ value: 'Sample Number', position: 'insideBottom', offset: -5 }} />
-              <YAxis domain={[46, 55]} label={{ value: 'Mean Value', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="Lower Control Limit" />
-              <Line type="linear" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Target" />
-              <Line type="linear" dataKey="mean" stroke="#3b82f6" strokeWidth={2} name="Sample Mean" dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-      case 'r':
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={rChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="sample" label={{ value: 'Sample Number', position: 'insideBottom', offset: -5 }} />
-              <YAxis domain={[0, 7]} label={{ value: 'Range', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="linear" dataKey="range" stroke="#8b5cf6" strokeWidth={2} name="Sample Range" dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-      case 'p':
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={pChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: -5 }} />
-              <YAxis domain={[0, 0.1]} label={{ value: 'Proportion Defective', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="linear" dataKey="proportion" stroke="#f59e0b" strokeWidth={2} name="Proportion" dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-      case 'c':
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={cChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: -5 }} />
-              <YAxis domain={[0, 17]} label={{ value: 'Number of Defects', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" />
-              <Line type="linear" dataKey="defects" stroke="#10b981" strokeWidth={2} name="Defect Count" dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-      default:
-        return null;
-    }
+    const cfg = chartConfig[activeChart];
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={cfg.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey={cfg.xKey} label={{ value: cfg.xLabel, position: 'insideBottom', offset: -5 }} />
+          <YAxis domain={cfg.yDomain} label={{ value: cfg.yLabel, angle: -90, position: 'insideLeft' }} />
+          <Tooltip />
+          <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="Upper Control Limit" dot={false} />
+          <Line type="linear" dataKey="CL" stroke="#6b7280" name="Center Line" dot={false} />
+          <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="Lower Control Limit" dot={false} />
+          <Line type="linear" dataKey={cfg.yKey} stroke={cfg.color} strokeWidth={2} name={cfg.name} dot={{ r: 4 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    );
   };
 
   const info = chartInfo[activeChart];
@@ -322,6 +289,43 @@ const ProcessChartsGuide = () => {
       <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Statistical Process Control Charts</h1>
         <p className="text-gray-600 mb-6">A Visual Guide to Understanding When and Why to Use Each Chart Type</p>
+
+        {/* Same Four Lines: the recipe every chart follows */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-1">Every Control Chart: Same Four Lines</h2>
+          <p className="text-gray-600 mb-4">Same four steps every time. Only the ingredients change.</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <table className="w-full text-sm border border-slate-200 bg-white">
+              <thead className="bg-slate-800 text-white">
+                <tr><th className="p-2 text-left">Line</th><th className="p-2 text-left">What it is</th></tr>
+              </thead>
+              <tbody>
+                <tr className="border-t"><td className="p-2 font-semibold">Data points</td><td className="p-2">The statistic you plot for each sample</td></tr>
+                <tr className="border-t"><td className="p-2 font-semibold">Center line (CL)</td><td className="p-2">The average of those statistics</td></tr>
+                <tr className="border-t"><td className="p-2 font-semibold">UCL / LCL</td><td className="p-2">CL ± 3 × (spread of that statistic)</td></tr>
+              </tbody>
+            </table>
+            <table className="w-full text-sm border border-slate-200 bg-white">
+              <thead className="bg-slate-800 text-white">
+                <tr><th className="p-2 text-left">Chart</th><th className="p-2 text-left">Data</th><th className="p-2 text-left">Plot</th><th className="p-2 text-left">Limits</th></tr>
+              </thead>
+              <tbody>
+                <tr className="border-t"><td className="p-2 font-semibold">X̄</td><td className="p-2">Measured</td><td className="p-2">Sample mean</td><td className="p-2 font-mono">X̿ ± A₂R̄</td></tr>
+                <tr className="border-t"><td className="p-2 font-semibold">R</td><td className="p-2">Measured</td><td className="p-2">Sample range</td><td className="p-2 font-mono">D₄R̄, D₃R̄</td></tr>
+                <tr className="border-t"><td className="p-2 font-semibold">p</td><td className="p-2">Yes / No</td><td className="p-2">Proportion defective</td><td className="p-2 font-mono">p̄ ± 3√(p̄(1−p̄)/n)</td></tr>
+                <tr className="border-t"><td className="p-2 font-semibold">c</td><td className="p-2">Count</td><td className="p-2">Defects per unit</td><td className="p-2 font-mono">c̄ ± 3√c̄</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ol className="list-decimal ml-5 mt-4 text-sm text-gray-700 space-y-1">
+            <li>Collect samples over time.</li>
+            <li>Compute one number per sample (mean, range, proportion, or count).</li>
+            <li>Average those numbers → CL.</li>
+            <li>Add and subtract 3 × spread → UCL and LCL. A negative LCL becomes 0.</li>
+            <li>Plot, and look for points outside the limits.</li>
+          </ol>
+          <p className="text-sm text-gray-600 mt-3"><strong>Constants depend on sample size n.</strong> n = 4: A₂ = 0.729, D₃ = 0, D₄ = 2.282. n = 5: A₂ = 0.577, D₃ = 0, D₄ = 2.114. p and c charts need no constants table.</p>
+        </div>
         
         {/* Chart Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
