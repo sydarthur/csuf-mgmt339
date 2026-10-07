@@ -8,6 +8,8 @@ This folder is how the project tells the outside world where it stands. Sid's co
 |---|---|---|
 | `STATUS.md` | Current snapshot: where things stand right now | Rewritten in place, never appended |
 | `project_timeline.md` | Running log of decisions, findings, and meetings | Append-only, dated entries |
+| `to-tower.md` | Requests for the tower (splits, new repos, cross-project) | Append entries; mark done when the tower replies |
+| `from-tower.md` | Briefs from the tower | Written by the tower only |
 | `CLAUDE.md` | These instructions | Changed only via the control tower's templates |
 
 ## When to update
@@ -38,6 +40,19 @@ This folder is how the project tells the outside world where it stands. Sid's co
 - Be specific: journal names, dates, table numbers, task names, who we're waiting on.
 - An empty section gets `- (none)`. Don't pad.
 - `draft: true` means Sid hasn't reviewed it yet. Remove it only when Sid confirms the content.
+
+## Talking to the tower
+
+The tower (Sid's control tower repo) coordinates across projects. Two files in this folder carry messages:
+
+- **`to-tower.md`: requests up.** Anything that crosses repo boundaries goes here, not into action: splitting this repo, spinning off a new project, moving work to or from another repo, template or structure changes, cross-project ideas. Append an entry; never edit other repos or the tower yourself.
+  ```markdown
+  ## YYYY-MM-DD: <short title>
+  status: open
+  <what and why; for a split, list exactly what moves where (folders, files, docs) and what stays>
+  ```
+  When the tower has handled it, it replies in `from-tower.md`; then change `status: open` to `status: done (see from-tower YYYY-MM-DD)`.
+- **`from-tower.md`: briefs down.** Read it at the start of a session. Discuss with Sid before acting on it. Never edit it.
 
 ## Never
 

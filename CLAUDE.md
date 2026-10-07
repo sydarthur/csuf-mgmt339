@@ -177,28 +177,40 @@ Cards use per-topic accent colors and type badges (Walkthrough / Interactive / G
 
 ---
 
-## Exam Files (`exam/Spring 26/`)
+## Exam Files (`exam/`)
 
-Each exam lives in its own folder. See `exam/Spring 26/Exam N/BUILD_NOTES.md` for the full build log, question map, and Canvas sync notes for that exam.
+Organized by semester (`exam/Spring 26/`, `exam/Fall 26/`, ...). Each exam lives in its own folder. Not every exam has a `BUILD_NOTES.md` — Spring 26/Exam 2 is the fullest-documented example (build log, question map, Canvas sync notes) and the pattern worth following for a new exam, but it's not a strict requirement for every one.
 
-**Exam 2 (completed Spring 2026):**
+**Spring 26 (completed):** Exams 1–3. See `exam/Spring 26/Exam 2/BUILD_NOTES.md` for the reference build log.
 - `Exam 2/Build/MGMT_339_-_Exam_2_v2.md` — final exam (25 questions, 100 pts)
 - `Exam 2/Build/MGMT_339_-_Exam_2_Answer_Key.md` — answer key with distractor notes
 - `Exam 2/Build/canvas_exam_header.html` — formula reference pasted into Canvas header
 - `Exam 2/Build/images/` — figures attached to exam questions (fishbone, VSM, YPI, etc.)
 - `Exam 2/MGMT_339_-_Exam_2_Formula_Sheet.md` — standalone formula sheet (PDF export)
 
+**Fall 26 (current):** six planned exams, one per course topic:
+1. Principles of Management
+2. Value through Ops
+3. Ops Strategy
+4. Supply Chain Management
+5. Supply Chain Design
+6. Process Strategy and Analysis
+
+Each `Exam N/` folder starts with a `MGMT 339 - Exam N Workspace.md` — topic reference list up top, then a scaffold (formulas / conceptual questions / essay-problem questions) matching Spring 26/Exam 1's established style: realistic named-company scenarios (not abstract questions), checkbox-style options (`- [ ] A)`), 3 pts per conceptual question. Draft directly in the workspace file; split into `Build/` with a proper `BUILD_NOTES.md` once a draft firms up, following the Exam 2 pattern above.
+
 **To export exam or formula sheet to PDF:**
 ```bash
-cd "exam/Spring 26/Exam N/Build"
-pandoc MGMT_339_-_Exam_N_vX.md -o MGMT_339_-_Exam_N_vX.pdf \
+cd "exam/<Semester>/Exam N/Build"   # or the exam folder itself, if there's no Build/ subfolder yet
+pandoc "<file>.md" -o "<file>.pdf" \
   --pdf-engine=xelatex -V mainfont="Helvetica" -V geometry:margin=1in --resource-path=.
 ```
 
 **Known pandoc/Helvetica quirks:**
 - `$` signs inside markdown table cells trigger LaTeX math mode — strip `$` from cell values; put it in the column header only
-- `→` (U+2192) does not render in Helvetica — avoid in body text (formula sheet uses it; suppress warning, it's cosmetic)
+- `→` (U+2192) does not render in Helvetica — avoid in body text (formula sheet uses it; suppress warning, it's cosmetic). It's fine baked into a raster figure/PNG, since that's not live LaTeX text.
 - Subscript unicode chars (e.g. `ₙ`) don't render — use plain text alternatives in tables
+- Circle-outline glyphs (`○` U+25CB, `◯` U+25EF) don't render in Helvetica — render as a missing-character box. For a single-select option marker, use `( )` instead (renders cleanly, and reads as the standard scantron-bubble convention). The ballot-box `☐` and filled `●` do render fine — reserve `☐` for genuine "select all that apply" questions so it visually contrasts with `( )` single-select options.
+- A markdown image given both alt text and a separate manual caption line produces a doubled caption in the PDF (pandoc auto-numbers "Figure N:" from the alt text, so a redundant manual caption reads as "Figure 1: Figure 1: ...") — use the image alt text as the only caption, don't add a second caption line below it.
 
 ---
 
@@ -216,3 +228,12 @@ pandoc MGMT_339_-_Exam_N_vX.md -o MGMT_339_-_Exam_N_vX.pdf \
 ## Status tracking
 
 `status/` is how this course reports its state to Sid's control tower. Follow `status/CLAUDE.md`. In short: at the end of every working session where something meaningful changed, add a dated entry to `status/project_timeline.md` if warranted, then rewrite `status/STATUS.md` and set `updated:` to today.
+
+## Course narrative (from Sid's Claude Desktop teaching project)
+
+Sid works on lecture narrative, slide flow, and teaching ideas in a separate Claude Desktop project. The decisions from that work live in his Obsidian vault at `Labs/Teaching/MGMT339/Master/` (this machine's path is in `.claude/settings.local.json` under `additionalDirectories`).
+
+- **Before changing a tool, slide deck, or exam for a module, read the matching note** in that folder (start with `Narrative Notes - README.md`, then `Course Arc.md` and `Narrative - Module N.md` if they exist). Build to the narrative there; if the code and the narrative disagree, ask Sid rather than picking one.
+- **Read-only from here.** Don't edit those vault notes from this repo. If a tool change suggests the narrative should change, say so to Sid (or note it in `status/STATUS.md` under Ideas).
+- No student names, grades, or anything from `grading/` goes into the vault notes.
+
