@@ -4,18 +4,18 @@ type: teaching
 stage: in-session
 target: MGMT 339 Operations Management, CSUF, Fall 2026
 draft: true
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 ## Now
 - Week 7: quality and SPC lectures (X̄/R, p, c, Cp/Cpk); In-Class Exercises 2.2 and 2.3 built
 - Assignment 2.1 (VeloShip SPC case, Aug 2026 data) due Sun Oct 18
-- SPC site tool updated for Fall 26 (four-lines recipe, new Capability tab) on branch fall26-spc-guide
+- SPC site tool Fall 26 update (four-lines recipe, Capability tab) merged to main and live
+- SPC Playground rebuilt on real Exercise 2.2/2.3 data (FreshRoast coffee X̄/R, Hometown Bank p, Waverly Print c) — deployed
 - The Great Tech Reckoning ops-strategy game has run live; Spring 26 Exam 2 BUILD_NOTES.md is the reference build pattern
 
 ## Next
-- Merge fall26-spc-guide to main so the site deploys
-- Step-by-step guides for In-Class Exercises 2.2 and 2.3; refresh SPC Playground to coffee-bag data
 - Draft Fall 26 Exam 2 (quality, lean, capacity, TOC), due Oct 28
+- Cp/Cpk step-through walkthrough for Exercise 2.3 (Playground only covers X̄/R, p, c so far)
 - Commit the untracked exam folders and the CLAUDE.md change
 
 ## Blocked on

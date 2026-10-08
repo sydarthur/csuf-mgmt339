@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-type ChartType = 'xbar' | 'r' | 'p' | 'c';
+type ChartType = 'xbar' | 'p' | 'c';
 
 interface StepData {
   step: number;
@@ -11,281 +11,430 @@ interface StepData {
   calculations?: { label: string; value: string }[];
 }
 
+const columnLabels: Record<string, string> = {
+  sample: 'Sample',
+  m1: 'Bag 1',
+  m2: 'Bag 2',
+  m3: 'Bag 3',
+  m4: 'Bag 4',
+  mean: 'Mean (X̄)',
+  range: 'Range (R)',
+  meanStatus: 'X̄ Status',
+  rangeStatus: 'R Status',
+  week: 'Week',
+  inspected: 'Deposits Checked',
+  wrong: 'Wrong Account #s',
+  proportion: 'Proportion (p)',
+  day: 'Day',
+  defects: 'Defects',
+  status: 'Status'
+};
+
 const Playground = () => {
   const [selectedChart, setSelectedChart] = useState<ChartType>('xbar');
   const [currentStep, setCurrentStep] = useState(0);
 
+  // X-bar & R: FreshRoast Coffee, bag weights (g), 5 samples of n = 4
+  // Same data as the Guide tab's "same four lines" example (In-Class Exercise 2.2, Q1):
+  // X-double-bar = 498.86, R-bar = 6.284, A2(n=4) = 0.729, D3 = 0, D4(n=4) = 2.282
   const xbarSteps: StepData[] = [
     {
       step: 0,
-      description: 'Step 1: Collect Sample Data',
-      instruction: 'We collected 5 measurements each day for 5 days. Click Next to see the raw data.',
+      description: 'Step 1: The Scenario',
+      instruction: 'FreshRoast Coffee monitors the weight of bags (in grams) in its packaging process. Below are 5 samples, each containing 4 bag weights. Click Next to see the raw data.',
       tableData: []
     },
     {
       step: 1,
-      description: 'Step 2: View Raw Measurements',
-      instruction: 'Here are our daily measurements. Each row represents one day with 5 measurements.',
+      description: 'Step 2: Raw Measurements',
+      instruction: 'Each row is one sample of 4 bags.',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '', range: '' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '', range: '' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '', range: '' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '', range: '' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '', range: '' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '', range: '' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '', range: '' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '', range: '' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '', range: '' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '', range: '' }
       ]
     },
     {
       step: 2,
       description: 'Step 3: Calculate Sample Means (X̄)',
-      instruction: 'For each day, we calculate the average of the 5 measurements.',
+      instruction: 'For each sample, average the 4 bag weights.',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '49.0', range: '' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '50.0', range: '' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '50.0', range: '' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '48.0', range: '' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '51.0', range: '' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '501.44', range: '' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '498.57', range: '' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '493.63', range: '' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '499.41', range: '' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '501.24', range: '' }
       ],
       calculations: [
-        { label: 'Day 1 Mean', value: '(48+50+49+51+47)/5 = 49.0' },
-        { label: 'Day 2 Mean', value: '(49+51+50+52+48)/5 = 50.0' },
-        { label: 'Day 3 Mean', value: '(50+52+51+49+48)/5 = 50.0' },
-        { label: 'Day 4 Mean', value: '(47+49+48+50+46)/5 = 48.0' },
-        { label: 'Day 5 Mean', value: '(51+53+52+50+49)/5 = 51.0' }
+        { label: 'Sample 1 Mean', value: '(503.44+497.99+501.77+502.54)/4 = 501.44' },
+        { label: 'Sample 2 Mean', value: '(495.50+495.19+499.68+503.92)/4 = 498.57' },
+        { label: 'Sample 3 Mean', value: '(490.98+490.22+494.00+499.31)/4 = 493.63' },
+        { label: 'Sample 4 Mean', value: '(498.92+498.78+502.05+497.89)/4 = 499.41' },
+        { label: 'Sample 5 Mean', value: '(503.22+502.39+500.12+499.23)/4 = 501.24' }
       ]
     },
     {
       step: 3,
       description: 'Step 4: Calculate Sample Ranges (R)',
-      instruction: 'For each day, we calculate the range (Maximum - Minimum).',
+      instruction: 'For each sample, the range is Maximum − Minimum.',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '49.0', range: '4' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '48.0', range: '4' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '51.0', range: '4' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '501.44', range: '5.45' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '498.57', range: '8.73' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '493.63', range: '9.09' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '499.41', range: '4.16' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '501.24', range: '3.99' }
       ],
       calculations: [
-        { label: 'Day 1 Range', value: '51 - 47 = 4' },
-        { label: 'Day 2 Range', value: '52 - 48 = 4' },
-        { label: 'Day 3 Range', value: '52 - 48 = 4' },
-        { label: 'Day 4 Range', value: '50 - 46 = 4' },
-        { label: 'Day 5 Range', value: '53 - 49 = 4' }
+        { label: 'Sample 1 Range', value: '503.44 − 497.99 = 5.45' },
+        { label: 'Sample 2 Range', value: '503.92 − 495.19 = 8.73' },
+        { label: 'Sample 3 Range', value: '499.31 − 490.22 = 9.09' },
+        { label: 'Sample 4 Range', value: '502.05 − 497.89 = 4.16' },
+        { label: 'Sample 5 Range', value: '503.22 − 499.23 = 3.99' }
       ]
     },
     {
       step: 4,
-      description: 'Step 5: Calculate Grand Mean (X̄̄)',
-      instruction: 'Average all the sample means to get the grand mean.',
+      description: 'Step 5: Calculate the Grand Mean (X̿) and Average Range (R̄)',
+      instruction: 'Average the 5 sample means for X̿; average the 5 ranges for R̄.',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '49.0', range: '4' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '48.0', range: '4' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '51.0', range: '4' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '501.44', range: '5.45' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '498.57', range: '8.73' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '493.63', range: '9.09' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '499.41', range: '4.16' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '501.24', range: '3.99' }
       ],
       calculations: [
-        { label: 'X̄̄ (Grand Mean)', value: '(49.0 + 50.0 + 50.0 + 48.0 + 51.0) / 5 = 49.6' },
-        { label: 'R̄ (Average Range)', value: '(4 + 4 + 4 + 4 + 4) / 5 = 4.0' }
+        { label: 'X̿ (Grand Mean)', value: '(501.44+498.57+493.63+499.41+501.24)/5 = 498.86' },
+        { label: 'R̄ (Average Range)', value: '(5.45+8.73+9.09+4.16+3.99)/5 = 6.284' }
       ]
     },
     {
       step: 5,
       description: 'Step 6: Calculate Control Limits',
-      instruction: 'Use the formulas with constant A₂ = 0.577 (for n=5) to find control limits.',
+      instruction: 'Use A₂ = 0.729 for the X̄ chart, D₃ = 0 and D₄ = 2.282 for the R chart (table constants for n = 4).',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '49.0', range: '4' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '50.0', range: '4' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '48.0', range: '4' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '51.0', range: '4' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '501.44', range: '5.45' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '498.57', range: '8.73' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '493.63', range: '9.09' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '499.41', range: '4.16' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '501.24', range: '3.99' }
       ],
       calculations: [
-        { label: 'X̄̄', value: '49.6' },
-        { label: 'R̄', value: '4.0' },
-        { label: 'A₂ (from table for n=5)', value: '0.577' },
-        { label: 'UCL', value: 'X̄̄ + A₂R̄ = 49.6 + (0.577 × 4.0) = 49.6 + 2.31 = 51.91' },
-        { label: 'LCL', value: 'X̄̄ - A₂R̄ = 49.6 - (0.577 × 4.0) = 49.6 - 2.31 = 47.29' }
+        { label: 'X̿ / R̄', value: '498.86 / 6.284' },
+        { label: 'X̄ UCL', value: 'X̿ + A₂R̄ = 498.86 + (0.729 × 6.284) = 503.44' },
+        { label: 'X̄ LCL', value: 'X̿ − A₂R̄ = 498.86 − (0.729 × 6.284) = 494.28' },
+        { label: 'R UCL', value: 'D₄R̄ = 2.282 × 6.284 = 14.34' },
+        { label: 'R LCL', value: 'D₃R̄ = 0 × 6.284 = 0' }
       ]
     },
     {
       step: 6,
-      description: 'Step 7: Plot the Chart',
-      instruction: 'All sample means fall within control limits - process is in control!',
+      description: 'Step 7: Plot and Interpret',
+      instruction: 'Sample 3’s mean (493.63 g) falls below the X̄ chart’s lower control limit (494.28) — that sample is out of control. All 5 ranges fall within the R chart’s limits, so variability within samples is stable.',
       tableData: [
-        { day: 'Day 1', m1: 48, m2: 50, m3: 49, m4: 51, m5: 47, mean: '49.0', range: '4', status: '✓ In Control' },
-        { day: 'Day 2', m1: 49, m2: 51, m3: 50, m4: 52, m5: 48, mean: '50.0', range: '4', status: '✓ In Control' },
-        { day: 'Day 3', m1: 50, m2: 52, m3: 51, m4: 49, m5: 48, mean: '50.0', range: '4', status: '✓ In Control' },
-        { day: 'Day 4', m1: 47, m2: 49, m3: 48, m4: 50, m5: 46, mean: '48.0', range: '4', status: '✓ In Control' },
-        { day: 'Day 5', m1: 51, m2: 53, m3: 52, m4: 50, m5: 49, mean: '51.0', range: '4', status: '✓ In Control' }
+        { sample: 'Sample 1', m1: 503.44, m2: 497.99, m3: 501.77, m4: 502.54, mean: '501.44', range: '5.45', meanStatus: '✓ In Control', rangeStatus: '✓ In Control' },
+        { sample: 'Sample 2', m1: 495.50, m2: 495.19, m3: 499.68, m4: 503.92, mean: '498.57', range: '8.73', meanStatus: '✓ In Control', rangeStatus: '✓ In Control' },
+        { sample: 'Sample 3', m1: 490.98, m2: 490.22, m3: 494.00, m4: 499.31, mean: '493.63', range: '9.09', meanStatus: '⚠ Out of Control (low)', rangeStatus: '✓ In Control' },
+        { sample: 'Sample 4', m1: 498.92, m2: 498.78, m3: 502.05, m4: 497.89, mean: '499.41', range: '4.16', meanStatus: '✓ In Control', rangeStatus: '✓ In Control' },
+        { sample: 'Sample 5', m1: 503.22, m2: 502.39, m3: 500.12, m4: 499.23, mean: '501.24', range: '3.99', meanStatus: '✓ In Control', rangeStatus: '✓ In Control' }
       ],
       calculations: [
-        { label: 'UCL', value: '51.91' },
-        { label: 'Center Line (X̄̄)', value: '49.6' },
-        { label: 'LCL', value: '47.29' }
+        { label: 'X̄ chart', value: 'UCL 503.44 / CL 498.86 / LCL 494.28' },
+        { label: 'R chart', value: 'UCL 14.34 / CL 6.284 / LCL 0' }
       ]
     }
   ];
 
+  // p-chart: Hometown Bank, wrong account numbers, n = 2,500 deposits/week, 12 weeks
   const pChartSteps: StepData[] = [
     {
       step: 0,
-      description: 'Step 1: Define the Problem',
-      instruction: 'We inspect orders daily to count defective items. Click Next to start.',
+      description: 'Step 1: The Scenario',
+      instruction: 'The operations manager of the booking services department at Hometown Bank is concerned about wrong customer account numbers being recorded. Each week, a random sample of 2,500 deposits is checked. Click Next to see the last 12 weeks of data.',
       tableData: []
     },
     {
       step: 1,
-      description: 'Step 2: Collect Data',
-      instruction: 'Record the number of defects found and total items inspected each day.',
-      tableData: [
-        { day: 'Mon', inspected: 200, defects: '', proportion: '' },
-        { day: 'Tue', inspected: 200, defects: '', proportion: '' },
-        { day: 'Wed', inspected: 200, defects: '', proportion: '' },
-        { day: 'Thu', inspected: 200, defects: '', proportion: '' },
-        { day: 'Fri', inspected: 200, defects: '', proportion: '' }
-      ]
+      description: 'Step 2: Raw Weekly Data',
+      instruction: 'Each row is one week of 2,500 deposits checked.',
+      tableData: Array.from({ length: 12 }, (_, i) => ({ week: `Week ${i + 1}`, inspected: 2500, wrong: '', proportion: '' }))
     },
     {
       step: 2,
-      description: 'Step 3: Count Defects',
-      instruction: 'Here are the defect counts for each day.',
-      tableData: [
-        { day: 'Mon', inspected: 200, defects: '6', proportion: '' },
-        { day: 'Tue', inspected: 200, defects: '5', proportion: '' },
-        { day: 'Wed', inspected: 200, defects: '12', proportion: '' },
-        { day: 'Thu', inspected: 200, defects: '4', proportion: '' },
-        { day: 'Fri', inspected: 200, defects: '8', proportion: '' }
-      ]
+      description: 'Step 3: Record Wrong Account Numbers',
+      instruction: 'Here are the wrong-account-number counts for each week.',
+      tableData: [15, 12, 19, 2, 19, 4, 24, 7, 10, 17, 15, 3].map((w, i) => ({
+        week: `Week ${i + 1}`, inspected: 2500, wrong: String(w), proportion: ''
+      }))
     },
     {
       step: 3,
       description: 'Step 4: Calculate Proportions',
-      instruction: 'Calculate the proportion defective for each day (defects ÷ inspected).',
+      instruction: 'Proportion defective = wrong ÷ deposits checked, for each week.',
       tableData: [
-        { day: 'Mon', inspected: 200, defects: '6', proportion: '0.030' },
-        { day: 'Tue', inspected: 200, defects: '5', proportion: '0.025' },
-        { day: 'Wed', inspected: 200, defects: '12', proportion: '0.060' },
-        { day: 'Thu', inspected: 200, defects: '4', proportion: '0.020' },
-        { day: 'Fri', inspected: 200, defects: '8', proportion: '0.040' }
+        { week: 'Week 1', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 2', inspected: 2500, wrong: '12', proportion: '0.0048' },
+        { week: 'Week 3', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 4', inspected: 2500, wrong: '2', proportion: '0.0008' },
+        { week: 'Week 5', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 6', inspected: 2500, wrong: '4', proportion: '0.0016' },
+        { week: 'Week 7', inspected: 2500, wrong: '24', proportion: '0.0096' },
+        { week: 'Week 8', inspected: 2500, wrong: '7', proportion: '0.0028' },
+        { week: 'Week 9', inspected: 2500, wrong: '10', proportion: '0.0040' },
+        { week: 'Week 10', inspected: 2500, wrong: '17', proportion: '0.0068' },
+        { week: 'Week 11', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 12', inspected: 2500, wrong: '3', proportion: '0.0012' }
       ],
       calculations: [
-        { label: 'Monday', value: '6/200 = 0.030 (3.0%)' },
-        { label: 'Tuesday', value: '5/200 = 0.025 (2.5%)' },
-        { label: 'Wednesday', value: '12/200 = 0.060 (6.0%)' },
-        { label: 'Thursday', value: '4/200 = 0.020 (2.0%)' },
-        { label: 'Friday', value: '8/200 = 0.040 (4.0%)' }
+        { label: 'Week 1–6', value: '15/2500, 12/2500, 19/2500, 2/2500, 19/2500, 4/2500' },
+        { label: 'Week 7–12', value: '24/2500, 7/2500, 10/2500, 17/2500, 15/2500, 3/2500' }
       ]
     },
     {
       step: 4,
-      description: 'Step 5: Calculate Average Proportion (p̄)',
-      instruction: 'Calculate the overall average proportion defective.',
+      description: 'Step 5: Calculate the Average Proportion (p̄)',
+      instruction: 'Pool all 12 weeks: total wrong ÷ total deposits checked.',
       tableData: [
-        { day: 'Mon', inspected: 200, defects: '6', proportion: '0.030' },
-        { day: 'Tue', inspected: 200, defects: '5', proportion: '0.025' },
-        { day: 'Wed', inspected: 200, defects: '12', proportion: '0.060' },
-        { day: 'Thu', inspected: 200, defects: '4', proportion: '0.020' },
-        { day: 'Fri', inspected: 200, defects: '8', proportion: '0.040' }
+        { week: 'Week 1', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 2', inspected: 2500, wrong: '12', proportion: '0.0048' },
+        { week: 'Week 3', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 4', inspected: 2500, wrong: '2', proportion: '0.0008' },
+        { week: 'Week 5', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 6', inspected: 2500, wrong: '4', proportion: '0.0016' },
+        { week: 'Week 7', inspected: 2500, wrong: '24', proportion: '0.0096' },
+        { week: 'Week 8', inspected: 2500, wrong: '7', proportion: '0.0028' },
+        { week: 'Week 9', inspected: 2500, wrong: '10', proportion: '0.0040' },
+        { week: 'Week 10', inspected: 2500, wrong: '17', proportion: '0.0068' },
+        { week: 'Week 11', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 12', inspected: 2500, wrong: '3', proportion: '0.0012' }
       ],
       calculations: [
-        { label: 'Total Defects', value: '6 + 5 + 12 + 4 + 8 = 35' },
-        { label: 'Total Inspected', value: '200 × 5 = 1000' },
-        { label: 'p̄ (Average Proportion)', value: '35 / 1000 = 0.035 (3.5%)' }
+        { label: 'Total Wrong', value: '15+12+19+2+19+4+24+7+10+17+15+3 = 147' },
+        { label: 'Total Checked', value: '2,500 × 12 = 30,000' },
+        { label: 'p̄ (Average Proportion)', value: '147 / 30,000 = 0.0049 (0.49%)' }
       ]
     },
     {
       step: 5,
       description: 'Step 6: Calculate Control Limits',
-      instruction: 'Use the p-chart formula to calculate UCL and LCL.',
+      instruction: 'Use the p-chart formula with n = 2,500.',
       tableData: [
-        { day: 'Mon', inspected: 200, defects: '6', proportion: '0.030' },
-        { day: 'Tue', inspected: 200, defects: '5', proportion: '0.025' },
-        { day: 'Wed', inspected: 200, defects: '12', proportion: '0.060' },
-        { day: 'Thu', inspected: 200, defects: '4', proportion: '0.020' },
-        { day: 'Fri', inspected: 200, defects: '8', proportion: '0.040' }
+        { week: 'Week 1', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 2', inspected: 2500, wrong: '12', proportion: '0.0048' },
+        { week: 'Week 3', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 4', inspected: 2500, wrong: '2', proportion: '0.0008' },
+        { week: 'Week 5', inspected: 2500, wrong: '19', proportion: '0.0076' },
+        { week: 'Week 6', inspected: 2500, wrong: '4', proportion: '0.0016' },
+        { week: 'Week 7', inspected: 2500, wrong: '24', proportion: '0.0096' },
+        { week: 'Week 8', inspected: 2500, wrong: '7', proportion: '0.0028' },
+        { week: 'Week 9', inspected: 2500, wrong: '10', proportion: '0.0040' },
+        { week: 'Week 10', inspected: 2500, wrong: '17', proportion: '0.0068' },
+        { week: 'Week 11', inspected: 2500, wrong: '15', proportion: '0.0060' },
+        { week: 'Week 12', inspected: 2500, wrong: '3', proportion: '0.0012' }
       ],
       calculations: [
-        { label: 'p̄', value: '0.035' },
-        { label: 'n (sample size)', value: '200' },
-        { label: 'σ = √(p̄(1-p̄)/n)', value: '√(0.035 × 0.965 / 200) = √0.000169 = 0.013' },
-        { label: 'UCL', value: 'p̄ + 3σ = 0.035 + 3(0.013) = 0.035 + 0.039 = 0.074 (7.4%)' },
-        { label: 'LCL', value: 'p̄ - 3σ = 0.035 - 3(0.013) = -0.004 → 0 (cannot be negative)' }
+        { label: 'p̄', value: '0.0049' },
+        { label: 'n (sample size)', value: '2,500' },
+        { label: 'σ = √(p̄(1−p̄)/n)', value: '√(0.0049 × 0.9951 / 2500) = 0.0014' },
+        { label: 'UCL', value: 'p̄ + 3σ = 0.0049 + 3(0.0014) = 0.0091' },
+        { label: 'LCL', value: 'p̄ − 3σ = 0.0049 − 3(0.0014) = 0.0007' }
       ]
     },
     {
       step: 6,
-      description: 'Step 7: Interpret Results',
-      instruction: 'All points are within control limits - process is stable!',
+      description: 'Step 7: Plot and Interpret',
+      instruction: 'Week 7 (0.0096) is above the UCL (0.0091) — the booking process was out of control that week. Every other week falls inside the limits. Investigate what happened in Week 7 before trusting the average error rate going forward.',
       tableData: [
-        { day: 'Mon', inspected: 200, defects: '6', proportion: '0.030', status: '✓ In Control' },
-        { day: 'Tue', inspected: 200, defects: '5', proportion: '0.025', status: '✓ In Control' },
-        { day: 'Wed', inspected: 200, defects: '12', proportion: '0.060', status: '✓ In Control' },
-        { day: 'Thu', inspected: 200, defects: '4', proportion: '0.020', status: '✓ In Control' },
-        { day: 'Fri', inspected: 200, defects: '8', proportion: '0.040', status: '✓ In Control' }
+        { week: 'Week 1', inspected: 2500, wrong: '15', proportion: '0.0060', status: '✓ In Control' },
+        { week: 'Week 2', inspected: 2500, wrong: '12', proportion: '0.0048', status: '✓ In Control' },
+        { week: 'Week 3', inspected: 2500, wrong: '19', proportion: '0.0076', status: '✓ In Control' },
+        { week: 'Week 4', inspected: 2500, wrong: '2', proportion: '0.0008', status: '✓ In Control' },
+        { week: 'Week 5', inspected: 2500, wrong: '19', proportion: '0.0076', status: '✓ In Control' },
+        { week: 'Week 6', inspected: 2500, wrong: '4', proportion: '0.0016', status: '✓ In Control' },
+        { week: 'Week 7', inspected: 2500, wrong: '24', proportion: '0.0096', status: '⚠ Out of Control (above UCL)' },
+        { week: 'Week 8', inspected: 2500, wrong: '7', proportion: '0.0028', status: '✓ In Control' },
+        { week: 'Week 9', inspected: 2500, wrong: '10', proportion: '0.0040', status: '✓ In Control' },
+        { week: 'Week 10', inspected: 2500, wrong: '17', proportion: '0.0068', status: '✓ In Control' },
+        { week: 'Week 11', inspected: 2500, wrong: '15', proportion: '0.0060', status: '✓ In Control' },
+        { week: 'Week 12', inspected: 2500, wrong: '3', proportion: '0.0012', status: '✓ In Control' }
       ],
       calculations: [
-        { label: 'UCL', value: '0.074 (7.4%)' },
-        { label: 'Center Line (p̄)', value: '0.035 (3.5%)' },
-        { label: 'LCL', value: '0 (0%)' }
+        { label: 'UCL', value: '0.0091 (0.91%)' },
+        { label: 'Center Line (p̄)', value: '0.0049 (0.49%)' },
+        { label: 'LCL', value: '0.0007 (0.07%)' }
       ]
     }
   ];
 
-  const getChartData = () => {
-    if (selectedChart === 'xbar' && currentStep >= 2) {
-      const step = xbarSteps[currentStep];
-      return step.tableData?.map((row: any, idx: number) => ({
-        day: idx + 1,
-        mean: parseFloat(row.mean) || null,
-        UCL: currentStep >= 5 ? 51.91 : null,
-        LCL: currentStep >= 5 ? 47.29 : null,
-        target: currentStep >= 4 ? 49.6 : null
-      }));
-    } else if (selectedChart === 'p' && currentStep >= 3) {
-      const step = pChartSteps[currentStep];
-      return step.tableData?.map((row: any) => ({
-        day: row.day,
-        proportion: parseFloat(row.proportion) || null,
-        UCL: currentStep >= 5 ? 0.074 : null,
-        LCL: 0,
-        target: currentStep >= 4 ? 0.035 : null
-      }));
+  // c-chart: Waverly Print Co., defects per 500-page print run, 10 days
+  const cChartSteps: StepData[] = [
+    {
+      step: 0,
+      description: 'Step 1: The Scenario',
+      instruction: 'Waverly Print Co. inspects one 500-page print run each day and counts every printing defect it finds — smudges, misaligned pages, missing pages. A single run can have several defects. Click Next to see the last 10 days.',
+      tableData: []
+    },
+    {
+      step: 1,
+      description: 'Step 2: Record Daily Defect Counts',
+      instruction: 'Each row is one day’s print run.',
+      tableData: [14, 18, 12, 21, 16, 29, 13, 15, 10, 12].map((d, i) => ({ day: `Day ${i + 1}`, defects: String(d) }))
+    },
+    {
+      step: 2,
+      description: 'Step 3: Calculate the Average Defect Count (c̄)',
+      instruction: 'Average the defect counts across all 10 days.',
+      tableData: [14, 18, 12, 21, 16, 29, 13, 15, 10, 12].map((d, i) => ({ day: `Day ${i + 1}`, defects: String(d) })),
+      calculations: [
+        { label: 'Total Defects', value: '14+18+12+21+16+29+13+15+10+12 = 160' },
+        { label: 'c̄ (Average Defects per Run)', value: '160 / 10 = 16.0' }
+      ]
+    },
+    {
+      step: 3,
+      description: 'Step 4: Calculate Control Limits',
+      instruction: 'A c-chart’s spread is √c̄ — no sample size is needed since each run is a fixed inspection unit (500 pages).',
+      tableData: [14, 18, 12, 21, 16, 29, 13, 15, 10, 12].map((d, i) => ({ day: `Day ${i + 1}`, defects: String(d) })),
+      calculations: [
+        { label: 'c̄', value: '16.0' },
+        { label: '√c̄', value: '√16 = 4' },
+        { label: 'UCL', value: 'c̄ + 3√c̄ = 16 + 3(4) = 28' },
+        { label: 'LCL', value: 'c̄ − 3√c̄ = 16 − 3(4) = 4' }
+      ]
+    },
+    {
+      step: 4,
+      description: 'Step 5: Plot and Interpret',
+      instruction: 'Day 6 (29 defects) is above the UCL (28) — that print run is out of control. Investigate what happened that day. Every other day falls inside the limits.',
+      tableData: [14, 18, 12, 21, 16, 29, 13, 15, 10, 12].map((d, i) => ({
+        day: `Day ${i + 1}`,
+        defects: String(d),
+        status: d > 28 ? '⚠ Out of Control (above UCL)' : '✓ In Control'
+      })),
+      calculations: [
+        { label: 'UCL', value: '28' },
+        { label: 'Center Line (c̄)', value: '16.0' },
+        { label: 'LCL', value: '4' }
+      ]
     }
-    return [];
+  ];
+
+  const moduleMeta: Record<ChartType, { label: string; color: string; steps: StepData[] }> = {
+    xbar: { label: 'X̄ & R Chart — FreshRoast Coffee', color: 'blue', steps: xbarSteps },
+    p: { label: 'p-Chart — Hometown Bank', color: 'orange', steps: pChartSteps },
+    c: { label: 'c-Chart — Waverly Print Co.', color: 'teal', steps: cChartSteps }
   };
 
-  const currentSteps = selectedChart === 'xbar' ? xbarSteps : pChartSteps;
+  const currentSteps = moduleMeta[selectedChart].steps;
   const stepData = currentSteps[currentStep];
-  const chartData = getChartData();
+
+  const xbarMeanData = () => {
+    if (selectedChart !== 'xbar' || currentStep < 2) return [];
+    const step = xbarSteps[currentStep];
+    return step.tableData?.map((row: any, idx: number) => ({
+      sample: idx + 1,
+      mean: parseFloat(row.mean) || null,
+      UCL: currentStep >= 5 ? 503.44 : null,
+      LCL: currentStep >= 5 ? 494.28 : null,
+      target: currentStep >= 4 ? 498.86 : null
+    })) ?? [];
+  };
+
+  const xbarRangeData = () => {
+    if (selectedChart !== 'xbar' || currentStep < 3) return [];
+    const step = xbarSteps[currentStep];
+    return step.tableData?.map((row: any, idx: number) => ({
+      sample: idx + 1,
+      range: parseFloat(row.range) || null,
+      UCL: currentStep >= 5 ? 14.34 : null,
+      LCL: currentStep >= 5 ? 0 : null,
+      target: currentStep >= 4 ? 6.284 : null
+    })) ?? [];
+  };
+
+  const pChartData = () => {
+    if (selectedChart !== 'p' || currentStep < 3) return [];
+    const step = pChartSteps[currentStep];
+    return step.tableData?.map((row: any, idx: number) => ({
+      week: idx + 1,
+      proportion: parseFloat(row.proportion) || null,
+      UCL: currentStep >= 5 ? 0.0091 : null,
+      LCL: currentStep >= 5 ? 0.0007 : null,
+      target: currentStep >= 4 ? 0.0049 : null
+    })) ?? [];
+  };
+
+  const cChartData = () => {
+    if (selectedChart !== 'c' || currentStep < 1) return [];
+    const step = cChartSteps[currentStep];
+    return step.tableData?.map((row: any, idx: number) => ({
+      day: idx + 1,
+      defects: parseFloat(row.defects) || null,
+      UCL: currentStep >= 3 ? 28 : null,
+      LCL: currentStep >= 3 ? 4 : null,
+      target: currentStep >= 2 ? 16 : null
+    })) ?? [];
+  };
+
+  const colorMap: Record<string, { bg: string; text: string; border: string; hover: string }> = {
+    blue: { bg: 'bg-blue-600', text: 'text-blue-900', border: 'border-blue-600', hover: 'hover:bg-blue-700' },
+    orange: { bg: 'bg-orange-600', text: 'text-orange-900', border: 'border-orange-600', hover: 'hover:bg-orange-700' },
+    teal: { bg: 'bg-teal-600', text: 'text-teal-900', border: 'border-teal-600', hover: 'hover:bg-teal-700' }
+  };
+  const activeColor = colorMap[moduleMeta[selectedChart].color];
+
+  const renderMiniChart = (data: any[], xKey: string, yKey: string, title: string, showLimits: boolean, showTarget: boolean, yDomain?: [any, any], tickFormatter?: (v: number) => string) => (
+    <div className="bg-gray-50 p-4 rounded-lg">
+      <h4 className="font-semibold text-gray-800 mb-2">{title}</h4>
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey={xKey} />
+          <YAxis domain={yDomain} tickFormatter={tickFormatter} width={tickFormatter ? 70 : 50} />
+          <Tooltip />
+          {showLimits && (
+            <>
+              <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="UCL" dot={false} />
+              <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="LCL" dot={false} />
+            </>
+          )}
+          {showTarget && (
+            <Line type="linear" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Center" dot={false} />
+          )}
+          <Line type="linear" dataKey={yKey} stroke="#3b82f6" strokeWidth={2} dot={{ r: 5 }} name="Data" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
+  const dynamicPad = (padFactor: number, minPad: number) => ([dataMin, dataMax]: [number, number]) => {
+    const pad = Math.max((dataMax - dataMin) * padFactor, minPad);
+    return [Math.floor(dataMin - pad), Math.ceil(dataMax + pad)];
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Interactive SPC Playground</h1>
-        <p className="text-gray-600 mb-6">Learn by doing - follow each step to build a control chart</p>
+        <p className="text-gray-600 mb-6">Learn by doing — follow each step to build a control chart, using real in-class exercise data</p>
 
         {/* Chart Type Selector */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <button
-            onClick={() => { setSelectedChart('xbar'); setCurrentStep(0); }}
-            className={`p-4 rounded-lg font-semibold transition-all ${
-              selectedChart === 'xbar'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            X-bar Chart Tutorial
-          </button>
-          <button
-            onClick={() => { setSelectedChart('p'); setCurrentStep(0); }}
-            className={`p-4 rounded-lg font-semibold transition-all ${
-              selectedChart === 'p'
-                ? 'bg-orange-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            p-Chart Tutorial
-          </button>
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
+          {(Object.keys(moduleMeta) as ChartType[]).map((key) => (
+            <button
+              key={key}
+              onClick={() => { setSelectedChart(key); setCurrentStep(0); }}
+              className={`p-4 rounded-lg font-semibold transition-all ${
+                selectedChart === key
+                  ? `${colorMap[moduleMeta[key].color].bg} text-white shadow-md`
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {moduleMeta[key].label}
+            </button>
+          ))}
         </div>
 
         {/* Progress Bar */}
@@ -298,15 +447,15 @@ const Playground = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              className={`${activeColor.bg} h-2.5 rounded-full transition-all duration-300`}
               style={{ width: `${((currentStep + 1) / currentSteps.length) * 100}%` }}
             ></div>
           </div>
         </div>
 
         {/* Step Description */}
-        <div className="bg-blue-50 p-6 rounded-lg mb-6 border-l-4 border-blue-600">
-          <h2 className="text-xl font-bold text-blue-900 mb-2">{stepData.description}</h2>
+        <div className={`bg-gray-50 p-6 rounded-lg mb-6 border-l-4 ${activeColor.border}`}>
+          <h2 className={`text-xl font-bold mb-2 ${activeColor.text}`}>{stepData.description}</h2>
           <p className="text-gray-700">{stepData.instruction}</p>
         </div>
 
@@ -322,7 +471,7 @@ const Playground = () => {
                     <tr>
                       {Object.keys(stepData.tableData[0]).map((key) => (
                         <th key={key} className="px-3 py-2 text-left font-semibold text-gray-700">
-                          {key.charAt(0).toUpperCase() + key.slice(1)}
+                          {columnLabels[key] ?? (key.charAt(0).toUpperCase() + key.slice(1))}
                         </th>
                       ))}
                     </tr>
@@ -336,6 +485,8 @@ const Playground = () => {
                             className={`px-3 py-2 ${
                               value && value.toString().includes('✓')
                                 ? 'text-green-600 font-semibold'
+                                : value && value.toString().includes('⚠')
+                                ? 'text-red-600 font-semibold'
                                 : value === ''
                                 ? 'bg-gray-50 text-gray-400'
                                 : 'text-gray-700'
@@ -360,7 +511,7 @@ const Playground = () => {
             {stepData.calculations && stepData.calculations.length > 0 ? (
               <div className="space-y-3">
                 {stepData.calculations.map((calc, idx) => (
-                  <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-blue-500">
+                  <div key={idx} className={`bg-gray-50 p-3 rounded border-l-4 ${activeColor.border}`}>
                     <p className="font-semibold text-gray-800">{calc.label}</p>
                     <p className="text-gray-700 mt-1 font-mono text-sm">{calc.value}</p>
                   </div>
@@ -373,42 +524,28 @@ const Playground = () => {
         </div>
 
         {/* Chart Visualization */}
-        {chartData && chartData.length > 0 && (
+        {selectedChart === 'xbar' && xbarMeanData().length > 0 && (
+          <div className="bg-gray-50 p-6 rounded-lg mb-6">
+            <h3 className="font-bold text-lg text-gray-800 mb-4">Control Charts</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {renderMiniChart(xbarMeanData(), 'sample', 'mean', 'X̄ Chart (Sample Means)', currentStep >= 5, currentStep >= 4, dynamicPad(0.3, 1) as any)}
+              {xbarRangeData().length > 0 &&
+                renderMiniChart(xbarRangeData(), 'sample', 'range', 'R Chart (Sample Ranges)', currentStep >= 5, currentStep >= 4, [0, 16])}
+            </div>
+          </div>
+        )}
+
+        {selectedChart === 'p' && pChartData().length > 0 && (
           <div className="bg-gray-50 p-6 rounded-lg mb-6">
             <h3 className="font-bold text-lg text-gray-800 mb-4">Control Chart</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey={selectedChart === 'xbar' ? 'day' : 'day'} />
-                <YAxis
-                  domain={selectedChart === 'xbar'
-                    ? ([dataMin, dataMax]: [number, number]) => {
-                        const pad = Math.max((dataMax - dataMin) * 0.5, 1)
-                        return [Math.floor(dataMin - pad), Math.ceil(dataMax + pad)]
-                      }
-                    : [0, 0.15]
-                  }
-                />
-                <Tooltip />
-                {currentStep >= 5 && (
-                  <>
-                    <Line type="linear" dataKey="UCL" stroke="#ef4444" strokeDasharray="5 5" name="UCL" />
-                    <Line type="linear" dataKey="LCL" stroke="#ef4444" strokeDasharray="5 5" name="LCL" />
-                  </>
-                )}
-                {currentStep >= 4 && (
-                  <Line type="linear" dataKey="target" stroke="#22c55e" strokeDasharray="3 3" name="Center" />
-                )}
-                <Line
-                  type="linear"
-                  dataKey={selectedChart === 'xbar' ? 'mean' : 'proportion'}
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  dot={{ r: 5 }}
-                  name="Data"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {renderMiniChart(pChartData(), 'week', 'proportion', 'p Chart (Proportion Defective)', currentStep >= 5, currentStep >= 4, [0, 0.011], (v: number) => v.toFixed(4))}
+          </div>
+        )}
+
+        {selectedChart === 'c' && cChartData().length > 0 && (
+          <div className="bg-gray-50 p-6 rounded-lg mb-6">
+            <h3 className="font-bold text-lg text-gray-800 mb-4">Control Chart</h3>
+            {renderMiniChart(cChartData(), 'day', 'defects', 'c Chart (Defects per Run)', currentStep >= 3, currentStep >= 2, [0, 32])}
           </div>
         )}
 
@@ -439,7 +576,7 @@ const Playground = () => {
             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
               currentStep === currentSteps.length - 1
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
+                : `${activeColor.bg} text-white ${activeColor.hover}`
             }`}
           >
             Next →

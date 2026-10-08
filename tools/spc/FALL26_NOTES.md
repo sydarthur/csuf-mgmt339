@@ -29,10 +29,20 @@ The SPC tool was updated to match how quality and SPC were taught in Fall 2026 (
 ### `src/App.tsx`
 - Added the 📐 Capability tab between Guide and Playground.
 
+## What changed (2026-10-08, on `main`)
+
+### `src/Playground.tsx` (🎮 Playground tab)
+- Replaced the old generic n = 5 espresso example with three real In-Class Exercise 2.2/2.3 walkthroughs, each its own module in the chart-type selector:
+  - **X̄ & R — FreshRoast Coffee** bag weights, 5 samples of n = 4. Same data and constants as the Guide tab (X̿ = 498.86, R̄ = 6.284, A₂ = 0.729, D₃ = 0, D₄ = 2.282). Both charts render side by side once ranges are calculated; **Sample 3 (493.63) is below the X̄ LCL (494.28)** — flagged out of control. R chart is all in control.
+  - **p — Hometown Bank** wrong account numbers, n = 2,500 deposits/week, 12 weeks. p̄ = 0.0049, UCL = 0.0091, LCL = 0.0007 (not forced to 0 — stays positive at this n). **Week 7 (0.0096) is above UCL** — flagged out of control.
+  - **c — Waverly Print Co.** printing defects per 500-page run, 10 days. c̄ = 16.0, UCL = 28, LCL = 4. **Day 6 (29) is above UCL** — flagged out of control.
+- Each module keeps the same step-through pattern (raw data → per-sample stat → center line → control limits → plot/interpret), with a status column that flags the specific out-of-control point and why.
+- All arithmetic re-derived and verified by hand before publishing (not just transcribed from the source worksheets).
+
 ## Not changed / still open
-- **`src/Playground.tsx`** was not touched. It still uses its own n = 5 espresso-style example. A future pass could switch it to the coffee-bag data and add c-chart and capability walkthroughs.
+- **Editable data points in Playground**: Sid asked about letting users edit the default dataset interactively (not just step through a fixed example). Flagged as "might be harder" — deferred. If picked up, scope it as an optional edit mode on top of the existing fixed walkthroughs, not a replacement for them.
 - `src/ProcessChartsGuide.tsx` (v1) is unused; `App.tsx` imports `_v2`. It can be deleted.
-- **Planned next (Sid asked for these):** step-by-step guides for In-Class Exercise 2.2 (X̄/R in Excel: coffee bags, candy bags n = 8, TechAssemble) and 2.3 (p chart Hometown Bank, c chart Waverly Print, Cp/Cpk). Answer keys are in the Fall 2026 lecture notes in Sid's vault; verify every number before publishing.
+- Capability (Cp/Cpk) walkthrough for Exercise 2.3 is still just the Capability tab's bolt/coffee-line examples — no step-through tied to the Waverly/Hometown Bank data yet.
 - The bundle is >500 kB (Recharts). Vite warns; it is not an error.
 
 ## Course conventions that matter here
