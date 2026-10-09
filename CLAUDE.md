@@ -194,13 +194,10 @@ Organized by semester (`exam/Spring 26/`, `exam/Fall 26/`, ...). Each exam lives
 - `Exam 2/Build/images/` — figures attached to exam questions (fishbone, VSM, YPI, etc.)
 - `Exam 2/MGMT_339_-_Exam_2_Formula_Sheet.md` — standalone formula sheet (PDF export)
 
-**Fall 26 (current):** six planned exams, one per course topic:
-1. Principles of Management
-2. Value through Ops
-3. Ops Strategy
-4. Supply Chain Management
-5. Supply Chain Design
-6. Process Strategy and Analysis
+**Fall 26 (current):** three exams (two midterms + final, 20% each). Dates and status are in the vault's `TA/Fall 2026 Semester Timeline.md`.
+1. **Exam 1** (Mon Sep 28, given): Principles of Management, Using Operations to Create Value, Ops Strategy, Supply Chain Management, Supply Chain Design, Process Strategy and Analysis. 25 questions / 100 pts.
+2. **Exam 2** (Wed Oct 28): Quality & SPC, Lean Systems, Capacity Planning, Constraint Management.
+3. **Final** (Mon Dec 14, 1:00–2:50 PM): Module 3 (Project Management, Inventory, Ops Planning & Scheduling, Resource Planning).
 
 Each `Exam N/` folder starts with a `MGMT 339 - Exam N Workspace.md` — topic reference list up top, then a scaffold (formulas / conceptual questions / essay-problem questions) matching Spring 26/Exam 1's established style: realistic named-company scenarios (not abstract questions), checkbox-style options (`- [ ] A)`), 3 pts per conceptual question. Draft directly in the workspace file; split into `Build/` with a proper `BUILD_NOTES.md` once a draft firms up, following the Exam 2 pattern above.
 
@@ -237,9 +234,9 @@ pandoc "<file>.md" -o "<file>.pdf" \
 
 ## Course narrative (from Sid's Claude Desktop teaching project)
 
-Sid works on lecture narrative, slide flow, and teaching ideas in a separate Claude Desktop project. The decisions from that work live in his Obsidian vault at `Labs/Teaching/MGMT339/Master/` (this machine's path is in `.claude/settings.local.json` under `additionalDirectories`).
+Sid works on lecture narrative, slide flow, and teaching ideas in a separate Claude Desktop project. The decisions from that work live in his Obsidian vault at `Labs/Teaching/MGMT339/TA/` (this machine's path is in `.claude/settings.local.json` under `additionalDirectories`).
 
-- **Before changing a tool, slide deck, or exam for a module, read the matching note** in that folder (start with `Narrative Notes - README.md`, then `Course Arc.md` and `Narrative - Module N.md` if they exist). Build to the narrative there; if the code and the narrative disagree, ask Sid rather than picking one.
+- **Before changing a tool, slide deck, or exam for a module, read the matching note** in that folder (start with `Narrative Notes - README.md` and `Fall 2026 Semester Timeline.md` for where the course is and what's coming, then `Course Arc.md` and `Narrative - Module N.md` if they exist). Build to the narrative there; if the code and the narrative disagree, ask Sid rather than picking one.
 - **Read-only from here.** Don't edit those vault notes from this repo. If a tool change suggests the narrative should change, say so to Sid (or note it in `status/STATUS.md` under Ideas).
 - No student names, grades, or anything from `grading/` goes into the vault notes.
 
