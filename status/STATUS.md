@@ -4,9 +4,11 @@ type: teaching
 stage: in-session
 target: MGMT 339 Operations Management, CSUF, Fall 2026
 draft: true
-updated: 2026-10-08
+updated: 2026-10-12
 ---
 ## Now
+- Week 8: Lean Systems (Oct 12). SunCrest Bakery VSM rebuilt as a step-through walkthrough; numbers now match the In-N-Out walkthrough (11.5-day lead time)
+- Module 2 resequenced: Lean → TOC ×3 (Oct 14–21) → Capacity (light) + review (Oct 26) → Exam 2 (Oct 28); Assignment 2.2 extended to Sun Nov 1
 - Week 7: quality and SPC lectures (X̄/R, p, c, Cp/Cpk); In-Class Exercises 2.2 and 2.3 built
 - Assignment 2.1 (VeloShip SPC case, Aug 2026 data) due Sun Oct 18
 - SPC site tool Fall 26 update (four-lines recipe, Capability tab) merged to main and live
