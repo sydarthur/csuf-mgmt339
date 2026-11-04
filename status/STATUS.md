@@ -4,30 +4,27 @@ type: teaching
 stage: in-session
 target: MGMT 339 Operations Management, CSUF, Fall 2026
 draft: true
-updated: 2026-10-12
+updated: 2026-11-04
 ---
 ## Now
-- Week 8: Lean Systems (Oct 12). SunCrest Bakery VSM rebuilt as a step-through walkthrough; numbers now match the In-N-Out walkthrough (11.5-day lead time)
-- Module 2 resequenced: Lean → TOC ×3 (Oct 14–21) → Capacity (light) + review (Oct 26) → Exam 2 (Oct 28); Assignment 2.2 extended to Sun Nov 1
-- Week 7: quality and SPC lectures (X̄/R, p, c, Cp/Cpk); In-Class Exercises 2.2 and 2.3 built
-- Assignment 2.1 (VeloShip SPC case, Aug 2026 data) due Sun Oct 18
-- SPC site tool Fall 26 update (four-lines recipe, Capability tab) merged to main and live
-- SPC Playground rebuilt on real Exercise 2.2/2.3 data (FreshRoast coffee X̄/R, Hometown Bank p, Waverly Print c) — deployed
-- The Great Tech Reckoning ops-strategy game has run live; Spring 26 Exam 2 BUILD_NOTES.md is the reference build pattern
+- Module 3 started Nov 2: Project Management (K8) Nov 2, Nov 4, first half of Nov 9; Inventory (K10) from second half of Nov 9 through Nov 18
+- Nov 4: CPM passes + ICE 3.1 (St. John's drawn by hand, submitted in class) + crashing at the decision level
+- CPM walkthrough labels corrected to match the St. John's slide (numbers were already right); cost-crashing walkthrough verified
+- Exam 2 given Oct 28; Assignment 2.2 closed Nov 1
 
 ## Next
-- Draft Fall 26 Exam 2 (quality, lean, capacity, TOC), due Oct 28
-- Cp/Cpk step-through walkthrough for Exercise 2.3 (Playground only covers X̄/R, p, c so far)
-- Commit the untracked exam folders and the CLAUDE.md change
+- Nov 9: PERT probability, Scrum, monitoring, then inventory concepts
+- Short crashing-decision problems for next ICE (Capstone, Narnia, Mendoza patterns: worth of a week vs. crash cost)
+- EOQ walkthrough check against this term's inventory slides before Nov 16
+- Final exam (Dec 14) covers Module 3: PM, inventory, planning & scheduling, resource planning
 
 ## Blocked on
-- Pushing from cloud sessions: Claude GitHub App not installed for this repo
 - Digital pick-and-resolve game interface needs a backend decision (Firebase vs Supabase free tier)
 - 339 Agent needs a check with CSUF IT / academic tech on AI tool policy
 
 ## Ideas / loose threads
+- Crashing walkthrough could add a "is the next week worth buying?" ledger view (cost vs. worth per week) to match how it's now taught and tested
 - Delete unused tools/spc/src/ProcessChartsGuide.tsx (v1)
-- Digital game interface: GitHub Pages app with team signup, picks, and a GM copilot screen
 - CLAUDE.md layout is out of date (lists a nonexistent research/ folder; 339_agent/, strategy/, grading/ undocumented)
 
 ## Connects to

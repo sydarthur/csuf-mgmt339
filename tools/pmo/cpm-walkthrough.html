@@ -243,7 +243,7 @@ header a:hover { color:#fff; }
     </div>
     <div id="panel-nav">
       <button id="btn-prev" onclick="go(-1)" disabled>← Previous</button>
-      <span class="sctr" id="sctr">1 / 27</span>
+      <span class="sctr" id="sctr">1 / 43</span>
       <button id="btn-next" onclick="go(1)">Next →</button>
     </div>
   </div>
@@ -300,8 +300,8 @@ const STEPS = [
   phase:'intro',
   content:`<p>St. John's Hospital is relocating to a new site. The project has <strong>11 activities (A–K)</strong> in two phases:</p>
   <ul>
-    <li><strong>Phase 1:</strong> Organizing & Site Preparation (A–E)</li>
-    <li><strong>Phase 2:</strong> Physical Facilities & Infrastructure (F–K)</li>
+    <li><strong>Phase 1:</strong> Organizing & Site Preparation (A–F)</li>
+    <li><strong>Phase 2:</strong> Physical Facilities & Infrastructure (G–K)</li>
   </ul>
   <p>Each activity has a defined <strong>duration (in weeks)</strong>, predecessors it depends on, and a responsible person.</p>
   <div class="callout">Our goal: calculate the project duration and find which activities are critical.</div>`,
@@ -422,7 +422,7 @@ const STEPS = [
     <tr class="focus"><td>D</td><td>9</td><td>10</td><td><strong>19</strong></td></tr>
     <tr class="focus"><td>E</td><td>9</td><td>24</td><td><strong>33</strong></td></tr>
   </table>
-  <p>D is short and finishes quickly. E is a long activity (training) and runs well into the project.</p>`,
+  <p>D is short and finishes quickly. E (bringing utilities to the site) is a long activity and runs well into the project.</p>`,
   focus:['B','D','E'],newReveal:{D:['ef'],E:['ef']},dimOthers:true,showCrit:false
 },
 // Step 4a — G: ES
@@ -440,7 +440,7 @@ const STEPS = [
 {
   title:'Step 4 — G: Early Finish',
   phase:'forward',
-  content:`<p>G takes 35 weeks — the longest single activity in Phase 1.</p>
+  content:`<p>G (purchase and deliver equipment) takes 35 weeks — the second-longest activity in the project.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>G</td><td>22</td><td>35</td><td><strong>57</strong></td></tr>
@@ -480,7 +480,7 @@ const STEPS = [
     <tr><th>Predecessor</th><th>EF</th></tr>
     <tr><td>H (construction)</td><td><strong>59</strong></td></tr>
     <tr><td>G (equipment)</td><td>57</td></tr>
-    <tr><td>E (training)</td><td>33</td></tr>
+    <tr><td>E (utilities)</td><td>33</td></tr>
   </table>
   <div class="formula">
     <span class="flabel">Multiple predecessors → take the max</span>
@@ -493,7 +493,7 @@ const STEPS = [
 {
   title:'Step 6 — J: Early Finish',
   phase:'forward',
-  content:`<p>J (inspection) takes only 4 weeks.</p>
+  content:`<p>J (install medical equipment) takes only 4 weeks.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>J</td><td>59</td><td>4</td><td><strong>63</strong></td></tr>
@@ -508,9 +508,9 @@ const STEPS = [
   content:`<p>K waits for F, I, and J to all finish.</p>
   <table class="ctable">
     <tr><th>Predecessor</th><th>EF</th></tr>
-    <tr><td>J (inspection)</td><td><strong>63</strong></td></tr>
-    <tr><td>I (advertising)</td><td>27</td></tr>
-    <tr><td>F (checklists)</td><td>22</td></tr>
+    <tr><td>J (equipment install)</td><td><strong>63</strong></td></tr>
+    <tr><td>I (information system)</td><td>27</td></tr>
+    <tr><td>F (staff interviews)</td><td>22</td></tr>
   </table>
   <div class="formula">
     <span class="flabel">Multiple predecessors → take the max</span>
@@ -523,7 +523,7 @@ const STEPS = [
 {
   title:'Step 7 — K: Early Finish and Project Duration',
   phase:'forward',
-  content:`<p>K (staff orientation) takes 6 weeks.</p>
+  content:`<p>K (train nurses and support staff) takes 6 weeks.</p>
   <table class="ctable">
     <tr><th>Activity</th><th>ES</th><th>Duration</th><th>EF</th></tr>
     <tr class="focus"><td>K</td><td>63</td><td>6</td><td><strong>69</strong></td></tr>
@@ -610,7 +610,7 @@ const STEPS = [
     LS = 63 − 4 = <strong>59</strong><br>
     S = 59 − 59 = <strong>0</strong>
   </div>
-  <div class="callout red">S = 0 → J is critical. The inspection cannot slip at all.</div>`,
+  <div class="callout red">S = 0 → J is critical. Installing the medical equipment cannot slip at all.</div>`,
   focus:['J','K'],newReveal:{J:['ls','s']},dimOthers:true,showCrit:false
 },
 // H: LF
@@ -658,7 +658,7 @@ const STEPS = [
     <tr class="focus"><td>G</td><td>59</td><td>35</td><td>24</td><td>22</td><td><strong>2</strong></td></tr>
     <tr class="focus"><td>E</td><td>59</td><td>24</td><td>35</td><td>9</td><td><strong>26</strong></td></tr>
   </table>
-  <p>G has only 2 weeks of flexibility. E has 26 weeks — training could slip over half a year without affecting the project.</p>`,
+  <p>G has only 2 weeks of flexibility. E has 26 weeks — bringing utilities to the site could slip about half a year without affecting the project.</p>`,
   focus:['G','E','J'],newReveal:{G:['ls','s'],E:['ls','s']},dimOthers:true,showCrit:false
 },
 // D: LF
@@ -682,7 +682,7 @@ const STEPS = [
     LS = 19 − 10 = <strong>9</strong><br>
     S = 9 − 9 = <strong>0</strong>
   </div>
-  <div class="callout red">S = 0 → D is critical. Site survey must start on time.</div>`,
+  <div class="callout red">S = 0 → D is critical. The final construction plans must start on time.</div>`,
   focus:['D','H'],newReveal:{D:['ls','s']},dimOthers:true,showCrit:false
 },
 // C: LF
@@ -830,9 +830,9 @@ const STEPS = [
   <table class="ctable">
     <tr><th>Activity</th><th>Slack</th><th>Implication</th></tr>
     <tr><td>A, C, G</td><td>2 wks</td><td>Very little flexibility — monitor closely</td></tr>
-    <tr><td>E</td><td>26 wks</td><td>Training can be delayed significantly</td></tr>
-    <tr><td>I</td><td>36 wks</td><td>Advertising has enormous flexibility</td></tr>
-    <tr><td>F</td><td>41 wks</td><td>Checklists: lowest priority for scheduling</td></tr>
+    <tr><td>E</td><td>26 wks</td><td>Utilities can be delayed significantly</td></tr>
+    <tr><td>I</td><td>36 wks</td><td>The information system has enormous flexibility</td></tr>
+    <tr><td>F</td><td>41 wks</td><td>Staff interviews: the most scheduling room of any activity</td></tr>
   </table>
   <div class="callout">Slack doesn't mean an activity is unimportant — only that it has scheduling flexibility. All activities must still be completed.</div>`,
   focus:[],newReveal:{},dimOthers:false,showCrit:true
