@@ -237,7 +237,7 @@ pandoc "<file>.md" -o "<file>.pdf" \
 
 ## Course narrative (from Sid's Claude Desktop teaching project)
 
-Sid works on lecture narrative, slide flow, and teaching ideas in a separate Claude Desktop project. The decisions from that work live in his Obsidian vault at `Labs/Teaching/MGMT339/Master/` (this machine's path is in `.claude/settings.local.json` under `additionalDirectories`).
+Sid works on lecture narrative, slide flow, and teaching ideas in a separate Claude Desktop project. The decisions from that work live in his Obsidian vault at `Labs/Teaching/MGMT339/TA/` (this machine's path is in `.claude/settings.local.json` under `additionalDirectories`).
 
 - **Before changing a tool, slide deck, or exam for a module, read the matching note** in that folder (start with `Narrative Notes - README.md`, then `Course Arc.md` and `Narrative - Module N.md` if they exist). Build to the narrative there; if the code and the narrative disagree, ask Sid rather than picking one.
 - **Read-only from here.** Don't edit those vault notes from this repo. If a tool change suggests the narrative should change, say so to Sid (or note it in `status/STATUS.md` under Ideas).
