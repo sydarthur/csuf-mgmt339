@@ -1,0 +1,127 @@
+# Newsvendor classroom game — Level 1 research config (agent-native research
+# practice run, per tower brief 2026-10-16). Values marked provisional per
+# tower brief 2026-11-12 Sprint 1 spec; confirmed by Sid 2026-11-12 for the
+# Fri 2026-11-13 test version.
+#
+# game-config.js mirrors these values for the browser (no YAML parser in a
+# static-HTML page) — if you change a value here, change it there too.
+# known limitation, Sprint 1: keeping these two files in sync by hand.
+
+design_logic:
+  rounds:
+    practice: 1 # round 0, unscored, not counted in totals
+    counted: 20 # rounds 1-20
+  conditions:
+    - high_margin # cost 3, price 12, critical fractile 0.75, optimal order 75
+    - low_margin # cost 9, price 12, critical fractile 0.25, optimal order 25
+  assignment_rule: >
+    Deterministic 50/50 split from a hash (FNV-1a) of the student's entered
+    identifier, mod 2. Same identifier always maps to the same condition,
+    so a reload or replay never changes it. A URL param
+    (?test_condition=high|low) overrides this for instructor testing only.
+
+actors_and_information:
+  what_student_sees_each_round:
+    - price (fixed, $12)
+    - cost (their assigned condition's cost; $3 or $9)
+    - demand range ("equally likely to be anywhere from 0 to 100")
+    - order input (integer, 0-100 enforced)
+    - history table of all prior rounds this attempt (order, demand, sold, leftover, profit, cumulative profit)
+  what_student_enters:
+    - identifier (CSUF ID or Canvas name, free text)
+    - section (free text, Sprint 1; may become a fixed list before the 11-18 launch)
+    - order_qty per round (integer 0-100)
+  what_student_never_sees: >
+    The optimal order quantity or the critical-ratio formula, during or
+    after the game. Revealed only in the live class debrief.
+
+parameters:
+  price: 12
+  cost:
+    high_margin: 3
+    low_margin: 9
+  demand_distribution:
+    type: discrete_uniform
+    min: 0
+    max: 100
+    mean: 50
+  seed: 133913
+  fixed_demand_sequence: # index 0 = practice round; indices 1-20 = rounds 1-20. Identical for every student, both conditions.
+    - 38
+    - 96
+    - 52
+    - 73
+    - 80
+    - 47
+    - 39
+    - 51
+    - 67
+    - 30
+    - 29
+    - 39
+    - 60
+    - 45
+    - 27
+    - 94
+    - 75
+    - 83
+    - 65
+    - 15
+    - 73
+
+data_provenance:
+  storage: Google Sheet, written via an Apps Script web-app endpoint (see SETUP.md). No DB; CSV export is the deliverable.
+  per_round_row:
+    - student_id
+    - section
+    - condition
+    - attempt
+    - round # 0 = practice
+    - order_qty
+    - demand
+    - units_sold # min(order_qty, demand)
+    - leftover # max(order_qty - demand, 0)
+    - round_profit # price * units_sold - cost * order_qty
+    - cumulative_profit # sum of round_profit, counted rounds only (resets to 0 after practice)
+    - decision_time_ms # time from round shown to order submitted
+    - timestamp # ISO 8601, at submit
+  per_student_row:
+    - student_id
+    - section
+    - condition
+    - attempt
+    - started_at
+    - finished_at
+    - completed
+    - total_profit # counted rounds only
+    - mean_order # counted rounds only
+  transforms: >
+    None server-side; the Sheet stores exactly what the client computes and
+    sends. attempt numbering is tracked client-side (localStorage keyed by
+    identifier), not server-verified — known Sprint 1 limitation, see
+    "Sprint 1 limitations" below.
+
+analytical_targets:
+  status: out_of_scope_sprint_1
+  note: >
+    Expected direction once this runs: mean order < 75 (optimum) in
+    high_margin, mean order > 25 (optimum) in low_margin — the classic
+    pull-to-center effect. Summary statistic and formal test deferred to
+    Sprint 2 per tower brief.
+
+replication_requirements:
+  rounds: 20 counted + 1 practice
+  players: ~96 students across 2 sections (target for 11-18 launch); 1 (Sid) for the 11-13 test
+  exclusions: >
+    Analysis should use attempt 1 only per student_id. Rows with attempt > 1
+    exist for replay tracking but are excluded from the headline comparison.
+
+scope_conditions: >
+  Classroom demo and bonus-point exercise, not a research study. No IRB; no
+  data kept or shared beyond Sid. Not for publication in its current form.
+
+sprint_1_limitations:
+  - "Attempt numbering is per-browser (localStorage), not server-verified across devices."
+  - "Section is free text, not a fixed list — real section codes still TBD before 11-18 launch."
+  - "Incentive/bonus-point scoring, the debrief chart, and instructions-page wording are out of scope (Sprint 2, per tower)."
+  - "research-config.yaml and game-config.js are hand-synced, not one source of truth."
