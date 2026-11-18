@@ -132,6 +132,21 @@ function uCurve(Q,{D=EX.D,S=EX.S,H=EX.C*EX.i,maxQ=1200}={}){
   g+=`<text x="${x1}" y="${y1+12}" text-anchor="end" font-size="14"><tspan fill="#002E5B" font-weight="700">— Carrying  </tspan><tspan fill="#C85F00" font-weight="700">— Ordering  </tspan><tspan fill="#1E7A3C" font-weight="700">— Total</tspan></text>`;
   return svg(W,H2+20,g);
 }
+function costCurve(Q,kind){
+  const W=640,H2=300,x0=80,y0=250,x1=620,y1=24,maxQ=1200,maxC=kind==='c'?26000:30000;
+  const D=EX.D,S=EX.S,H=EX.C*EX.i, f=kind==='c'?(q=>q/2*H):(q=>D/q*S), col=kind==='c'?'#002E5B':'#C85F00';
+  const sx=q=>x0+(x1-x0)*q/maxQ, sy=v=>y0-(y0-y1)*Math.min(v,maxC)/maxC;
+  const qs=[];for(let q=(kind==='c'?0:90);q<=maxQ;q+=10)qs.push(q);
+  let g=axes(x0,y0,x1,y1,'Order size (Q)',kind==='c'?'Carrying cost / yr':'Ordering cost / yr');
+  [0,300,600,900,1200].forEach(q=>g+=tick(sx(q),y0+18,fmt(q)));
+  [0,10000,20000].forEach(v=>g+=tick(x0-8,sy(v)+4,'$'+fmt(v/1000)+'k','end'));
+  g+=poly(qs.map(q=>[sx(q),sy(f(q))]),col,3.5);
+  const v=f(Q);
+  g+=`<line x1="${sx(Q)}" y1="${y0}" x2="${sx(Q)}" y2="${sy(v)}" stroke="#9AA4B2" stroke-dasharray="4 4"/><line x1="${x0}" y1="${sy(v)}" x2="${sx(Q)}" y2="${sy(v)}" stroke="#9AA4B2" stroke-dasharray="4 4"/>`;
+  g+=`<circle cx="${sx(Q)}" cy="${sy(v)}" r="8" fill="#fff" stroke="#B42318" stroke-width="3"/><text x="${sx(Q)+12}" y="${sy(v)-12}" font-size="16" font-weight="700" fill="#B42318">${$$(v)}</text>`;
+  g+=`<text x="${x1}" y="${y1+12}" text-anchor="end" font-size="14" font-weight="700" fill="${col}">${kind==='c'?'Rises in a straight line as Q grows':'Falls fast, then flattens'}</text>`;
+  return svg(W,H2+20,g);
+}
 function normalChart(mean,sd,z){
   const W=640,H=280,x0=40,y0=230,x1=620,y1=30; const lo=mean-4*sd, hi=mean+4*sd;
   const sx=x=>x0+(x1-x0)*(x-lo)/(hi-lo); const pdf=x=>Math.exp(-0.5*((x-mean)/sd)**2); const sy=v=>y0-(y0-y1)*v;
@@ -153,6 +168,24 @@ function bars(items,maxV,unit=''){
   items.forEach((it,i)=>{const h=(y0-y1)*it.v/maxV, x=x0+i*bw+bw*0.18, w=bw*0.64;
     g+=`<rect x="${x}" y="${y0-h}" width="${w}" height="${h}" rx="4" fill="${it.hl?'#C85F00':'#9FB3C8'}"/><text x="${x+w/2}" y="${y0-h-8}" text-anchor="middle" font-size="15" font-weight="700" fill="${it.hl?'#C85F00':'#1B2430'}">${fmt(it.v,1)}${unit}</text><text x="${x+w/2}" y="${y0+22}" text-anchor="middle" font-size="14" fill="#5A6472">${it.label}</text>`;});
   return svg(W,H,g);
+}
+function pBasic(){
+  const W=640,H=320,x0=70,y0=260,x1=620,y1=40,days=48,maxV=520,d=30,P=12,L=4,T=480;
+  const sx=t=>x0+(x1-x0)*t/days, sy=v=>y0-(y0-y1)*v/maxV;
+  let pts=[], g=axes(x0,y0,x1,y1,'Days','Units');
+  [0,12,24,36,48].forEach(t=>g+=tick(sx(t),y0+18,t));
+  // on hand: arrivals at day 4,16,28,40 of 360 units; starts at 120
+  let t=0,v=120; pts.push([sx(0),sy(v)]);
+  [4,16,28,40].forEach(a=>{pts.push([sx(a),sy(0)]);pts.push([sx(a),sy(360)]);});
+  pts.push([sx(48),sy(360-30*8)]);
+  g+=`<line x1="${x0}" y1="${sy(T)}" x2="${x1}" y2="${sy(T)}" stroke="#C85F00" stroke-width="2.5" stroke-dasharray="8 6"/><text x="${x1}" y="${sy(T)-8}" text-anchor="end" font-size="15" font-weight="700" fill="#C85F00">target T = 480 (on hand + on order)</text>`;
+  [0,12,24,36].forEach((r,k)=>{g+=`<line x1="${sx(r)}" y1="${y0}" x2="${sx(r)}" y2="${sy(T)}" stroke="#002E5B" stroke-dasharray="3 4"/><text x="${sx(r)+4}" y="${sy(T)+18}" font-size="13" fill="#002E5B">review: order 360</text>`;});
+  g+=poly(pts,'#002E5B',2.5);
+  // protection interval bracket: from review day 12 to arrival of next order (day 28)
+  const yb=y0+60;
+  g+=`<line x1="${sx(12)}" y1="${yb}" x2="${sx(28)}" y2="${yb}" stroke="#B42318" stroke-width="3"/><line x1="${sx(12)}" y1="${yb-7}" x2="${sx(12)}" y2="${yb+7}" stroke="#B42318" stroke-width="3"/><line x1="${sx(28)}" y1="${yb-7}" x2="${sx(28)}" y2="${yb+7}" stroke="#B42318" stroke-width="3"/>`;
+  g+=`<text x="${(sx(12)+sx(28))/2}" y="${yb+22}" text-anchor="middle" font-size="14" font-weight="700" fill="#B42318">day 12 order must last until the next one arrives (day 28): P + L = 16 days</text>`;
+  return svg(W,H+60,g);
 }
 // P system sawtooth with variable demand (seeded so it's the same every time)
 function pSaw(P,L,T,{d=RX.d,days=60}={}){
@@ -194,19 +227,19 @@ const slides=[
 <li><b>Q/2</b>: you receive Q, use it steadily down to zero, then receive Q again. On average, half of Q is on the shelf.</li></ul>
 <div class="ctrl"><label>Order size Q</label><input type="range" id="q1" min="60" max="1200" step="10" value="600"><output id="q1o"></output></div>
 <div class="read"><div><span>Average inventory</span><strong id="r1a"></strong></div><div class="hl"><span>Carrying cost / yr</span><strong id="r1b"></strong></div></div></div>
-<div id="c1"></div></div>
+<div><div id="c1"></div><p class="note" style="text-align:center;margin-top:6px">Why Q/2? Stock runs from Q down to 0, so on average half of Q is on the shelf:</p><div id="c1b" style="max-width:420px;margin:0 auto"></div></div></div>
 <p class="anchor">Inventory is cash sitting on a shelf.</p>`,
- init:()=>{const f=()=>{const Q=+$('#q1').value;$('#q1o').textContent=fmt(Q);$('#r1a').textContent=fmt(Q/2);$('#r1b').textContent=$$(Q/2*40);$('#c1').innerHTML=sawtooth(Q)};$('#q1').oninput=f;f();}},
+ init:()=>{const f=()=>{const Q=+$('#q1').value;$('#q1o').textContent=fmt(Q);$('#r1a').textContent=fmt(Q/2);$('#r1b').textContent=$$(Q/2*40);$('#c1').innerHTML=costCurve(Q,'c');$('#c1b').innerHTML=sawtooth(Q,{days:60})};$('#q1').oninput=f;f();}},
 {part:1,html:()=>`<div class="kicker">Costs · 3 of 3</div><h2>Ordering cost: the price of getting stock</h2>
 <div class="cols wide-right"><div><div class="formula">Ordering cost/yr = <span class="t1">D/Q</span> × <span class="t3">S</span></div>
-<ul class="clean"><li><b>D/Q</b> = how many orders a year. Count the teeth on the sawtooth.</li>
+<ul class="clean"><li><b>D/Q</b> = how many orders a year: annual demand ÷ order size.</li>
 <li><b>S</b> = $250 per order: paperwork, delivery scheduling, receiving, paying the invoice. Same cost for a small order or a big one.</li></ul>
 <div class="ctrl"><label>Order size Q</label><input type="range" id="q2" min="60" max="1200" step="10" value="600"><output id="q2o"></output></div>
 <div class="read"><div><span>Orders / yr</span><strong id="r2a"></strong></div><div class="hl"><span>Ordering cost / yr</span><strong id="r2b"></strong></div></div></div>
 <div id="c2"></div></div>
 <p class="anchor">Order more at a time, and you place fewer orders.</p>`,
- init:()=>{const f=()=>{const Q=+$('#q2').value;$('#q2o').textContent=fmt(Q);$('#r2a').textContent=fmt(EX.D/Q,1);$('#r2b').textContent=$$(EX.D/Q*250);$('#c2').innerHTML=sawtooth(Q,{showAvg:false})};$('#q2').oninput=f;f();}},
-{part:2,html:()=>`<div class="kicker">EOQ · 1 of 3</div><h2>Find the bottom of the U</h2>
+ init:()=>{const f=()=>{const Q=+$('#q2').value;$('#q2o').textContent=fmt(Q);$('#r2a').textContent=fmt(EX.D/Q,1);$('#r2b').textContent=$$(EX.D/Q*250);$('#c2').innerHTML=costCurve(Q,'o')};$('#q2').oninput=f;f();}},
+{part:2,html:()=>`<div class="kicker">EOQ · 1 of 4</div><h2>Find the bottom of the U</h2>
 <div class="cols wide-right"><div><p>Slide Q and watch the two costs move in opposite directions. The <b style="color:var(--green)">total</b> is lowest where they cross.</p>
 <div class="ctrl"><label>Order size Q</label><input type="range" id="q3" min="60" max="1200" step="1" value="200"><output id="q3o"></output></div>
 <div class="read"><div><span>Carrying</span><strong id="r3a"></strong></div><div><span>Ordering</span><strong id="r3b"></strong></div><div class="hl"><span>Total</span><strong id="r3c"></strong></div></div>
@@ -215,18 +248,31 @@ const slides=[
 <p class="anchor">At the EOQ, the two costs are equal. That's the bottom of the U.</p>`,
  init:()=>{const f=()=>{const Q=+$('#q3').value,c=costs(Q);$('#q3o').textContent=fmt(Q);$('#r3a').textContent=$$(c.c);$('#r3b').textContent=$$(c.o);$('#r3c').textContent=$$(c.t);
   $('#r3m').textContent=Math.abs(c.c-c.o)<300?'Here the two costs are (almost) equal: you\'re at the EOQ.':(c.o>c.c?'Ordering cost is bigger: try a larger Q.':'Carrying cost is bigger: try a smaller Q.');$('#c3').innerHTML=uCurve(Q)};$('#q3').oninput=f;f();}},
-{part:2,html:()=>`<div class="kicker">EOQ · 2 of 3</div><h2>The EOQ formula, step by step</h2>
+{part:2,html:()=>`<div class="kicker">EOQ · 2 of 4</div><h2>Total annual cost, step by step</h2>
+<p class="lead">Total cost = <b style="color:var(--navy)">average inventory × holding cost per unit</b> + <b style="color:var(--orange)">orders per year × cost per order</b></p>
+<div class="formula">TC = <span class="t1">(Q/2) × H</span> + <span class="t3">(D/Q) × S</span></div>
+<p>Example: the company orders <b>Q = 600</b> at a time (D = 10,800, H = $40, S = $250).</p>
+<div class="steps">
+<div class="st"><span class="n" style="color:var(--navy)">Step 1</span><span>Average inventory = order size ÷ 2 = 600 ÷ 2 = <b>300</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Carrying cost = average inventory × holding cost per unit = 300 × $40 = <b style="color:var(--navy)">$12,000</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 3</span><span>Orders per year = annual demand ÷ order size = 10,800 ÷ 600 = <b>18</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Ordering cost = orders per year × cost per order = 18 × $250 = <b style="color:var(--orange)">$4,500</b></span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 5</span><span>Total = $12,000 + $4,500 = <b style="color:var(--green)">$16,500</b> a year. At the EOQ (367) it drops to about <b style="color:var(--green)">$14,697</b>.</span></div>
+</div><p class="reveal-hint">Press Next to reveal each step.</p>
+<p class="anchor">Carrying is too high at 600. A smaller order balances the two.</p>`,steps:5},
+{part:2,html:()=>`<div class="kicker">EOQ · 3 of 4</div><h2>The EOQ formula, step by step</h2>
+<p class="lead">EOQ = square root of ( 2 × <b>annual demand</b> × <b style="color:var(--orange)">cost per order</b> ÷ <b style="color:var(--green)">holding cost per unit per year</b> )</p>
 <div class="formula">EOQ = √( 2 × <span class="t1">D</span> × <span class="t3">S</span> ÷ <span class="t2">H</span> )</div>
 <div class="steps" id="st5">
-<div class="st"><span class="n" style="color:var(--green)">Step 1</span><span>Holding cost per unit: <b style="color:var(--green)">H = 25% × $160 = $40</b></span></div>
-<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Top of the fraction: 2 × <b>10,800</b> × <b style="color:var(--orange)">$250</b> = <b>5,400,000</b></span></div>
-<div class="st"><span class="n" style="color:var(--navy)">Step 3</span><span>Divide by H: 5,400,000 ÷ <b style="color:var(--green)">40</b> = <b>135,000</b></span></div>
-<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Square root: √135,000 ≈ <b style="color:var(--orange)">367 units</b> per order</span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 1</span><span>Holding cost per unit = holding % × unit cost = 25% × $160 = <b style="color:var(--green)">$40</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>2 × annual demand × cost per order = 2 × <b>10,800</b> × <b style="color:var(--orange)">$250</b> = <b>5,400,000</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 3</span><span>Divide by the holding cost per unit: 5,400,000 ÷ <b style="color:var(--green)">$40</b> = <b>135,000</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Take the square root: √135,000 ≈ <b style="color:var(--orange)">367 units</b> per order</span></div>
 <div class="st"><span class="n" style="color:var(--red)">Check</span><span>Carrying = 367/2 × $40 ≈ <b>$7,348</b> · Ordering = 10,800/367 × $250 ≈ <b>$7,348</b> · Total ≈ <b>$14,697</b></span></div>
 </div><p class="reveal-hint">Press Next to reveal each step.</p>
 <p class="note" style="margin-top:8px">Common slips: forgetting the 2 (gives 260), or using the $160 unit cost instead of H = $40 (gives 184).</p>`,
  steps:5},
-{part:2,html:()=>`<div class="kicker">EOQ · 3 of 3</div><h2>Try it: what moves the EOQ?</h2>
+{part:2,html:()=>`<div class="kicker">EOQ · 4 of 4</div><h2>Try it: what moves the EOQ?</h2>
 <div class="cols wide-right"><div>
 <div class="ctrl"><label>Demand D / yr</label><input type="range" id="d4" min="2000" max="20000" step="100" value="10800"><output id="d4o"></output></div>
 <div class="ctrl"><label>Order cost S</label><input type="range" id="s4" min="25" max="600" step="5" value="250"><output id="s4o"></output></div>
@@ -256,12 +302,13 @@ const slides=[
 <p class="anchor">Safety stock is the cushion for the days that go worse than average.</p>`},
 {part:3,html:()=>`<div class="kicker">Q system · 3 of 5</div><h2>Safety stock, step by step</h2>
 <p class="lead">Valley Pharmacy sells <b>30</b> boxes of allergy medicine a day on average (σ = <b>5</b>/day). Delivery takes <b>4 days</b>. Target: <b>95%</b> service level (z = 1.65).</p>
+<p class="lead" style="margin-bottom:6px">Reorder point = <b>average demand during the delivery wait</b> + <b style="color:var(--orange)">safety stock</b> (z × <b style="color:var(--green)">spread of demand during the wait</b>)</p>
 <div class="formula">R = <span class="t1">d̄ × L</span> + <span class="t3">z</span> × <span class="t2">σ<sub>dLT</sub></span></div>
 <div class="steps" id="st8">
-<div class="st"><span class="n" style="color:var(--navy)">Step 1</span><span>Average demand during the wait: <b>30 × 4 = 120</b></span></div>
-<div class="st"><span class="n" style="color:var(--green)">Step 2</span><span>Spread during the wait: σ<sub>dLT</sub> = 5 × √4 = <b style="color:var(--green)">10</b></span></div>
-<div class="st"><span class="n" style="color:var(--orange)">Step 3</span><span>Safety stock: 1.65 × 10 = 16.5 → <b style="color:var(--orange)">17</b> (round up)</span></div>
-<div class="st"><span class="n" style="color:var(--red)">Step 4</span><span>Reorder point: R = 120 + 17 = <b style="color:var(--red)">137 boxes</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 1</span><span>Average demand during the wait = average daily demand × delivery days = 30 × 4 = <b>120</b></span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 2</span><span>Spread during the wait = daily spread × √(delivery days) = 5 × √4 = <b style="color:var(--green)">10</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 3</span><span>Safety stock = z for 95% × spread = 1.65 × 10 = 16.5 → <b style="color:var(--orange)">17</b> (round up)</span></div>
+<div class="st"><span class="n" style="color:var(--red)">Step 4</span><span>Reorder point = average demand during the wait + safety stock = 120 + 17 = <b style="color:var(--red)">137 boxes</b></span></div>
 </div><p class="reveal-hint">Press Next to reveal each step.</p>
 <p class="note">Why √L? Busy days and slow days partly cancel out, so the spread grows more slowly than the wait.</p>
 <p class="anchor">120 covers a normal wait. 17 covers a bad one.</p>`,steps:4},
@@ -280,6 +327,7 @@ const slides=[
   ['#sd9','#sl9'].forEach(k=>$(k).oninput=f);f();}},
 {part:3,html:()=>`<div class="kicker">Q system · 5 of 5</div><h2>When the delivery time varies too</h2>
 <div class="cols wide-right"><div><p>Same pharmacy (30 a day, σ<sub>d</sub> = 5, 4-day average delivery, 95%). Now the supplier is unreliable: delivery time varies by σ<sub>L</sub> days.</p>
+<p style="font-size:17px">Spread during the wait = √( <b style="color:var(--green)">average delivery days × daily demand spread²</b> + <b style="color:var(--purple)">average daily demand² × delivery-time spread²</b> )</p>
 <div class="formula" style="font-size:22px">σ<sub>dLT</sub> = √( <span class="t2">L̄ × σ<sub>d</sub>²</span> + <span class="t4">d̄² × σ<sub>L</sub>²</span> )</div>
 <div class="ctrl"><label>Delivery spread σ<sub>L</sub> (days)</label><input type="range" id="sl10" min="0" max="2" step="0.1" value="0.8"><output id="sl10o"></output></div>
 <div class="read"><div><span>From demand</span><strong id="r10a" style="color:var(--green)"></strong></div><div><span>From the supplier</span><strong id="r10b" style="color:var(--purple)"></strong></div><div><span>σ<sub>dLT</sub></span><strong id="r10c"></strong></div><div class="hl"><span>Safety stock</span><strong id="r10d"></strong></div></div>
@@ -289,22 +337,34 @@ const slides=[
  init:()=>{const f=()=>{const sL=+$('#sl10').value, a=4*25, b=900*sL*sL, s=Math.sqrt(a+b), ss=Math.ceil(1.65*s-1e-9);
   $('#sl10o').textContent=sL.toFixed(1);$('#r10a').textContent=fmt(a);$('#r10b').textContent=fmt(b);$('#r10c').textContent=fmt(s,1);$('#r10d').textContent=fmt(ss);
   $('#c10').innerHTML=bars([{label:'Reliable supplier',v:17},{label:'This supplier',v:ss,hl:true}],Math.max(60,ss*1.2));};$('#sl10').oninput=f;f();}},
-{part:4,html:()=>`<div class="kicker">P system · 1 of 3</div><h2>Periodic review: check on a schedule</h2>
+{part:4,html:()=>`<div class="kicker">P system · 1 of 4</div><h2>Periodic review: check on a schedule</h2>
 <div class="cols"><div class="box"><b>Q system</b> (continuous)<ul class="clean"><li>Watch stock all the time</li><li>Order the <b>same amount</b> whenever stock hits R</li><li>Time between orders varies</li></ul></div>
 <div class="box warm"><b>P system</b> (periodic)<ul class="clean"><li>Check stock every <b>P</b> days, no matter what</li><li>Order enough to bring stock <b>up to a target T</b></li><li>Order size varies; timing is fixed</li></ul></div></div>
 <p class="lead" style="margin-top:16px">Coffee pods, P-system style: you check the drawer <b>every Sunday</b>, shipping takes 3 days, and you drink 2 a day. Your stock must last until the <i>next</i> order arrives: 7 + 3 = <b>10 days</b> → target 20 pods. Busy week, 6 left → order 14. Slow week, 14 left → order 6.</p>
 <p class="anchor">The order size changes every time. The target stays the same.</p>`},
-{part:4,html:()=>`<div class="kicker">P system · 2 of 3</div><h2>Target level, step by step</h2>
+{part:4,html:()=>`<div class="kicker">P system · 2 of 4</div><h2>How the P system works</h2>
+<div class="cols wide-right"><div>
+<ul class="clean"><li><b>Every P days</b> you check what you have (on hand + already on order).</li>
+<li>You order enough to bring that <b>up to the target T</b>: order = T − what you have.</li>
+<li>The order arrives <b>L days</b> later.</li>
+<li>Nothing else gets ordered until the next review, so this order has to last until the <i>next</i> order arrives: <b>P + L days</b> (the protection interval).</li></ul>
+<div class="box warm" style="margin-top:12px"><b>Basic target (no uncertainty):</b><br>T = daily demand × (review period + delivery days)<br>= 30 × (12 + 4) = <b>480</b></div>
+<p class="note" style="margin-top:8px">Next: add safety stock for the days that go worse than average.</p></div>
+<div id="cP"></div></div>
+<p class="anchor">The target has to cover the review period and the delivery wait.</p>`,
+ init:()=>{$('#cP').innerHTML=pBasic();}},
+{part:4,html:()=>`<div class="kicker">P system · 3 of 4</div><h2>Target level, step by step</h2>
 <p class="lead">Valley Pharmacy now checks stock every <b>12 days</b> (P). Delivery: <b>4 days</b> (L). Same demand: 30 a day, σ = 5, 95% (z = 1.65).</p>
+<p class="lead" style="margin-bottom:6px">Target = <b>average demand over (review period + delivery days)</b> + <b style="color:var(--orange)">safety stock</b> · Order = target − what you have</p>
 <div class="formula">T = <span class="t1">d̄ × (P + L)</span> + <span class="t3">z × σ<sub>P+L</sub></span> &nbsp;&nbsp; Order = T − IP</div>
 <div class="steps" id="st12">
-<div class="st"><span class="n" style="color:var(--muted)">Step 1</span><span>Protection interval (how long stock must last): P + L = 12 + 4 = <b>16 days</b></span></div>
-<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Average demand over it: 30 × 16 = <b>480</b></span></div>
-<div class="st"><span class="n" style="color:var(--green)">Step 3</span><span>Spread over it: σ<sub>P+L</sub> = 5 × √16 = <b style="color:var(--green)">20</b></span></div>
-<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Safety stock 1.65 × 20 = 33 → target <b style="color:var(--orange)">T = 480 + 33 = 513</b></span></div>
-<div class="st"><span class="n" style="color:var(--red)">Step 5</span><span>Review day with 200 on hand (IP): order <b style="color:var(--red)">513 − 200 = 313</b></span></div>
+<div class="st"><span class="n" style="color:var(--muted)">Step 1</span><span>Protection interval = review period + delivery days = 12 + 4 = <b>16 days</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Average demand over it = average daily demand × 16 = 30 × 16 = <b>480</b></span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 3</span><span>Spread over it = daily spread × √16 = 5 × √16 = <b style="color:var(--green)">20</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Safety stock = z × spread = 1.65 × 20 = 33 → target = 480 + 33 = <b style="color:var(--orange)">513</b></span></div>
+<div class="st"><span class="n" style="color:var(--red)">Step 5</span><span>Review day, 200 on hand and on order (IP): order = target − IP = 513 − 200 = <b style="color:var(--red)">313</b></span></div>
 </div><p class="reveal-hint">Press Next to reveal each step.</p>`,steps:5},
-{part:4,html:()=>`<div class="kicker">P system · 3 of 3</div><h2>Watch the P system run</h2>
+{part:4,html:()=>`<div class="kicker">P system · 4 of 4</div><h2>Watch the P system run</h2>
 <div class="cols wide-right"><div><p>Demand bounces around 30 a day. Every review, the pharmacy orders whatever it takes to get back up to T. Change the review period.</p>
 <div class="ctrl"><label>Review period P (days)</label><input type="range" id="p13" min="4" max="20" step="1" value="12"><output id="p13o"></output></div>
 <div class="read"><div><span>Protection interval</span><strong id="r13a"></strong></div><div class="hl"><span>Safety stock</span><strong id="r13b"></strong></div><div><span>Target T</span><strong id="r13c"></strong></div></div>
