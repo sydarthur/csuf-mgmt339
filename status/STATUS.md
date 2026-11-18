@@ -4,18 +4,18 @@ type: teaching
 stage: in-session
 target: MGMT 339 Operations Management, CSUF, Fall 2026
 draft: true
-updated: 2026-11-04
+updated: 2026-11-17
 ---
 ## Now
-- Module 3 started Nov 2: Project Management (K8) Nov 2, Nov 4, first half of Nov 9; Inventory (K10) from second half of Nov 9 through Nov 18
-- Nov 4: CPM passes + ICE 3.1 (St. John's drawn by hand, submitted in class) + crashing at the decision level
-- CPM walkthrough labels corrected to match the St. John's slide (numbers were already right); cost-crashing walkthrough verified
-- Exam 2 given Oct 28; Assignment 2.2 closed Nov 1
+- Module 3, inventory: costs + EOQ taught Nov 16; reorder point, safety stock, P system on Nov 18 (last inventory class)
+- EOQ walkthrough rebuilt as a 17-slide step-through matching the lecture flow and examples (not yet published to students)
+- Newsvendor "Morning Stand" game built (Sprint 1); its fixed demand sequence averages 57, which undercuts the low-margin debrief, and launch timing vs. the service-level debrief is unsettled (raised with Sid)
+- ICE 3.2 (project management, 20 pts) and ICE 3.3 (inventory costs + EOQ) built in Canvas
 
 ## Next
-- Nov 9: PERT probability, Scrum, monitoring, then inventory concepts
-- Short crashing-decision problems for next ICE (Capstone, Narnia, Mendoza patterns: worth of a week vs. crash cost)
-- EOQ walkthrough check against this term's inventory slides before Nov 16
+- Nov 18: safety stock and P system slides (Valley Pharmacy example), ICE 3.4
+- Publish the EOQ walkthrough to students once Sid has reviewed it
+- Nov 30 / Dec 2: operations planning and scheduling, resource planning
 - Final exam (Dec 14) covers Module 3: PM, inventory, planning & scheduling, resource planning
 
 ## Blocked on

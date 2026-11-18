@@ -135,24 +135,18 @@ Design language: DM Sans + JetBrains Mono, navy (#1e3a5f) header, two-panel layo
 
 ## EOQ Tool (`tools/eoq/`)
 
-Static HTML scroll-based walkthrough for inventory management. The `build:eoq` script copies the whole folder.
+Static HTML step-through walkthrough for inventory management (rebuilt 2026-11-17 to match the Fall 26 lecture slides). The `build:eoq` script copies the whole folder.
 
 Current files:
-- `eoq-walkthrough.html` — Full EOQ + inventory systems walkthrough (based on slides 17–31 of the Inventory Management deck)
+- `eoq-walkthrough.html` — 17 slides with Back/Next and arrow keys, grouped into Start / Costs / EOQ / Q system / P system / Summary. Formula slides reveal one step per click (`steps` field); interactive slides have sliders (`init` function). Deep-link with `#N`.
 
-Sections covered:
-1. Inventory Carrying Cost (ICC table: capital/storage/service/risk = 31.2%)
-2. Ordering cost formula and the carrying/ordering tradeoff
-3. Total Annual Cost curve (SVG with ICC, Order Cost, U-shaped TAC)
-4. EOQ formula: √(2DS/H) with assumptions
-5. Worked example: D=10,800, H=$40, S=$250 → EOQ=367 units
-6. Q System (Continuous Review): sawtooth diagram, R = dL = 180 units
-7. Reorder point with safety stock: R = d̄L + z·σ
-8. P System (Periodic Review): protection interval P+L, T = d̄(P+L) + z·σ, Petromax example (T=365)
-9. When EOQ breaks (quantity discounts, perishables, lumpy demand, Lean philosophy)
-10. Summary: all formulas for ICC, EOQ, Q system, P system
+Slides: two costs → carrying cost (sawtooth + Q/2 slider) → ordering cost (D/Q slider) → U-curve slider (costs equal at the EOQ) → EOQ step by step → EOQ sensitivity sliders (D, S, H; flat bottom) → reorder point R = d × L (lead-time slider) → coffee pods "what if demand varies" → safety stock step by step → cushion sliders (σ and service level, normal curve + safety stock by service level) → lead time varies too (σ_L slider) → P vs. Q concept + Sunday coffee pods → P target step by step → P system run (review-period slider) → Q vs. P table → formula sheet.
 
-Design language: same Instrument Serif + DM Sans scroll format as VSM tools, teal accent (#0e7490).
+Examples (same numbers as the slides):
+- EOQ: D = 10,800/yr, $160, 25% → H = $40, S = $250 → EOQ = 367, total ≈ $14,697; d = 30/day (360 days), L = 6 → R = 180
+- Valley Pharmacy (safety stock / P system): d̄ = 30/day, σ_d = 5, L = 4, 95% (z = 1.65) → SS = 17, R = 137; σ_L = 0.8 → σ_dLT = 26, SS = 43, R = 163; P = 12 → P + L = 16, SS = 33, T = 513, IP 200 → order 313
+
+Design language: Atkinson Hyperlegible (accessible sans; system-ui fallback), navy #002E5B + orange #C85F00 to match the slide deck, white slide card on a light grey page, no long scroll.
 
 ---
 

@@ -3,1833 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Economic Order Quantity — An Interactive Walkthrough</title>
+<title>Inventory Management: EOQ, Q System and P System | MGMT 339</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-  :root {
-    --bg: #f5f8fa;
-    --text: #111827;
-    --text-muted: #4b5563;
-    --accent: #0e7490;
-    --accent-light: #e0f2f7;
-    --blue: #1d4ed8;
-    --blue-light: #dbeafe;
-    --green: #15803d;
-    --green-light: #dcfce7;
-    --amber: #b45309;
-    --amber-light: #fef3c7;
-    --red: #b91c1c;
-    --red-light: #fee2e2;
-    --purple: #7c3aed;
-    --purple-light: #f5f3ff;
-    --card: #ffffff;
-    --border: #e2e8f0;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* === NAV === */
-  .nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(245,248,250,0.93); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px; display: flex; align-items: center;
-    justify-content: space-between; height: 52px;
-  }
-  .nav-brand { font-family: 'Instrument Serif', serif; font-size: 17px; color: var(--accent); }
-  .nav-steps { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-  .nav-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--border); cursor: pointer;
-    transition: all 0.3s; border: none;
-  }
-  .nav-dot.active { background: var(--accent); width: 28px; border-radius: 5px; }
-  .nav-dot:hover { background: var(--text-muted); }
-  .nav-badge {
-    font-size: 11px; font-weight: 600; color: var(--text-muted);
-    background: var(--amber-light); padding: 3px 10px; border-radius: 12px;
-  }
-  .progress-bar {
-    position: fixed; top: 52px; left: 0; height: 3px;
-    background: var(--accent); z-index: 101; transition: width 0.4s ease;
-  }
-
-  /* === SECTIONS === */
-  .section {
-    min-height: 100vh; padding: 80px 32px 60px;
-    display: flex; align-items: center; justify-content: center; position: relative;
-  }
-  .section-inner { max-width: 860px; width: 100%; }
-  .section-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; font-weight: 600; color: var(--accent);
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 12px; opacity: 0.7;
-  }
-  .section h2 {
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(28px, 4vw, 42px);
-    line-height: 1.2; margin-bottom: 20px; color: var(--text);
-  }
-  .section h2 em { color: var(--accent); font-style: italic; }
-  .section p { font-size: 17px; color: var(--text); margin-bottom: 16px; max-width: 720px; }
-  .section p.muted { color: var(--text-muted); font-size: 15px; }
-
-  /* === HERO === */
-  .hero {
-    background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 60%, #0891b2 100%);
-    color: #fff; min-height: 100vh;
-  }
-  .hero h1 {
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(36px, 5.5vw, 56px);
-    line-height: 1.15; margin-bottom: 20px;
-  }
-  .hero h1 em { color: #fcd34d; font-style: italic; }
-  .hero p { color: #bae6fd; }
-  .hero .start-btn {
-    display: inline-block; margin-top: 24px;
-    padding: 12px 28px; background: #fcd34d; color: #0c4a6e;
-    border: none; border-radius: 6px;
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-    cursor: pointer; transition: transform 0.2s;
-  }
-  .hero .start-btn:hover { transform: translateY(-2px); }
-
-  /* === CALLOUTS === */
-  .callout {
-    background: var(--card); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 20px 24px;
-    margin: 20px 0; box-shadow: var(--shadow);
-  }
-  .callout.accent  { border-color: var(--accent);  background: var(--accent-light); }
-  .callout.blue    { border-color: var(--blue);    background: var(--blue-light); }
-  .callout.green   { border-color: var(--green);   background: var(--green-light); }
-  .callout.amber   { border-color: var(--amber);   background: var(--amber-light); }
-  .callout.red     { border-color: var(--red);     background: var(--red-light); }
-  .callout.purple  { border-color: var(--purple);  background: var(--purple-light); }
-  .callout-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; margin-bottom: 6px;
-  }
-  .callout.accent .callout-label { color: var(--accent); }
-  .callout.blue   .callout-label { color: var(--blue); }
-  .callout.green  .callout-label { color: var(--green); }
-  .callout.amber  .callout-label { color: var(--amber); }
-  .callout.red    .callout-label { color: var(--red); }
-  .callout.purple .callout-label { color: var(--purple); }
-  .callout-title  { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .callout-body   { font-size: 15px; color: var(--text); line-height: 1.6; }
-
-  /* === FORMULA BOX === */
-  .formula-box {
-    background: #fff; border: 2px solid #c7d2fe;
-    border-radius: 10px; padding: 18px 22px; margin: 18px 0;
-  }
-  .formula-label {
-    font-size: 11px; font-weight: 700; color: #4f46e5;
-    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
-  }
-  .formula-body {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.05rem; color: #312e81; line-height: 1.7;
-  }
-  .formula-body .big {
-    font-size: 1.4rem; font-weight: 600; color: #1e40af;
-    display: block; margin: 6px 0;
-  }
-
-  /* === TABLES === */
-  .icc-table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 16px 0; }
-  .icc-table th {
-    background: #f1f5f9; padding: 8px 14px; text-align: left;
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .06em; color: var(--text-muted);
-    border-bottom: 2px solid var(--border);
-  }
-  .icc-table td {
-    padding: 8px 14px; border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace; font-size: 14px;
-  }
-  .icc-table td:first-child { font-family: 'DM Sans'; font-weight: 600; color: var(--text); }
-  .icc-table tr.total-row td { background: #f0fdf4; font-weight: 700; color: var(--green); }
-
-  /* === LAYOUT === */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
-  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
-
-  /* === DIAGRAMS === */
-  .diagram-container {
-    margin: 28px 0; background: var(--card);
-    border: 1.5px solid var(--border); border-radius: 12px;
-    overflow: hidden; box-shadow: var(--shadow);
-  }
-  .diagram-header {
-    padding: 10px 18px; background: #f1f5f9;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 1px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .diagram-body { padding: 20px; }
-
-  /* === HIGHLIGHT BOX === */
-  .hl-box {
-    display: flex; align-items: flex-start; gap: 14px;
-    background: #fff; border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 16px 20px; margin: 12px 0;
-    box-shadow: var(--shadow);
-  }
-  .hl-box .hl-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
-  .hl-box .hl-text { font-size: 15px; line-height: 1.6; }
-  .hl-box .hl-text strong { display: block; font-size: 16px; margin-bottom: 2px; }
-
-  /* === DARK & SUMMARY === */
-  .dark-section { background: #0f172a; }
-  .dark-section .section-num { color: #7dd3fc; }
-  .dark-section h2 { color: #f1f5f9; }
-  .dark-section h2 em { color: #fcd34d; }
-  .dark-section p { color: #94a3b8; }
-
-  .summary-section { background: #f0fdf4; }
-  .formula-card {
-    background: #fff; border: 1.5px solid #bbf7d0;
-    border-radius: 10px; padding: 16px 20px; margin-bottom: 12px;
-  }
-  .formula-card .fc-label {
-    font-size: 11px; font-weight: 700; color: var(--green);
-    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;
-  }
-  .formula-card .fc-formula {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1rem; color: #166534;
-  }
-  .assume-list { list-style: none; padding: 0; margin: 12px 0; }
-  .assume-list li {
-    padding: 7px 0 7px 28px; border-bottom: 1px solid var(--border);
-    font-size: 15px; position: relative;
-  }
-  .assume-list li::before {
-    content: "✓"; position: absolute; left: 4px;
-    color: var(--green); font-weight: 700;
-  }
-
-  /* === INTERACTIVE CONTROLS === */
-  .control-panel {
-    background: #fafbfc; border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 18px 22px; margin: 16px 0;
-  }
-  .control-row {
-    display: grid; grid-template-columns: 110px 1fr 90px;
-    gap: 14px; align-items: center; margin-bottom: 10px;
-  }
-  .control-row:last-child { margin-bottom: 0; }
-  .control-label {
-    font-size: 13px; font-weight: 600; color: var(--text);
-  }
-  .control-label .unit { color: var(--text-muted); font-weight: 400; font-size: 12px; }
-  .control-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px; font-weight: 600; color: var(--accent);
-    text-align: right; background: var(--accent-light);
-    padding: 4px 10px; border-radius: 4px;
-  }
-  input[type="range"] {
-    -webkit-appearance: none; appearance: none;
-    width: 100%; height: 6px; border-radius: 3px;
-    background: #e2e8f0; outline: none;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--accent); cursor: pointer;
-    box-shadow: 0 2px 6px rgba(14,116,144,0.4);
-    transition: transform 0.15s;
-  }
-  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-  input[type="range"]::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--accent); cursor: pointer; border: none;
-    box-shadow: 0 2px 6px rgba(14,116,144,0.4);
-  }
-
-  .result-row {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 12px; margin-top: 16px;
-    padding-top: 14px; border-top: 1.5px dashed var(--border);
-  }
-  .result-cell {
-    text-align: center; padding: 10px 8px;
-    background: #fff; border-radius: 8px; border: 1px solid var(--border);
-  }
-  .result-cell .rc-label {
-    font-size: 10px; font-weight: 700; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
-  }
-  .result-cell .rc-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px; font-weight: 700; color: var(--text);
-  }
-  .result-cell.highlight .rc-value { color: var(--accent); }
-  .result-cell.highlight { background: var(--accent-light); border-color: var(--accent); }
-  @media (max-width: 640px) {
-    .result-row { grid-template-columns: 1fr 1fr; }
-    .control-row { grid-template-columns: 90px 1fr 80px; }
-  }
-
-  /* === INDUSTRY TABS === */
-  .industry-tabs {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
-  }
-  .industry-tab {
-    padding: 8px 14px; border: 1.5px solid var(--border);
-    background: #fff; border-radius: 20px; font-size: 13px;
-    font-weight: 600; color: var(--text-muted); cursor: pointer;
-    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-  }
-  .industry-tab:hover { border-color: var(--accent); color: var(--accent); }
-  .industry-tab.active {
-    background: var(--accent); color: #fff; border-color: var(--accent);
-  }
-
-  /* === ANIMATED SAWTOOTH === */
-  .sawtooth-controls {
-    display: flex; gap: 8px; align-items: center; justify-content: center;
-    margin-top: 10px;
-  }
-  .btn-play {
-    padding: 6px 16px; border: 1.5px solid var(--accent);
-    background: #fff; color: var(--accent); border-radius: 6px;
-    cursor: pointer; font-weight: 600; font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .btn-play:hover { background: var(--accent-light); }
-  .btn-play.playing { background: var(--accent); color: #fff; }
-
-  /* === INTUITION PILLS === */
-  .intuition-pill {
-    display: inline-block; padding: 4px 10px;
-    background: var(--accent-light); color: var(--accent);
-    border-radius: 12px; font-size: 12px; font-weight: 600;
-    font-family: 'JetBrains Mono', monospace; margin: 2px 4px 2px 0;
-  }
-
-  /* === COMPARE TABLE === */
-  .compare-table {
-    width: 100%; border-collapse: collapse;
-    font-size: 14px; margin: 16px 0; background: #fff;
-    border-radius: 10px; overflow: hidden; box-shadow: var(--shadow);
-  }
-  .compare-table th {
-    background: var(--accent); color: #fff;
-    padding: 10px 12px; text-align: left; font-size: 12px;
-    font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-  }
-  .compare-table td {
-    padding: 10px 12px; border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .compare-table td:first-child {
-    font-family: 'DM Sans'; font-weight: 600; color: var(--text);
-  }
-  .compare-table tr:last-child td { border-bottom: none; }
-  .compare-table tr.eoq-row td { background: #fef3c7; font-weight: 700; }
-  .compare-table tr.eoq-row td:first-child { color: var(--amber); }
-
-  @media (max-width: 640px) {
-    .section { padding: 70px 20px 40px; }
-    .nav { padding: 0 16px; }
-    .compare-table { font-size: 12px; }
-    .compare-table th, .compare-table td { padding: 8px 6px; }
-  }
+:root{
+  --navy:#002E5B; --orange:#C85F00; --orange-soft:#FDF0E3; --green:#1E7A3C; --purple:#6A3D9A; --red:#B42318;
+  --ink:#1B2430; --muted:#5A6472; --line:#D9DEE5; --bg:#EEF2F6; --card:#FFFFFF; --soft:#F4F7FA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:19px;line-height:1.5;display:flex;flex-direction:column}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:18px;padding:10px 22px;flex-wrap:wrap}
+header a.home{color:#fff;opacity:.8;text-decoration:none;font-size:15px}
+header h1{font-size:18px;font-weight:700;margin-right:auto}
+nav.parts{display:flex;gap:6px;flex-wrap:wrap}
+nav.parts button{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 14px;font:inherit;font-size:15px;cursor:pointer}
+nav.parts button.on{background:#fff;color:var(--navy);font-weight:700}
+.progress{height:4px;background:#cfd8e3}.progress div{height:100%;background:var(--orange);width:0;transition:width .25s}
+main{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:22px 16px;overflow:auto}
+.slide{background:var(--card);border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.08);width:min(1180px,100%);min-height:600px;padding:30px 38px 26px;display:flex;flex-direction:column}
+.kicker{color:var(--orange);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+.slide h2{color:var(--navy);font-size:32px;line-height:1.2;margin:4px 0 14px}
+.lead{font-size:20px;color:var(--ink);margin-bottom:14px;max-width:62em}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+.cols.wide-right{grid-template-columns:5fr 7fr}
+.box{background:var(--soft);border-radius:10px;padding:14px 18px}
+.box.warm{background:var(--orange-soft)}
+.formula{font-size:26px;font-weight:700;color:var(--navy);text-align:center;margin:8px 0 14px}
+.formula .t1{color:var(--navy)}.formula .t2{color:var(--green)}.formula .t3{color:var(--orange)}.formula .t4{color:var(--purple)}
+ul.clean{list-style:none}ul.clean li{padding:4px 0}
+ul.clean li b{color:var(--orange)}
+.anchor{margin-top:auto;padding-top:16px;color:var(--orange);font-weight:700;font-size:21px}
+.note{color:var(--muted);font-size:16px;font-style:italic}
+.steps .st{display:flex;gap:12px;padding:7px 0;font-size:20px;opacity:.18;transition:opacity .25s}
+.steps .st.show{opacity:1}
+.steps .n{font-weight:700;min-width:84px}
+.reveal-hint{font-size:14px;color:var(--muted);margin-top:4px}
+.ctrl{display:grid;grid-template-columns:150px 1fr 90px;gap:10px;align-items:center;margin:6px 0}
+.ctrl label{font-size:16px;color:var(--muted)}
+.ctrl output{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--orange);height:28px}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.read div{background:var(--soft);border-radius:10px;padding:10px 12px}
+.read span{display:block;font-size:14px;color:var(--muted)}
+.read strong{font-size:24px;color:var(--navy);font-variant-numeric:tabular-nums}
+.read .hl{background:var(--orange-soft)}.read .hl strong{color:var(--orange)}
+table.t{border-collapse:collapse;width:100%;font-size:18px}
+table.t th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-size:16px}
+table.t td{padding:8px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.t tr.hl td{background:var(--orange-soft);font-weight:700;color:var(--orange)}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:inherit}
+footer{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px;background:var(--card);border-top:1px solid var(--line)}
+footer button{font:inherit;font-size:16px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 18px;cursor:pointer;color:var(--navy)}
+footer button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+footer button:disabled{opacity:.35;cursor:default}
+#c9 svg,#b9 svg{max-height:225px}
+#counter{font-size:15px;color:var(--muted);min-width:90px;text-align:center;font-variant-numeric:tabular-nums}
+.kbd{font-size:13px;color:var(--muted)}
+@media (max-width:860px){.cols,.cols.wide-right{grid-template-columns:1fr}.slide{padding:22px 18px}.slide h2{font-size:26px}body{font-size:17px}.formula{font-size:21px}}
 </style>
 </head>
 <body>
-
-<nav class="nav">
-  <div class="nav-brand">Economic Order Quantity</div>
-  <div class="nav-steps" id="navSteps"></div>
-  <div class="nav-badge">MGMT 339</div>
-</nav>
-<div class="progress-bar" id="progressBar" style="width:0%"></div>
-
-<!-- ─── HERO ─────────────────────────────────────────────── -->
-<div class="section hero" data-step="0">
-  <div class="section-inner">
-    <div class="section-num" style="color:#7dd3fc;opacity:0.6">Inventory Management</div>
-    <h1>How much should<br>you <em>order</em>?</h1>
-    <p>Order too little — you're constantly reordering, burning time on paperwork. Order too much — you're drowning in carrying costs. There's a sweet spot between these two forces. This walkthrough is about finding it, understanding why it exists, and knowing when it doesn't apply.</p>
-    <p class="muted">Interactive examples · 5 industries · live cost curves · MGMT 339</p>
-    <button class="start-btn" onclick="document.querySelector('[data-step=\'1\']').scrollIntoView({behavior:'smooth'})">Start with the intuition →</button>
-  </div>
-</div>
-
-<!-- ─── SECTION 1: The Core Intuition ─────────────────────── -->
-<div class="section" data-step="1">
-  <div class="section-inner">
-    <div class="section-num">The Core Intuition</div>
-    <h2>Two forces pulling <em>against each other</em></h2>
-    <p>Before any math, picture a warehouse manager making one decision: <strong>how big should each order be?</strong></p>
-    <p>Two completely different people yell different things at her:</p>
-
-    <div class="two-col" style="margin-top:20px">
-      <div class="callout red" style="margin:0">
-        <div class="callout-label">The Accountant</div>
-        <div class="callout-body">
-          <strong>"Order small batches!"</strong><br>
-          Inventory sitting on shelves is cash frozen in place. It incurs capital costs, storage costs, insurance, and risk of obsolescence. The less you hold, the less it costs.
-        </div>
-      </div>
-      <div class="callout blue" style="margin:0">
-        <div class="callout-label">The Purchasing Manager</div>
-        <div class="callout-body">
-          <strong>"Order large batches!"</strong><br>
-          Every order has fixed overhead — paperwork, receiving, shipping fees, inspection. Placing 50 orders a year is a logistical nightmare. Place fewer, larger orders.
-        </div>
-      </div>
-    </div>
-
-    <p style="margin-top:22px">Both are right. The accountant wants to minimize <strong>holding cost</strong>. The purchasing manager wants to minimize <strong>ordering cost</strong>. These costs pull in opposite directions as Q changes. The EOQ is where their tug-of-war settles.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">The Tug of War</div>
-      <div class="diagram-body">
-        <svg viewBox="0 0 520 180" style="width:100%;display:block;margin:0 auto">
-          <!-- Rope -->
-          <line x1="60" y1="90" x2="460" y2="90" stroke="#64748b" stroke-width="3"/>
-
-          <!-- Accountant left -->
-          <g>
-            <rect x="20" y="60" width="80" height="60" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
-            <text x="60" y="83" font-size="11" fill="#b91c1c" font-family="DM Sans" font-weight="700" text-anchor="middle">Accountant</text>
-            <text x="60" y="99" font-size="9" fill="#991b1b" font-family="DM Sans" text-anchor="middle">"Small Q!"</text>
-            <text x="60" y="111" font-size="9" fill="#991b1b" font-family="DM Sans" text-anchor="middle">Holding↓</text>
-            <!-- Arrow pulling left -->
-            <line x1="105" y1="90" x2="140" y2="90" stroke="#b91c1c" stroke-width="2" marker-end="url(#arrLeft)"/>
-          </g>
-
-          <!-- Purchasing right -->
-          <g>
-            <rect x="420" y="60" width="80" height="60" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
-            <text x="460" y="83" font-size="11" fill="#1d4ed8" font-family="DM Sans" font-weight="700" text-anchor="middle">Purchasing</text>
-            <text x="460" y="99" font-size="9" fill="#1e40af" font-family="DM Sans" text-anchor="middle">"Large Q!"</text>
-            <text x="460" y="111" font-size="9" fill="#1e40af" font-family="DM Sans" text-anchor="middle">Ordering↓</text>
-            <line x1="415" y1="90" x2="380" y2="90" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrRight)"/>
-          </g>
-
-          <!-- Middle marker - EOQ -->
-          <g>
-            <circle cx="260" cy="90" r="22" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
-            <text x="260" y="88" font-size="11" fill="#d97706" font-family="DM Sans" font-weight="700" text-anchor="middle">EOQ</text>
-            <text x="260" y="100" font-size="8" fill="#92400e" font-family="DM Sans" text-anchor="middle">balance</text>
-          </g>
-
-          <defs>
-            <marker id="arrLeft" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-              <polygon points="6,0 0,3 6,6" fill="#b91c1c"/>
-            </marker>
-            <marker id="arrRight" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-              <polygon points="0,0 6,3 0,6" fill="#1d4ed8"/>
-            </marker>
-          </defs>
-
-          <text x="260" y="145" font-size="11" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-style="italic">The EOQ is the equilibrium point — minimum total cost</text>
-        </svg>
-      </div>
-    </div>
-
-    <div class="callout accent">
-      <div class="callout-label">What We're Solving</div>
-      <div class="callout-body">Find the order quantity Q* that minimizes the <strong>sum</strong> of holding cost and ordering cost. We'll build each piece, then combine.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 2: Holding Cost (ICC) ─────────────────────── -->
-<div class="section" style="background:#fff" data-step="2">
-  <div class="section-inner">
-    <div class="section-num">The First Cost</div>
-    <h2>Holding inventory <em>isn't free</em></h2>
-    <p>Every unit sitting in your warehouse is costing you money right now. This is called the <strong>Inventory Carrying Cost (ICC)</strong> — and students consistently underestimate how large it is.</p>
-    <p>Take an inkjet printer worth <strong>$100</strong>. Here's what it actually costs to hold one unit for a year:</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">ICC Breakdown — Inkjet Printer ($100/unit)</div>
-      <div class="diagram-body">
-        <table class="icc-table">
-          <thead><tr><th>Cost Component</th><th>How It's Calculated</th><th>Rate</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Capital (opportunity cost)</td>
-              <td>Money tied up in inventory can't earn returns elsewhere</td>
-              <td>25.0%</td>
-            </tr>
-            <tr>
-              <td>Storage space</td>
-              <td>$12/pallet/mo to store + $10 in + $10 out → $3.20/unit</td>
-              <td>3.2%</td>
-            </tr>
-            <tr>
-              <td>Inventory service</td>
-              <td>Taxes (1.5%) + Insurance (0.5%)</td>
-              <td>2.0%</td>
-            </tr>
-            <tr>
-              <td>Inventory risk</td>
-              <td>Historical shrinkage, obsolescence, damage</td>
-              <td>1.0%</td>
-            </tr>
-            <tr class="total-row">
-              <td>Total ICC Rate (H)</td>
-              <td>31.2% × $100/unit = <strong>$31.20/unit/year</strong></td>
-              <td>31.2%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="callout amber">
-      <div class="callout-label">Try It — What's Your Warehouse Costing?</div>
-      <div class="callout-body" style="margin-top:8px">
-        <div class="control-panel" style="background:#fffbeb;border-color:#fcd34d;margin:0">
-          <div class="control-row">
-            <div class="control-label">Unit cost <span class="unit">($)</span></div>
-            <input type="range" id="icc-unit" min="10" max="500" value="100" step="5">
-            <div class="control-value" id="icc-unit-val">$100</div>
-          </div>
-          <div class="control-row">
-            <div class="control-label">Avg inventory <span class="unit">(units)</span></div>
-            <input type="range" id="icc-avg" min="100" max="10000" value="2500" step="50">
-            <div class="control-value" id="icc-avg-val">2,500</div>
-          </div>
-          <div class="control-row">
-            <div class="control-label">ICC rate <span class="unit">(%)</span></div>
-            <input type="range" id="icc-rate" min="15" max="45" value="31" step="1">
-            <div class="control-value" id="icc-rate-val">31%</div>
-          </div>
-          <div class="result-row" style="grid-template-columns: 1fr 1fr">
-            <div class="result-cell">
-              <div class="rc-label">H (per unit/yr)</div>
-              <div class="rc-value" id="icc-h-out">$31.00</div>
-            </div>
-            <div class="result-cell highlight">
-              <div class="rc-label">Annual holding cost</div>
-              <div class="rc-value" id="icc-annual-out">$77,500</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="formula-box">
-      <div class="formula-label">Holding Cost per Year</div>
-      <div class="formula-body">
-        ICC/yr = (Q/2) × H<br>
-        <span style="color:#6b7280;font-size:.88rem">Q/2 = average inventory (starts at Q, drains to 0, averages Q/2) · H = holding cost per unit per year</span>
-      </div>
-    </div>
-
-    <div class="callout blue">
-      <div class="callout-label">Why Average Inventory = Q/2</div>
-      <div class="callout-body">
-        When an order of Q arrives, you have Q units. You consume them linearly until 0, then reorder. Over the cycle, your average on-hand is <strong>(Q + 0)/2 = Q/2</strong>. This is the triangle under the sawtooth — we'll see it next.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 3: Ordering Cost ─────────────────────────── -->
-<div class="section" data-step="3">
-  <div class="section-inner">
-    <div class="section-num">The Second Cost</div>
-    <h2>Every order <em>costs money</em> to place</h2>
-    <p>Ordering isn't free either. Every purchase order triggers a chain of work: someone analyzes inventory, creates the PO, coordinates with the vendor, receives the shipment, inspects it, and processes payment. Whether you order 10 units or 10,000, that chain of work is largely fixed.</p>
-
-    <div class="two-col">
-      <div class="hl-box">
-        <div class="hl-icon">📋</div>
-        <div class="hl-text">
-          <strong>Ordering Costs (S)</strong>
-          PO creation, systems costs, receiving labor, vendor payment processing, inventory analysis, freight fixed fees. Incurred <em>per order placed</em>.
-        </div>
-      </div>
-      <div class="hl-box">
-        <div class="hl-icon">🔧</div>
-        <div class="hl-text">
-          <strong>Setup Costs (S)</strong>
-          For manufacturing: changeover time, tooling adjustment, calibration, and scrap from the first run. Incurred <em>per production batch</em>.
-        </div>
-      </div>
-    </div>
-
-    <p>Here's the key insight that drives the whole problem: <strong>order quantity (Q) and order frequency move in opposite directions.</strong> If annual demand is fixed at D, then ordering Q each time means <em>D/Q</em> orders per year.</p>
-
-    <div class="callout blue">
-      <div class="callout-label">The Tradeoff</div>
-      <div class="callout-body">
-        <strong>Order larger Q:</strong> fewer orders per year → ordering cost falls. But average inventory (Q/2) is higher → holding cost rises.<br><br>
-        <strong>Order smaller Q:</strong> more orders per year → ordering cost rises. But average inventory is lower → holding cost falls.<br><br>
-        Neither extreme is optimal. The question is: where's the balance?
-      </div>
-    </div>
-
-    <div class="formula-box">
-      <div class="formula-label">Ordering Cost per Year</div>
-      <div class="formula-body">
-        Ordering Cost/yr = (D/Q) × S<br>
-        <span style="color:#6b7280;font-size:.88rem">D/Q = orders per year · S = cost per order</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 4: Animated Sawtooth ──────────────────────── -->
-<div class="section" style="background:#fff" data-step="4">
-  <div class="section-inner">
-    <div class="section-num">Seeing the Tradeoff</div>
-    <h2>How Q reshapes <em>the whole pattern</em></h2>
-    <p>Inventory over time looks like a sawtooth: stock arrives in a batch of Q, drains steadily as customers buy, then another order arrives. Change Q and you change the entire shape — the peaks, the triangles, how often it cycles.</p>
-    <p>Slide Q below. Watch what happens to the number of orders, the height of each sawtooth, and the two cost components.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">
-        <span>Inventory Pattern Over One Year</span>
-        <span id="sawtooth-status" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">D = 1,200/yr</span>
-      </div>
-      <div class="diagram-body" style="padding:16px">
-        <svg id="sawtooth-svg" viewBox="0 0 600 240" style="width:100%;display:block;margin:0 auto">
-          <defs>
-            <marker id="saw-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
-            </marker>
-            <pattern id="triFill" patternUnits="userSpaceOnUse" width="6" height="6">
-              <path d="M 0 6 L 6 0" stroke="#0e7490" stroke-width="0.6" opacity="0.15"/>
-            </pattern>
-          </defs>
-          <!-- Axes -->
-          <line x1="50" y1="200" x2="580" y2="200" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#saw-arr)"/>
-          <line x1="50" y1="200" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#saw-arr)"/>
-          <text x="315" y="220" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time (one year)</text>
-          <text x="20" y="115" font-size="11" fill="#64748b" transform="rotate(-90,20,115)" text-anchor="middle" font-family="DM Sans">Inventory</text>
-          <!-- Dynamic sawtooth path -->
-          <g id="saw-group"></g>
-          <!-- Average inventory line -->
-          <line id="avg-line" x1="50" y1="110" x2="575" y2="110" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
-          <text id="avg-label" x="580" y="113" font-size="10" fill="#b45309" font-family="DM Sans" font-weight="700">Q/2</text>
-          <!-- Q label -->
-          <text id="q-label" x="55" y="30" font-size="11" fill="#0e7490" font-family="DM Sans" font-weight="700">Q</text>
-        </svg>
-
-        <div class="control-panel" style="margin-top:14px">
-          <div class="control-row">
-            <div class="control-label">Order Qty (Q)</div>
-            <input type="range" id="saw-q" min="50" max="800" value="200" step="10">
-            <div class="control-value" id="saw-q-val">200</div>
-          </div>
-          <div class="result-row">
-            <div class="result-cell">
-              <div class="rc-label">Orders/yr</div>
-              <div class="rc-value" id="saw-orders">6</div>
-            </div>
-            <div class="result-cell">
-              <div class="rc-label">Avg inventory</div>
-              <div class="rc-value" id="saw-avg">100</div>
-            </div>
-            <div class="result-cell">
-              <div class="rc-label">Cycle (days)</div>
-              <div class="rc-value" id="saw-cycle">61</div>
-            </div>
-          </div>
-        </div>
-        <p class="muted" style="text-align:center;font-size:13px;margin:10px 0 0">Small Q → many tall cycles (high ordering cost). Large Q → few wide cycles (high holding cost).</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 5: Interactive TAC Curve ──────────────────── -->
-<div class="section" data-step="5">
-  <div class="section-inner">
-    <div class="section-num">The Core Insight</div>
-    <h2>The costs pull <em>against each other</em></h2>
-    <p>Let's plot both costs against Q on the same graph. Carrying cost rises linearly with Q (bigger batches → more inventory to hold). Ordering cost falls as 1/Q (bigger batches → fewer orders). Their sum — <strong>Total Annual Cost (TAC)</strong> — forms a U-shaped curve. The minimum of that curve is the EOQ.</p>
-    <p>Drag the slider to move Q. Watch the two costs swap dominance. At the EOQ, they cross.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">
-        <span>Annual Cost vs Order Quantity</span>
-        <span id="tac-eoq-label" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber)">EOQ ≈ 367</span>
-      </div>
-      <div class="diagram-body" style="padding:16px">
-        <svg id="tac-svg" viewBox="0 0 600 300" style="width:100%;display:block;margin:0 auto">
-          <defs>
-            <marker id="tac-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
-            </marker>
-          </defs>
-          <!-- Axes -->
-          <line x1="60" y1="260" x2="580" y2="260" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#tac-arr)"/>
-          <line x1="60" y1="260" x2="60" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#tac-arr)"/>
-          <text x="320" y="284" font-size="12" fill="#64748b" text-anchor="middle" font-family="DM Sans">Order Quantity (Q)</text>
-          <text x="22" y="140" font-size="12" fill="#64748b" transform="rotate(-90,22,140)" text-anchor="middle" font-family="DM Sans">Annual Cost ($)</text>
-
-          <!-- Curves will be drawn dynamically -->
-          <path id="curve-hold" fill="none" stroke="#b91c1c" stroke-width="2.2"/>
-          <path id="curve-order" fill="none" stroke="#059669" stroke-width="2.2"/>
-          <path id="curve-tac" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-dasharray="6,3"/>
-
-          <!-- EOQ vertical line -->
-          <line id="eoq-vline" x1="0" y1="0" x2="0" y2="260" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.6"/>
-          <circle id="eoq-dot" cx="0" cy="0" r="5" fill="#d97706"/>
-
-          <!-- Current Q vertical line (draggable) -->
-          <line id="q-vline" x1="0" y1="0" x2="0" y2="260" stroke="#64748b" stroke-width="1.5"/>
-          <circle id="q-dot-hold" cx="0" cy="0" r="5" fill="#b91c1c"/>
-          <circle id="q-dot-order" cx="0" cy="0" r="5" fill="#059669"/>
-          <circle id="q-dot-tac" cx="0" cy="0" r="6" fill="#1d4ed8"/>
-
-          <!-- Labels -->
-          <text x="570" y="18" font-size="11" fill="#1d4ed8" font-family="DM Sans" font-weight="700" text-anchor="end">Total Cost</text>
-          <text x="570" y="32" font-size="11" fill="#b91c1c" font-family="DM Sans" font-weight="700" text-anchor="end">Holding</text>
-          <text x="570" y="46" font-size="11" fill="#059669" font-family="DM Sans" font-weight="700" text-anchor="end">Ordering</text>
-          <text id="eoq-text" x="0" y="275" font-size="11" fill="#d97706" font-family="DM Sans" font-weight="700" text-anchor="middle">EOQ</text>
-        </svg>
-
-        <div class="control-panel" style="margin-top:14px">
-          <div class="control-row">
-            <div class="control-label">Your Q</div>
-            <input type="range" id="tac-q" min="50" max="900" value="200" step="10">
-            <div class="control-value" id="tac-q-val">200</div>
-          </div>
-          <div class="result-row">
-            <div class="result-cell" id="tac-hold-cell">
-              <div class="rc-label">Holding /yr</div>
-              <div class="rc-value" id="tac-hold">$4,000</div>
-            </div>
-            <div class="result-cell" id="tac-order-cell">
-              <div class="rc-label">Ordering /yr</div>
-              <div class="rc-value" id="tac-order">$13,500</div>
-            </div>
-            <div class="result-cell highlight">
-              <div class="rc-label">TAC /yr</div>
-              <div class="rc-value" id="tac-total">$17,500</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout green">
-      <div class="callout-label">Key Property — At EOQ, Holding = Ordering</div>
-      <div class="callout-body">Drag the slider to the EOQ and notice: the two cost components are equal. This isn't a coincidence — it's a direct consequence of minimizing the sum of a linearly-rising function and a falling-hyperbola. Where their slopes cancel, the curves intersect.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 6: EOQ Formula ─────────────────────────────── -->
-<div class="section" style="background:#fff" data-step="6">
-  <div class="section-inner">
-    <div class="section-num">The Formula</div>
-    <h2>Solving for the <em>optimal Q</em></h2>
-    <p>To find the minimum of TAC, we take the derivative with respect to Q and set it to zero. The result is remarkably clean:</p>
-
-    <div class="formula-box" style="border-color:#a5b4fc;background:#eef2ff;text-align:center;padding:28px">
-      <div class="formula-label" style="color:#4338ca">Economic Order Quantity</div>
-      <div class="formula-body big" style="font-size:1.8rem;color:#1e1b4b;display:block;text-align:center">
-        EOQ = √( 2DS / H )
-      </div>
-      <div style="margin-top:12px;font-size:.85rem;color:#4338ca;font-family:'DM Sans',sans-serif;line-height:1.8">
-        D = Annual demand (units/yr) &nbsp;|&nbsp; S = Cost per order ($/order)<br>
-        H = Holding cost ($/unit/yr) = unit cost × ICC rate
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:28px;margin-bottom:10px">Why a square root?</h3>
-    <p>The square root isn't arbitrary. It tells you something important about how EOQ responds to changes. Doubling any input doesn't double the output — it only multiplies it by √2 ≈ 1.414.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">Sensitivity — EOQ scales with √change</div>
-      <div class="diagram-body">
-        <table class="compare-table">
-          <thead>
-            <tr><th>Change</th><th>Base EOQ</th><th>New EOQ</th><th>Multiplier</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Double D</td><td>367</td><td>519</td><td>× 1.41 (√2)</td></tr>
-            <tr><td>Double S</td><td>367</td><td>519</td><td>× 1.41 (√2)</td></tr>
-            <tr><td>Double H</td><td>367</td><td>260</td><td>÷ 1.41 (√2)</td></tr>
-            <tr><td>4× D</td><td>367</td><td>734</td><td>× 2.00 (√4)</td></tr>
-            <tr><td>9× D</td><td>367</td><td>1,101</td><td>× 3.00 (√9)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="callout accent">
-      <div class="callout-label">Dampened Response</div>
-      <div class="callout-body">The √ function dampens large shocks. A 4× surge in demand only prescribes a 2× larger order. This makes EOQ decisions remarkably <strong>stable</strong> — small errors in estimating D, S, or H don't swing the recommended order size wildly. That's a feature, not a bug.</div>
-    </div>
-
-    <div class="two-col" style="margin-top:18px">
-      <div class="hl-box">
-        <div class="hl-icon">📈</div>
-        <div class="hl-text">
-          <strong>D or S goes up →</strong>
-          EOQ increases. Demand is high or ordering is expensive, so batch larger to spread the fixed cost.
-        </div>
-      </div>
-      <div class="hl-box">
-        <div class="hl-icon">📦</div>
-        <div class="hl-text">
-          <strong>H goes up →</strong>
-          EOQ decreases. Holding is expensive, so carry less inventory at a time, even if you reorder more.
-        </div>
-      </div>
-    </div>
-
-    <div class="callout amber">
-      <div class="callout-label">Assumptions Baked Into EOQ</div>
-      <ul class="assume-list" style="margin-top:8px">
-        <li>Demand is continuous, constant, and known</li>
-        <li>Lead time is constant and known</li>
-        <li>All demand is satisfied — no stockouts allowed</li>
-        <li>Unit price is constant (no quantity discounts)</li>
-        <li>Only carrying cost and ordering cost matter (not purchase price)</li>
-      </ul>
-      <div class="callout-body" style="margin-top:8px"><strong>Every assumption is violated somewhere in the real world.</strong> We'll cover what to do in those cases later.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 7: Multi-Industry Examples ────────────────── -->
-<div class="section dark-section" data-step="7">
-  <div class="section-inner">
-    <div class="section-num" style="color:#7dd3fc">Worked Examples</div>
-    <h2>EOQ across <em>different industries</em></h2>
-    <p>EOQ scales across wildly different contexts. The formula is the same, but the parameters — and the resulting order sizes — vary by orders of magnitude. Click each industry to see the numbers.</p>
-
-    <div class="industry-tabs" id="industryTabs" style="margin-top:20px">
-      <button class="industry-tab active" data-industry="hospital">🏥 Hospital</button>
-      <button class="industry-tab" data-industry="cafe">☕ Espresso Café</button>
-      <button class="industry-tab" data-industry="bike">🚴 Bike Shop</button>
-      <button class="industry-tab" data-industry="auto">🔧 Auto Parts</button>
-      <button class="industry-tab" data-industry="ecom">📦 E-commerce</button>
-    </div>
-
-    <div class="diagram-container" style="border-color:#334155">
-      <div class="diagram-header" style="background:#1e293b;color:#94a3b8">
-        <span id="industry-title">St. John's Hospital — Medical Supply</span>
-        <span id="industry-subtitle" style="font-size:11px;color:#64748b">Given parameters</span>
-      </div>
-      <div class="diagram-body" style="background:#1e293b;padding:18px">
-        <div id="industry-context" style="color:#cbd5e1;font-size:14px;font-style:italic;margin-bottom:14px;padding:10px 14px;background:#0f172a;border-radius:6px;border-left:3px solid #7dd3fc">
-          A regional hospital stocks a high-volume medical supply used across every department.
-        </div>
-
-        <div class="two-col" style="gap:14px">
-          <div>
-            <table class="icc-table" style="font-size:14px">
-              <tbody id="industry-given" style="color:#e2e8f0">
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:0">
-              <div class="formula-label" style="color:#7dd3fc">Calculate EOQ</div>
-              <div class="formula-body" style="color:#e2e8f0;font-size:.92rem" id="industry-calc">
-                EOQ = √(2DS/H)
-              </div>
-            </div>
-            <div class="formula-box" style="background:#0f172a;border-color:#334155;margin-top:10px">
-              <div class="formula-label" style="color:#7dd3fc">Verify Balance</div>
-              <div class="formula-body" style="color:#e2e8f0;font-size:.88rem" id="industry-verify">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout accent" style="background:rgba(14,116,144,0.15);border-color:#0e7490;color:#e2e8f0" id="industry-insight">
-      <div class="callout-label" style="color:#7dd3fc">Industry Insight</div>
-      <div class="callout-body" style="color:#cbd5e1" id="industry-insight-body">
-        Hospital inventory tends toward larger orders due to high unit costs and the catastrophic cost of stockouts on patient care. Safety stock is often generous.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 8: The Flat Bottom ────────────────────────── -->
-<div class="section" data-step="8">
-  <div class="section-inner">
-    <div class="section-num">A Practical Bonus</div>
-    <h2>The cost curve has a <em>flat bottom</em></h2>
-    <p>Here's a subtle but incredibly useful property of the EOQ: the TAC curve is surprisingly flat near the minimum. Being slightly off the optimal Q costs almost nothing.</p>
-    <p>This matters because in real life, you'll rarely order <em>exactly</em> 367.42 units. You'll order 350 (half a case) or 400 (a full case), or whatever your supplier's minimum lot size happens to be. The good news: you don't pay much for rounding.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">Hospital Example — Cost Penalty for Being Off</div>
-      <div class="diagram-body">
-        <table class="compare-table">
-          <thead>
-            <tr><th>Your Q</th><th>vs EOQ (367)</th><th>TAC</th><th>Penalty</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>184</td><td>50% of EOQ</td><td>$18,371</td><td>+25.0%</td></tr>
-            <tr><td>276</td><td>75% of EOQ</td><td>$15,309</td><td>+4.2%</td></tr>
-            <tr><td>331</td><td>90% of EOQ</td><td>$14,779</td><td>+0.6%</td></tr>
-            <tr class="eoq-row"><td>367</td><td>100% (EOQ)</td><td>$14,697</td><td>— minimum</td></tr>
-            <tr><td>404</td><td>110% of EOQ</td><td>$14,764</td><td>+0.5%</td></tr>
-            <tr><td>459</td><td>125% of EOQ</td><td>$15,064</td><td>+2.5%</td></tr>
-            <tr><td>551</td><td>150% of EOQ</td><td>$15,922</td><td>+8.3%</td></tr>
-            <tr><td>735</td><td>200% of EOQ</td><td>$18,371</td><td>+25.0%</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="callout green">
-      <div class="callout-label">What This Means in Practice</div>
-      <div class="callout-body">
-        Being within ±20% of the EOQ costs you less than 2% extra. That's a huge operational win. Round up to a full pallet, match the supplier's minimum, align with a shipping container — all without paying much penalty. <strong>EOQ is a target, not a prescription.</strong>
-      </div>
-    </div>
-
-    <div class="callout amber">
-      <div class="callout-label">The Catch — Asymmetry</div>
-      <div class="callout-body">Notice the table isn't perfectly symmetric. Errors on the <strong>low</strong> side (too small Q) are slightly more forgiving than errors on the high side once you get far out. But within ±30%, the penalty is tiny in either direction.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 9: Reorder Point ──────────────────────────── -->
-<div class="section" style="background:#fff" data-step="9">
-  <div class="section-inner">
-    <div class="section-num">When to Reorder — The Q System</div>
-    <h2>The <em>Continuous Review</em> System</h2>
-    <p>EOQ tells you <em>how much</em> to order. But you also need to know <em>when</em>. The continuous review system — also called the <strong>Q system</strong> or fixed-order-quantity system — watches inventory in real time and triggers an order when stock drops to a threshold called the <strong>Reorder Point (R)</strong>. The order quantity is always the same (Q = EOQ); what floats is <em>when</em> you place it.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">
-        <span>Inventory with Reorder Point — Animated</span>
-        <button class="btn-play" id="playRop">▶ Play</button>
-      </div>
-      <div class="diagram-body" style="padding:16px">
-        <svg id="rop-svg" viewBox="0 0 600 260" style="width:100%;display:block;margin:0 auto">
-          <defs>
-            <marker id="rop-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
-            </marker>
-          </defs>
-          <!-- Axes -->
-          <line x1="50" y1="220" x2="580" y2="220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#rop-arr)"/>
-          <line x1="50" y1="220" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#rop-arr)"/>
-          <text x="315" y="243" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
-          <text x="20" y="125" font-size="11" fill="#64748b" transform="rotate(-90,20,125)" text-anchor="middle" font-family="DM Sans">Inventory</text>
-
-          <!-- Q level -->
-          <text x="55" y="42" font-size="10" fill="#0e7490" font-family="DM Sans" font-weight="700">Q = 367</text>
-
-          <!-- Reorder point line -->
-          <line x1="50" y1="145" x2="575" y2="145" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,4"/>
-          <text x="580" y="148" font-size="10" fill="#d97706" font-family="DM Sans" font-weight="700">R = 180</text>
-
-          <!-- Static sawtooth drawing -->
-          <g id="rop-static">
-            <line x1="70" y1="220" x2="70" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-            <line x1="70" y1="38" x2="230" y2="220" stroke="#0e7490" stroke-width="2.2"/>
-            <line x1="230" y1="220" x2="230" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-            <line x1="230" y1="38" x2="390" y2="220" stroke="#0e7490" stroke-width="2.2"/>
-            <line x1="390" y1="220" x2="390" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-            <line x1="390" y1="38" x2="550" y2="220" stroke="#0e7490" stroke-width="2.2"/>
-
-            <!-- ROP hit markers -->
-            <circle cx="166" cy="145" r="5" fill="#d97706"/>
-            <circle cx="326" cy="145" r="5" fill="#d97706"/>
-            <circle cx="486" cy="145" r="5" fill="#d97706"/>
-            <text x="166" y="133" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle">order placed</text>
-
-            <!-- Lead time bracket -->
-            <line x1="166" y1="190" x2="230" y2="190" stroke="#d97706" stroke-width="1.5"/>
-            <line x1="166" y1="185" x2="166" y2="195" stroke="#d97706" stroke-width="1.5"/>
-            <line x1="230" y1="185" x2="230" y2="195" stroke="#d97706" stroke-width="1.5"/>
-            <text x="198" y="205" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle" font-weight="600">Lead time</text>
-          </g>
-
-          <!-- Animated marker -->
-          <circle id="rop-cursor" cx="70" cy="38" r="7" fill="#7c3aed" opacity="0"/>
-          <text id="rop-status" x="290" y="15" font-size="11" fill="#0e7490" font-family="DM Sans" font-weight="700" text-anchor="middle">Q = 367</text>
-        </svg>
-      </div>
-    </div>
-
-    <p>Each time inventory hits R, a fixed order of <strong>Q = 367 units</strong> is placed. The order arrives exactly one lead time later, replenishing stock back to Q.</p>
-
-    <div class="formula-box">
-      <div class="formula-label">Reorder Point (Constant Demand)</div>
-      <div class="formula-body">
-        R = d × L<br>
-        <span style="color:#6b7280;font-size:.88rem">d = daily demand rate, L = lead time in days</span>
-      </div>
-    </div>
-
-    <div class="callout accent">
-      <div class="callout-label">Hospital Example</div>
-      <div class="callout-body">
-        Daily demand = 10,800 ÷ 360 = <strong>30 units/day</strong><br>
-        Lead time = 6 days<br>
-        R = 30 × 6 = <strong>180 units</strong><br><br>
-        When stock drops to 180 units, place an order for 367 units. The 180 units will last exactly 6 days — just in time for the new shipment.
-      </div>
-    </div>
-
-    <div class="callout blue">
-      <div class="callout-label">Inventory Position (IP)</div>
-      <div class="callout-body">
-        IP = On-Hand + Scheduled Receipts − Backorders<br><br>
-        You track <em>inventory position</em> (not just on-hand) when checking against R, because an order may already be in transit. This prevents double-ordering.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 10: Safety Stock ──────────────────────────── -->
-<div class="section" data-step="10">
-  <div class="section-inner">
-    <div class="section-num">When Demand Varies</div>
-    <h2>Safety stock protects <em>against uncertainty</em></h2>
-    <p>The simple model assumes perfectly constant demand. In reality, demand fluctuates. If demand spikes during lead time, you can run out before your order arrives. <strong>Safety stock</strong> is a buffer against this. The higher your service level target, the more safety stock you need.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">Reorder Point with Variable Demand</div>
-      <div class="diagram-body" style="padding:16px">
-        <svg viewBox="0 0 600 260" style="width:100%;display:block;margin:0 auto">
-          <defs>
-            <marker id="ss-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
-            </marker>
-          </defs>
-          <!-- Axes -->
-          <line x1="50" y1="220" x2="580" y2="220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ss-arr)"/>
-          <line x1="50" y1="220" x2="50" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ss-arr)"/>
-          <text x="315" y="243" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
-          <text x="20" y="125" font-size="11" fill="#64748b" transform="rotate(-90,20,125)" text-anchor="middle" font-family="DM Sans">Inventory</text>
-
-          <!-- Safety stock floor -->
-          <rect x="50" y="190" width="525" height="30" fill="#7c3aed" opacity="0.08"/>
-          <line x1="50" y1="190" x2="575" y2="190" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,3"/>
-          <text x="580" y="193" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">SS buffer</text>
-
-          <!-- ROP line -->
-          <line x1="50" y1="145" x2="575" y2="145" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,4"/>
-          <text x="580" y="148" font-size="10" fill="#d97706" font-family="DM Sans" font-weight="700">R = d̄L + SS</text>
-
-          <!-- Cycle 1: normal demand, ends at SS floor -->
-          <line x1="70" y1="220" x2="70" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-          <line x1="70" y1="38" x2="230" y2="190" stroke="#0e7490" stroke-width="2.2"/>
-          <circle cx="180" cy="145" r="4" fill="#d97706"/>
-          <text x="180" y="133" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle">order</text>
-
-          <!-- Cycle 2: HIGHER demand (steeper drop, dips into safety stock) -->
-          <line x1="230" y1="190" x2="230" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-          <line x1="230" y1="38" x2="370" y2="205" stroke="#b91c1c" stroke-width="2.4"/>
-          <circle cx="322" cy="145" r="4" fill="#d97706"/>
-          <text x="350" y="98" font-size="10" fill="#b91c1c" font-family="DM Sans" font-weight="700">demand spike!</text>
-          <text x="350" y="110" font-size="9" fill="#b91c1c" font-family="DM Sans">dips into SS ↓</text>
-
-          <!-- Cycle 3: LOWER demand, lots of slack -->
-          <line x1="370" y1="205" x2="370" y2="38" stroke="#0e7490" stroke-width="2" stroke-dasharray="4,3"/>
-          <line x1="370" y1="38" x2="560" y2="180" stroke="#059669" stroke-width="2.4"/>
-          <circle cx="510" cy="145" r="4" fill="#d97706"/>
-          <text x="470" y="95" font-size="10" fill="#059669" font-family="DM Sans" font-weight="700">slow demand</text>
-          <text x="470" y="107" font-size="9" fill="#059669" font-family="DM Sans">plenty of slack ↑</text>
-
-          <!-- Q label -->
-          <text x="55" y="33" font-size="10" fill="#0e7490" font-family="DM Sans" font-weight="700">Q</text>
-        </svg>
-      </div>
-    </div>
-
-    <div class="formula-box">
-      <div class="formula-label">Reorder Point with Safety Stock</div>
-      <div class="formula-body">
-        R = d̄·L + z·σ<sub style="font-size:.85em">dL</sub><br>
-        <span style="color:#6b7280;font-size:.85rem">
-          d̄ = avg daily demand &nbsp;|&nbsp; L = lead time<br>
-          z = service level z-score &nbsp;|&nbsp; σ<sub>dL</sub> = std dev of demand during lead time
-        </span>
-      </div>
-    </div>
-
-    <div class="callout purple">
-      <div class="callout-label">How to Find Safety Stock</div>
-      <div class="callout-body">
-        <strong>1.</strong> Choose a service level (e.g., 95% → z = 1.65)<br>
-        <strong>2.</strong> Estimate the standard deviation of demand during lead time<br>
-        <strong>3.</strong> Safety Stock = z × σ<sub>dL</sub><br><br>
-        Higher service level = more safety stock = more carrying cost. It's always a tradeoff between stockout risk and holding cost.
-      </div>
-    </div>
-
-    <div class="diagram-container">
-      <div class="diagram-header">Service Level → z-score → Safety Stock</div>
-      <div class="diagram-body">
-        <table class="compare-table">
-          <thead>
-            <tr><th>Service Level</th><th>z-score</th><th>SS (σ=20)</th><th>Interpretation</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>90%</td><td>1.28</td><td>26 units</td><td>Stock out 1 cycle in 10</td></tr>
-            <tr><td>95%</td><td>1.65</td><td>33 units</td><td>Stock out 1 cycle in 20</td></tr>
-            <tr><td>99%</td><td>2.33</td><td>47 units</td><td>Stock out 1 cycle in 100</td></tr>
-            <tr><td>99.9%</td><td>3.09</td><td>62 units</td><td>Stock out 1 cycle in 1,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="callout amber">
-      <div class="callout-label">Diminishing Returns</div>
-      <div class="callout-body">Going from 95% to 99% service roughly <strong>doubles</strong> safety stock in most cases. Going from 99% to 99.9% doubles it again. The extra reliability gets expensive fast. This is why healthcare and defense tolerate costs that retail doesn't.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 11: Periodic Review (P System) ────────────── -->
-<div class="section" style="background:#fff" data-step="11">
-  <div class="section-inner">
-    <div class="section-num">A Different Approach — The P System</div>
-    <h2>The <em>Periodic Review</em> System</h2>
-    <p>The Q system watches inventory continuously. That requires real-time tracking, which isn't always practical — especially when you manage thousands of SKUs, coordinate orders from a single supplier, or operate on a weekly delivery schedule. The <strong>periodic review system</strong> (P system) flips the logic: instead of watching inventory and triggering on a threshold, you check inventory on a <em>fixed schedule</em> and order however much it takes to top back up to a target level.</p>
-
-    <div class="callout accent">
-      <div class="callout-label">The Key Contrast</div>
-      <div class="callout-body">
-        <strong>Q system:</strong> same amount every time, flexible timing (order when IP hits R).<br>
-        <strong>P system:</strong> fixed schedule, flexible amount (order up to T every P days).<br><br>
-        Both respond to demand variability — they just use different levers.
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:24px;margin-bottom:8px">The protection interval</h3>
-    <p>Here's the critical concept. In the Q system, once you trigger an order, you only had to survive L days — the lead time. In the P system, the vulnerable window is longer. Imagine you just reviewed and placed an order. When is the next moment you can react to unexpectedly high demand? Not until the next review P days from now — and then you wait another L days for that order to arrive. So the exposure window is <strong>P + L days</strong>, called the <strong>protection interval</strong>.</p>
-
-    <div class="diagram-container">
-      <div class="diagram-header">P System — Fixed Reviews, Variable Order Sizes</div>
-      <div class="diagram-body" style="padding:16px">
-        <svg viewBox="0 0 620 280" style="width:100%;display:block;margin:0 auto">
-          <defs>
-            <marker id="p-arr" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
-              <polygon points="0,0 7,3.5 0,7" fill="#94a3b8"/>
-            </marker>
-          </defs>
-          <!-- Axes -->
-          <line x1="60" y1="220" x2="600" y2="220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#p-arr)"/>
-          <line x1="60" y1="220" x2="60" y2="20" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#p-arr)"/>
-          <text x="330" y="270" font-size="11" fill="#64748b" text-anchor="middle" font-family="DM Sans">Time</text>
-          <text x="22" y="125" font-size="11" fill="#64748b" transform="rotate(-90,22,125)" text-anchor="middle" font-family="DM Sans">Inventory</text>
-
-          <!-- Target level T -->
-          <line x1="60" y1="40" x2="595" y2="40" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="5,3"/>
-          <text x="600" y="43" font-size="11" fill="#b91c1c" font-family="DM Sans" font-weight="700">T</text>
-
-          <!-- Review periods P -->
-          <line x1="120" y1="220" x2="120" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
-          <line x1="300" y1="220" x2="300" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
-          <line x1="480" y1="220" x2="480" y2="30" stroke="#64748b" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
-          <text x="120" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 1</text>
-          <text x="300" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 2</text>
-          <text x="480" y="15" font-size="10" fill="#64748b" font-family="DM Sans" text-anchor="middle" font-weight="700">Review 3</text>
-
-          <!-- P brackets at bottom -->
-          <line x1="120" y1="238" x2="300" y2="238" stroke="#0e7490" stroke-width="1.5"/>
-          <line x1="120" y1="233" x2="120" y2="243" stroke="#0e7490" stroke-width="1.5"/>
-          <line x1="300" y1="233" x2="300" y2="243" stroke="#0e7490" stroke-width="1.5"/>
-          <text x="210" y="251" font-size="10" fill="#0e7490" font-family="DM Sans" text-anchor="middle" font-weight="700">P</text>
-          <line x1="300" y1="238" x2="480" y2="238" stroke="#0e7490" stroke-width="1.5"/>
-          <line x1="480" y1="233" x2="480" y2="243" stroke="#0e7490" stroke-width="1.5"/>
-          <text x="390" y="251" font-size="10" fill="#0e7490" font-family="DM Sans" text-anchor="middle" font-weight="700">P</text>
-
-          <!-- Inventory line going down, with jumps at arrivals -->
-          <!-- IP at review 1 = 100 (down from 180 start) -->
-          <!-- Period 1: moderate drop -->
-          <line x1="60" y1="70" x2="120" y2="120" stroke="#1e3a8a" stroke-width="2"/>
-          <!-- Order placed at R1 (dashed up to new IP) -->
-          <line x1="120" y1="120" x2="120" y2="55" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <!-- Continue draining during L (lead time) -->
-          <line x1="120" y1="120" x2="170" y2="160" stroke="#1e3a8a" stroke-width="2"/>
-          <!-- Order arrives (jump up to top-up) -->
-          <line x1="170" y1="160" x2="170" y2="55" stroke="#1e3a8a" stroke-width="2.5"/>
-          <!-- Drain to review 2 -->
-          <line x1="170" y1="55" x2="300" y2="170" stroke="#1e3a8a" stroke-width="2"/>
-          <!-- Order placed at R2 -->
-          <line x1="300" y1="170" x2="300" y2="40" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <!-- Drain during L -->
-          <line x1="300" y1="170" x2="350" y2="200" stroke="#1e3a8a" stroke-width="2"/>
-          <!-- Order arrives -->
-          <line x1="350" y1="200" x2="350" y2="70" stroke="#1e3a8a" stroke-width="2.5"/>
-          <!-- Drain to review 3 -->
-          <line x1="350" y1="70" x2="480" y2="130" stroke="#1e3a8a" stroke-width="2"/>
-          <line x1="480" y1="130" x2="480" y2="60" stroke="#1e3a8a" stroke-width="1.5" stroke-dasharray="4,3"/>
-          <line x1="480" y1="130" x2="530" y2="170" stroke="#1e3a8a" stroke-width="2"/>
-          <line x1="530" y1="170" x2="530" y2="65" stroke="#1e3a8a" stroke-width="2.5"/>
-          <line x1="530" y1="65" x2="590" y2="120" stroke="#1e3a8a" stroke-width="2"/>
-
-          <!-- Order-placed markers -->
-          <circle cx="120" cy="120" r="5" fill="#d97706"/>
-          <circle cx="300" cy="170" r="5" fill="#d97706"/>
-          <circle cx="480" cy="130" r="5" fill="#d97706"/>
-
-          <!-- Order-received markers -->
-          <circle cx="170" cy="55" r="5" fill="#059669"/>
-          <circle cx="350" cy="70" r="5" fill="#059669"/>
-          <circle cx="530" cy="65" r="5" fill="#059669"/>
-
-          <!-- Q labels -->
-          <text x="145" y="90" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₁</text>
-          <text x="325" y="120" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₂ (bigger)</text>
-          <text x="505" y="95" font-size="10" fill="#7c3aed" font-family="DM Sans" font-weight="700">Q₃</text>
-
-          <!-- Lead time bracket on first cycle -->
-          <line x1="120" y1="180" x2="170" y2="180" stroke="#d97706" stroke-width="1.2"/>
-          <line x1="120" y1="175" x2="120" y2="185" stroke="#d97706" stroke-width="1.2"/>
-          <line x1="170" y1="175" x2="170" y2="185" stroke="#d97706" stroke-width="1.2"/>
-          <text x="145" y="195" font-size="9" fill="#d97706" font-family="DM Sans" text-anchor="middle" font-weight="600">L</text>
-
-          <!-- Protection interval highlight (P + L, from review 1 to arrival after review 2) -->
-          <line x1="120" y1="258" x2="350" y2="258" stroke="#b91c1c" stroke-width="2"/>
-          <line x1="120" y1="253" x2="120" y2="263" stroke="#b91c1c" stroke-width="2"/>
-          <line x1="350" y1="253" x2="350" y2="263" stroke="#b91c1c" stroke-width="2"/>
-          <text x="235" y="272" font-size="10" fill="#b91c1c" font-family="DM Sans" text-anchor="middle" font-weight="700">Protection interval = P + L</text>
-        </svg>
-        <p class="muted" style="text-align:center;font-size:12px;margin:8px 0 0">Reviews happen on a fixed schedule (every P days). At each review, the order quantity Q adjusts to bring inventory position back up to target T.</p>
-      </div>
-    </div>
-
-    <div class="formula-box">
-      <div class="formula-label">Target Inventory Level (T)</div>
-      <div class="formula-body">
-        T = d̄(P + L) + z·σ<sub style="font-size:.85em">P+L</sub><br>
-        Order Quantity at review: Q = T − IP<br>
-        <span style="color:#6b7280;font-size:.85rem">
-          P = review period &nbsp;|&nbsp; L = lead time &nbsp;|&nbsp; IP = inventory position at review<br>
-          σ<sub>P+L</sub> = std dev of demand over the protection interval
-        </span>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:24px;margin-bottom:8px">Coffee pods — the P-system version</h3>
-    <p>You decide to check your pod drawer every Sunday (P = 7 days). Shipping still takes 3 days (L = 3). You drink about 2 pods/day. The protection interval is P + L = 10 days, so your target is <strong>T = 2 × 10 = 20 pods</strong>. Whatever you count on Sunday, you order up to 20.</p>
-
-    <div class="two-col">
-      <div class="callout blue" style="margin:0">
-        <div class="callout-label">Busy Week</div>
-        <div class="callout-body">
-          Friends over all week. Sunday count: <strong>6 pods.</strong><br>
-          Order quantity Q = 20 − 6 = <strong>14 pods</strong>
-        </div>
-      </div>
-      <div class="callout green" style="margin:0">
-        <div class="callout-label">Slow Week</div>
-        <div class="callout-body">
-          You traveled Tue–Fri. Sunday count: <strong>14 pods.</strong><br>
-          Order quantity Q = 20 − 14 = <strong>6 pods</strong>
-        </div>
-      </div>
-    </div>
-
-    <p style="margin-top:14px">Same day. Same target T. Different order size. The review day never moves — the order quantity floats with whatever demand actually did.</p>
-
-    <div class="callout purple">
-      <div class="callout-label">Why P Needs More Safety Stock than Q</div>
-      <div class="callout-body">The protection interval P + L is longer than just L, so accumulated demand uncertainty is larger. The <strong>√(P+L)</strong> term in safety stock is strictly bigger than the <strong>√L</strong> term in the Q system. Practically: for the same service level and demand variability, the P system always carries more safety stock. You're paying for operational simplicity with a slightly larger inventory buffer.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 12: P-System Worked Example (Petromax) ────── -->
-<div class="section dark-section" data-step="12">
-  <div class="section-inner">
-    <div class="section-num" style="color:#7dd3fc">Worked Example — P System</div>
-    <h2>Petromax Enterprises — <em>target inventory level</em></h2>
-    <p>Petromax uses a periodic review system for a key product. Here are the parameters:</p>
-
-    <div class="diagram-container" style="border-color:#334155">
-      <div class="diagram-header" style="background:#1e293b;color:#94a3b8">Given Information</div>
-      <div class="diagram-body" style="background:#1e293b;padding:18px">
-        <table style="width:100%;color:#e2e8f0;font-size:14px;border-collapse:collapse">
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Weekly demand (d̄)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">92 units/week</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Ordering cost (S)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">$90/order</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Holding cost (H)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">$18/unit/yr</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Operating weeks</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">50 weeks/yr</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Lead time (L)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">1 week</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Weekly demand std dev (σ<sub>d</sub>)</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">23 units</td></tr>
-          <tr style="border-bottom:1px solid #334155"><td style="color:#94a3b8;padding:8px 10px">Service level / z</td><td style="color:#7dd3fc;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">92% / z ≈ 1.41</td></tr>
-          <tr><td style="color:#94a3b8;padding:8px 10px">EOQ (given)</td><td style="color:#fcd34d;font-family:'JetBrains Mono',monospace;text-align:right;padding:8px 10px">214 units</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
-      <div class="formula-label" style="color:#7dd3fc">Step 1: Find the review period P</div>
-      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
-        P is chosen so each review matches the EOQ cycle: P = EOQ / d̄<br>
-        P = 214 / 92 ≈ <span style="color:#fcd34d">2.33 weeks</span>
-      </div>
-    </div>
-
-    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
-      <div class="formula-label" style="color:#7dd3fc">Step 2: Protection interval</div>
-      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
-        P + L = 2.33 + 1 = <span style="color:#fcd34d">3.33 weeks</span><br>
-        <span style="color:#94a3b8;font-size:.82rem">This is the vulnerable window the target must cover.</span>
-      </div>
-    </div>
-
-    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
-      <div class="formula-label" style="color:#7dd3fc">Step 3: Safety stock</div>
-      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
-        SS = z · σ<sub>d</sub> · √(P + L)<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;= 1.41 × 23 × √3.33<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;= 1.41 × 23 × 1.824<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;≈ <span style="color:#fcd34d">59 units</span>
-      </div>
-    </div>
-
-    <div class="formula-box" style="background:#0f172a;border-color:#334155;margin:16px 0">
-      <div class="formula-label" style="color:#7dd3fc">Step 4: Target inventory level T</div>
-      <div class="formula-body" style="color:#e2e8f0;font-size:.95rem">
-        T = d̄(P + L) + SS<br>
-        &nbsp;&nbsp;&nbsp;= 92 × 3.33 + 59<br>
-        &nbsp;&nbsp;&nbsp;= 306 + 59<br>
-        <span class="big" style="color:#fcd34d">T ≈ 365 units</span>
-      </div>
-    </div>
-
-    <div class="callout accent" style="background:rgba(14,116,144,0.15);border-color:#0e7490;color:#e2e8f0">
-      <div class="callout-label" style="color:#7dd3fc">Interpretation</div>
-      <div class="callout-body" style="color:#cbd5e1">
-        Every 2.33 weeks (the review period), Petromax counts inventory position and orders up to 365 units. If IP = 200 at a review, order 165. If IP = 80, order 285. The target stays fixed at 365; <strong>the order quantity floats with whatever demand did since last review.</strong>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 13: When EOQ Breaks ───────────────────────── -->
-<div class="section" style="background:#fff" data-step="13">
-  <div class="section-inner">
-    <div class="section-num">Limits of the Model</div>
-    <h2>When EOQ <em>doesn't apply</em></h2>
-    <p>EOQ is a remarkably useful framework, but every assumption can break. Recognizing when is half the skill.</p>
-
-    <div class="callout red">
-      <div class="callout-label">Quantity Discounts</div>
-      <div class="callout-body">
-        If a supplier offers a price break at Q = 500 (say, 3% off), the purchase cost suddenly jumps into the analysis. The EOQ formula ignores purchase price, but with discounts the savings may outweigh the extra holding cost. <strong>Fix:</strong> compute TAC + purchase cost at the EOQ and at each discount threshold; pick the lowest.
-      </div>
-    </div>
-
-    <div class="callout purple">
-      <div class="callout-label">Lumpy / Intermittent Demand</div>
-      <div class="callout-body">
-        EOQ assumes demand is steady. If your SKU sells 50 units one week and zero for three weeks, the "average" misleads you. The sawtooth isn't really a sawtooth. <strong>Fix:</strong> use MRP, Silver-Meal heuristics, or period-order-quantity approaches designed for discrete demand.
-      </div>
-    </div>
-
-    <div class="callout green">
-      <div class="callout-label">The JIT / Lean Philosophy</div>
-      <div class="callout-body">
-        Lean thinking flips the premise: rather than accepting S as fixed, <strong>attack S itself</strong>. Reduce setup times via SMED, partner tightly with suppliers, use kanban signals. As S approaches zero, EOQ approaches zero — and you've enabled single-piece flow.<br><br>
-        This is one of Toyota's central insights: EOQ gives you the best answer <em>given your current S</em>, but S isn't fixed by physics.
-      </div>
-    </div>
-
-    <div class="callout blue">
-      <div class="callout-label">Perishables & Obsolescence Risk</div>
-      <div class="callout-body">
-        For products with a shelf life (food, pharmaceuticals) or fast obsolescence (electronics, fashion), holding costs aren't just interest and storage — they're the risk of writing off the entire batch. H should be inflated dramatically, which drives EOQ down. Some industries replace EOQ entirely with newsvendor-model thinking.
-      </div>
-    </div>
-
-    <div class="callout amber">
-      <div class="callout-label">Capacity Constraints</div>
-      <div class="callout-body">
-        If the EOQ says "order 10,000 units" but your warehouse holds 6,000, the model is giving advice you can't follow. Constrained EOQ problems require a Lagrangian approach — or, practically, just order up to capacity and accept the higher total cost.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── SECTION 14: Summary ───────────────────────────────── -->
-<div class="section summary-section" data-step="14">
-  <div class="section-inner">
-    <div class="section-num" style="color:var(--green)">Summary</div>
-    <h2>The <em>complete picture</em></h2>
-    <p>The EOQ framework answers two fundamental inventory questions: how much to order, and when to order. Here are all the pieces in one place.</p>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:16px;margin-bottom:8px;color:var(--green)">Costs & EOQ</h3>
-    <div class="two-col">
-      <div>
-        <div class="formula-card">
-          <div class="fc-label">Holding Cost per Year</div>
-          <div class="fc-formula">ICC/yr = (Q/2) × H</div>
-        </div>
-        <div class="formula-card">
-          <div class="fc-label">Ordering Cost per Year</div>
-          <div class="fc-formula">OC/yr = (D/Q) × S</div>
-        </div>
-        <div class="formula-card">
-          <div class="fc-label">Total Annual Cost</div>
-          <div class="fc-formula">TAC = (Q/2)H + (D/Q)S</div>
-        </div>
-      </div>
-      <div>
-        <div class="formula-card" style="border-color:#a5b4fc;background:#eef2ff">
-          <div class="fc-label" style="color:#4338ca">EOQ Formula</div>
-          <div class="fc-formula" style="color:#1e1b4b;font-size:1.1rem;font-weight:700">EOQ = √(2DS/H)</div>
-        </div>
-        <div class="formula-card">
-          <div class="fc-label">Orders per Year</div>
-          <div class="fc-formula">N = D / EOQ</div>
-        </div>
-        <div class="formula-card">
-          <div class="fc-label">Cycle Time</div>
-          <div class="fc-formula">Cycle = EOQ / D</div>
-        </div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:22px;margin-bottom:8px;color:var(--green)">Q System — Continuous Review</h3>
-    <div class="two-col">
-      <div>
-        <div class="formula-card">
-          <div class="fc-label">Reorder Point (fixed demand)</div>
-          <div class="fc-formula">R = d × L</div>
-        </div>
-      </div>
-      <div>
-        <div class="formula-card">
-          <div class="fc-label">Reorder Point (variable demand)</div>
-          <div class="fc-formula">R = d̄·L + z·σ<sub style="font-size:.85em">dL</sub></div>
-        </div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:22px;margin-top:22px;margin-bottom:8px;color:var(--green)">P System — Periodic Review</h3>
-    <div class="two-col">
-      <div>
-        <div class="formula-card">
-          <div class="fc-label">Target Inventory Level</div>
-          <div class="fc-formula">T = d̄(P + L) + z·σ<sub style="font-size:.85em">P+L</sub></div>
-        </div>
-      </div>
-      <div>
-        <div class="formula-card">
-          <div class="fc-label">Order Quantity at Review</div>
-          <div class="fc-formula">Q = T − IP</div>
-        </div>
-      </div>
-    </div>
-
-    <h3 style="font-family:'Instrument Serif',serif;font-size:24px;margin-top:28px;margin-bottom:10px">Six big takeaways</h3>
-    <div class="hl-box">
-      <div class="hl-icon">⚖️</div>
-      <div class="hl-text"><strong>Two costs in tension.</strong> Holding cost rises with Q, ordering cost falls with Q. EOQ sits where they balance.</div>
-    </div>
-    <div class="hl-box">
-      <div class="hl-icon">√</div>
-      <div class="hl-text"><strong>Square-root dampening.</strong> Doubling D or S only multiplies EOQ by 1.41. This makes EOQ stable to estimation errors.</div>
-    </div>
-    <div class="hl-box">
-      <div class="hl-icon">📏</div>
-      <div class="hl-text"><strong>Flat bottom.</strong> Being within ±20% of EOQ costs less than 2%. Round up to pallet, case, or container without worry.</div>
-    </div>
-    <div class="hl-box">
-      <div class="hl-icon">🔔</div>
-      <div class="hl-text"><strong>Safety stock is for uncertainty.</strong> Variable demand or lead times require a buffer — and higher service levels get expensive fast.</div>
-    </div>
-    <div class="hl-box">
-      <div class="hl-icon">🔄</div>
-      <div class="hl-text"><strong>Q vs P.</strong> Q system: same amount, flexible timing. P system: fixed schedule, flexible amount. Pick based on tracking capability and supplier schedule.</div>
-    </div>
-    <div class="hl-box">
-      <div class="hl-icon">🚫</div>
-      <div class="hl-text"><strong>Know when it breaks.</strong> Quantity discounts, perishables, lumpy demand, capacity limits, and Lean philosophy all demand different tools.</div>
-    </div>
-
-    <div class="callout green" style="margin-top:20px">
-      <div class="callout-label">Hospital Example — Final Answer</div>
-      <div class="callout-body">
-        D = 10,800 &nbsp;|&nbsp; H = $40 &nbsp;|&nbsp; S = $250 &nbsp;|&nbsp; L = 6 days<br><br>
-        <strong>Order 367 units</strong> each time inventory drops to <strong>180 units</strong>.<br>
-        Total annual cost ≈ <strong>$14,697/year</strong>.
-      </div>
-    </div>
-  </div>
-</div>
-
+<header>
+  <a class="home" href="/csuf-mgmt339/">← MGMT 339</a>
+  <h1>Inventory Management: EOQ, Q System, P System</h1>
+  <nav class="parts" id="parts"></nav>
+</header>
+<div class="progress"><div id="bar"></div></div>
+<main><section class="slide" id="slide" aria-live="polite"></section></main>
+<footer>
+  <button id="prev">← Back</button>
+  <span id="counter"></span>
+  <button id="next" class="primary">Next →</button>
+  <span class="kbd">Arrow keys work too</span>
+</footer>
 <script>
-  // ────────────────────────────────────────────
-  // NAV & PROGRESS
-  // ────────────────────────────────────────────
-  const sections = document.querySelectorAll('.section');
-  const navSteps = document.getElementById('navSteps');
-  const progressBar = document.getElementById('progressBar');
+(function(){
+const $=s=>document.querySelector(s);
+const fmt=(x,d=0)=>Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const $$=(n)=>'$'+fmt(Math.round(n));
+// ---------- shared examples (match the lecture slides) ----------
+const EX={D:10800,C:160,i:0.25,S:250,days:360,L:6};      // EOQ example: H = $40, EOQ = 367, R = 180
+const RX={d:30,sd:5,L:4,sl:95,P:12};                      // Valley Pharmacy: SS = 17, R = 137; P system T = 513
+const Z={80:0.84,85:1.04,90:1.28,95:1.65,97.5:1.96,99:2.33,99.9:3.09};
+const SLS=[80,85,90,95,97.5,99,99.9];
 
-  sections.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'nav-dot';
-    dot.setAttribute('aria-label', 'Go to section ' + (i + 1));
-    dot.onclick = () => sections[i].scrollIntoView({ behavior: 'smooth' });
-    navSteps.appendChild(dot);
-  });
-  const dots = document.querySelectorAll('.nav-dot');
+// ---------- tiny SVG helpers ----------
+function svg(w,h,inner){return `<svg viewBox="0 0 ${w} ${h}" role="img">${inner}</svg>`}
+function axes(x0,y0,x1,y1,xl,yl){return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#9AA4B2"/><line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="#9AA4B2"/>`+
+  `<text x="${(x0+x1)/2}" y="${y0+34}" text-anchor="middle" font-size="14" fill="#5A6472">${xl}</text>`+
+  `<text x="${x0-44}" y="${(y0+y1)/2}" text-anchor="middle" font-size="14" fill="#5A6472" transform="rotate(-90 ${x0-44} ${(y0+y1)/2})">${yl}</text>`}
+function poly(pts,col,w=3,dash=''){return `<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${col}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''} stroke-linejoin="round"/>`}
+function tick(x,y,t,anchor='middle'){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="13" fill="#5A6472">${t}</text>`}
 
-  function onScroll() {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    progressBar.style.width = (docHeight > 0 ? scrollTop / docHeight * 100 : 0) + '%';
-    let active = 0;
-    sections.forEach((sec, i) => {
-      if (sec.getBoundingClientRect().top <= window.innerHeight * 0.4) active = i;
-    });
-    dots.forEach((d, i) => d.classList.toggle('active', i === active));
+// Sawtooth: inventory over one year for order size Q (optional reorder line R)
+function sawtooth(Q,{D=EX.D,R=null,maxQ=1200,showAvg=true,days=EX.days,L=null}={}){
+  const W=640,H=300,x0=70,y0=250,x1=620,y1=30;
+  const sx=t=>x0+(x1-x0)*t/days, sy=v=>y0-(y0-y1)*v/maxQ;
+  const cyc=Q/(D/EX.days); let pts=[], t=0, shade='';
+  while(t<days-1e-9){const te=Math.min(days,t+cyc); const vEnd=Q-(Q*(te-t)/cyc);
+    pts.push([sx(t),sy(Q)],[sx(te),sy(Math.max(0,vEnd))]);
+    if(L!==null&&R!==null){const tr=t+cyc*(1-R/Q); if(tr<days) shade+=`<rect x="${sx(tr)}" y="${y1}" width="${Math.max(0,sx(Math.min(days,tr+L))-sx(tr))}" height="${y0-y1}" fill="#FDF0E3"/>`;}
+    t=te;}
+  let g=axes(x0,y0,x1,y1,days>100?'Days in the year':'Days','Units on hand')+shade;
+  (days>100?[0,90,180,270,360]:[0,15,30,45,60]).forEach(d=>g+=tick(sx(d),y0+18,d));
+  [0,maxQ/2,maxQ].forEach(v=>g+=tick(x0-8,sy(v)+4,fmt(v),'end'));
+  g+=poly(pts,'#002E5B',2.5);
+  if(showAvg) g+=`<line x1="${x0}" y1="${sy(Q/2)}" x2="${x1}" y2="${sy(Q/2)}" stroke="#C85F00" stroke-width="2.5" stroke-dasharray="8 6"/><text x="${x1}" y="${sy(Q/2)-8}" text-anchor="end" font-size="15" font-weight="700" fill="#C85F00">average = Q/2 = ${fmt(Q/2)}</text>`;
+  if(R!==null) g+=`<line x1="${x0}" y1="${sy(R)}" x2="${x1}" y2="${sy(R)}" stroke="#B42318" stroke-width="2.5" stroke-dasharray="4 4"/><text x="${x0+8}" y="${sy(R)-8}" font-size="15" font-weight="700" fill="#B42318">reorder point R = ${fmt(R)}</text>`;
+  return svg(W,H+20,g);
+}
+function costs(Q,{D=EX.D,S=EX.S,H=EX.C*EX.i}={}){const c=Q/2*H,o=D/Q*S;return{c,o,t:c+o}}
+function eoq(D,S,H){return Math.sqrt(2*D*S/H)}
+function uCurve(Q,{D=EX.D,S=EX.S,H=EX.C*EX.i,maxQ=1200}={}){
+  const W=640,H2=320,x0=80,y0=270,x1=620,y1=24, maxC=32000;
+  const sx=q=>x0+(x1-x0)*q/maxQ, sy=v=>y0-(y0-y1)*Math.min(v,maxC)/maxC;
+  const qs=[];for(let q=60;q<=maxQ;q+=10)qs.push(q);
+  let g=axes(x0,y0,x1,y1,'Order size (Q)','Annual cost');
+  [0,300,600,900,1200].forEach(q=>g+=tick(sx(q),y0+18,fmt(q)));
+  [0,10000,20000,30000].forEach(v=>g+=tick(x0-8,sy(v)+4,'$'+fmt(v/1000)+'k','end'));
+  g+=poly(qs.map(q=>[sx(q),sy(q/2*H)]),'#002E5B',3)+poly(qs.map(q=>[sx(q),sy(D/q*S)]),'#C85F00',3)+poly(qs.map(q=>[sx(q),sy(q/2*H+D/q*S)]),'#1E7A3C',4);
+  const e=eoq(D,S,H); const ce=costs(e,{D,S,H});
+  g+=`<line x1="${sx(e)}" y1="${y0}" x2="${sx(e)}" y2="${sy(ce.t)}" stroke="#1E7A3C" stroke-dasharray="4 4"/><circle cx="${sx(e)}" cy="${sy(ce.t)}" r="6" fill="#1E7A3C"/><text x="${sx(e)+8}" y="${sy(ce.t)+24}" font-size="14" fill="#1E7A3C" font-weight="700">EOQ ≈ ${fmt(e)}</text>`;
+  const c=costs(Q,{D,S,H});
+  g+=`<line x1="${sx(Q)}" y1="${y0}" x2="${sx(Q)}" y2="${y1}" stroke="#B42318" stroke-width="2"/><circle cx="${sx(Q)}" cy="${sy(c.t)}" r="7" fill="#fff" stroke="#B42318" stroke-width="3"/>`;
+  g+=`<text x="${x1}" y="${y1+12}" text-anchor="end" font-size="14"><tspan fill="#002E5B" font-weight="700">— Carrying  </tspan><tspan fill="#C85F00" font-weight="700">— Ordering  </tspan><tspan fill="#1E7A3C" font-weight="700">— Total</tspan></text>`;
+  return svg(W,H2+20,g);
+}
+function normalChart(mean,sd,z){
+  const W=640,H=280,x0=40,y0=230,x1=620,y1=30; const lo=mean-4*sd, hi=mean+4*sd;
+  const sx=x=>x0+(x1-x0)*(x-lo)/(hi-lo); const pdf=x=>Math.exp(-0.5*((x-mean)/sd)**2); const sy=v=>y0-(y0-y1)*v;
+  const R=mean+z*sd; let pts=[],tail=[[sx(R),y0]];
+  for(let i=0;i<=200;i++){const x=lo+(hi-lo)*i/200; pts.push([sx(x),sy(pdf(x))]); if(x>=R) tail.push([sx(x),sy(pdf(x))]);}
+  tail.push([sx(hi),y0]);
+  let g=`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#9AA4B2"/>`;
+  g+=`<polygon points="${tail.map(p=>p.join(',')).join(' ')}" fill="#F7C9C3"/>`;
+  g+=poly(pts,'#002E5B',3);
+  g+=`<line x1="${sx(mean)}" y1="${y0}" x2="${sx(mean)}" y2="${y1}" stroke="#002E5B" stroke-dasharray="4 4"/><text x="${sx(mean)}" y="${y0+22}" text-anchor="middle" font-size="14" fill="#002E5B">average ${fmt(mean)}</text>`;
+  g+=`<line x1="${sx(R)}" y1="${y0}" x2="${sx(R)}" y2="${y1}" stroke="#B42318" stroke-width="3"/><text x="${sx(R)}" y="${y1-6}" text-anchor="middle" font-size="15" font-weight="700" fill="#B42318">R = ${fmt(Math.ceil(R-1e-9))}</text>`;
+  g+=`<text x="${(sx(R)+x1)/2}" y="${y0-12}" text-anchor="middle" font-size="13" fill="#B42318">stockout risk</text>`;
+  g+=`<text x="${x0}" y="${y0+44}" font-size="14" fill="#5A6472">Demand during the delivery wait</text>`;
+  return svg(W,H+30,g);
+}
+function bars(items,maxV,unit=''){
+  const W=640,H=260,x0=40,y0=210,x1=620,y1=30; const bw=(x1-x0)/items.length;
+  let g=`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#9AA4B2"/>`;
+  items.forEach((it,i)=>{const h=(y0-y1)*it.v/maxV, x=x0+i*bw+bw*0.18, w=bw*0.64;
+    g+=`<rect x="${x}" y="${y0-h}" width="${w}" height="${h}" rx="4" fill="${it.hl?'#C85F00':'#9FB3C8'}"/><text x="${x+w/2}" y="${y0-h-8}" text-anchor="middle" font-size="15" font-weight="700" fill="${it.hl?'#C85F00':'#1B2430'}">${fmt(it.v,1)}${unit}</text><text x="${x+w/2}" y="${y0+22}" text-anchor="middle" font-size="14" fill="#5A6472">${it.label}</text>`;});
+  return svg(W,H,g);
+}
+// P system sawtooth with variable demand (seeded so it's the same every time)
+function pSaw(P,L,T,{d=RX.d,days=60}={}){
+  const W=640,H=300,x0=70,y0=250,x1=620,y1=30,maxV=Math.max(600,T*1.15);
+  const sx=t=>x0+(x1-x0)*t/days, sy=v=>y0-(y0-y1)*Math.max(0,v)/maxV;
+  let seed=7; const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  let inv=T-d*L, pts=[[sx(0),sy(inv)]], orders=[], g='';
+  const pending=[];
+  for(let day=0;day<days;day++){
+    if(day%P===0){const q=Math.round(T-(inv+pending.reduce((a,o)=>a+o.q,0))); if(q>0){pending.push({q,arr:day+L}); orders.push({day,q});}}
+    const use=d*(0.6+0.8*rnd()); inv-=use; pts.push([sx(day+1),sy(inv)]);
+    for(let k=pending.length-1;k>=0;k--) if(pending[k].arr===day+1){inv+=pending[k].q; pts.push([sx(day+1),sy(inv)]); pending.splice(k,1);}
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  g+=axes(x0,y0,x1,y1,'Days','Units on hand');
+  [0,20,40,60].forEach(t=>g+=tick(sx(t),y0+18,t));
+  g+=`<line x1="${x0}" y1="${sy(T)}" x2="${x1}" y2="${sy(T)}" stroke="#C85F00" stroke-width="2.5" stroke-dasharray="8 6"/><text x="${x1}" y="${sy(T)-8}" text-anchor="end" font-size="15" font-weight="700" fill="#C85F00">target T = ${fmt(T)}</text>`;
+  orders.forEach((o,k)=>{g+=`<line x1="${sx(o.day)}" y1="${y0}" x2="${sx(o.day)}" y2="${y1+30}" stroke="#9AA4B2" stroke-dasharray="3 4"/><text x="${sx(o.day)+4}" y="${y1+44+(k%2)*16}" font-size="13" fill="#5A6472">order ${fmt(o.q)}</text>`;});
+  g+=`<text x="${x0+6}" y="${y0-8}" font-size="13" fill="#5A6472">dashed lines = review days</text>`;
+  g+=poly(pts,'#002E5B',2.5);
+  return svg(W,H+20,g);
+}
 
-  // ────────────────────────────────────────────
-  // ICC INTERACTIVE
-  // ────────────────────────────────────────────
-  const iccUnit = document.getElementById('icc-unit');
-  const iccAvg = document.getElementById('icc-avg');
-  const iccRate = document.getElementById('icc-rate');
-  function updateICC() {
-    const u = +iccUnit.value;
-    const a = +iccAvg.value;
-    const r = +iccRate.value;
-    const H = u * (r / 100);
-    const annual = a * H;
-    document.getElementById('icc-unit-val').textContent = '$' + u;
-    document.getElementById('icc-avg-val').textContent = a.toLocaleString();
-    document.getElementById('icc-rate-val').textContent = r + '%';
-    document.getElementById('icc-h-out').textContent = '$' + H.toFixed(2);
-    document.getElementById('icc-annual-out').textContent = '$' + Math.round(annual).toLocaleString();
-  }
-  [iccUnit, iccAvg, iccRate].forEach(el => el.addEventListener('input', updateICC));
-  updateICC();
+// ---------- slides ----------
+const PARTS=['Start','Costs','EOQ','Q system','P system','Summary'];
+const slides=[
+{part:0,html:()=>`<div class="kicker">MGMT 339 · Inventory management</div><h2>How much to order, and when?</h2>
+<p class="lead">Every inventory manager answers two questions. This guide walks through them one step at a time, using the same examples as the lecture slides.</p>
+<div class="cols"><div class="box"><b>How much?</b><br>Balance the cost of <b>holding</b> stock against the cost of <b>ordering</b> it → the Economic Order Quantity (EOQ).</div>
+<div class="box"><b>When?</b><br>Reorder when what's left will last exactly as long as the delivery takes, plus a cushion for bad days → reorder point and safety stock (Q system), or a fixed review schedule (P system).</div></div>
+<p class="anchor">Too little and you lose the sale. Too much and you lose the money.</p>`},
+{part:1,html:()=>`<div class="kicker">Costs · 1 of 3</div><h2>Two costs pull against each other</h2>
+<div class="cols"><div class="box"><b>Order a lot at once</b><ul class="clean"><li>Few orders, so low ordering cost</li><li>But lots of stock sitting on the shelf → high <b>carrying cost</b></li></ul></div>
+<div class="box"><b>Order a little at a time</b><ul class="clean"><li>Little stock on the shelf → low carrying cost</li><li>But you're ordering constantly → high <b>ordering cost</b></li></ul></div></div>
+<p class="lead" style="margin-top:16px">Running example (same as the slides): demand <b>D = 10,800 units/yr</b>, unit cost <b>$160</b>, holding <b>25%</b> per year, ordering cost <b>S = $250</b> per order.</p>
+<p class="anchor">The EOQ is the order size where these two costs balance.</p>`},
+{part:1,html:()=>`<div class="kicker">Costs · 2 of 3</div><h2>Carrying cost: the price of having stock</h2>
+<div class="cols wide-right"><div><div class="formula">Carrying cost/yr = <span class="t1">Q/2</span> × <span class="t3">H</span></div>
+<ul class="clean"><li><b>H</b> = holding % × unit cost = 25% × $160 = <b>$40</b> per unit per year (cash tied up, storage, insurance, spoilage).</li>
+<li><b>Q/2</b>: you receive Q, use it steadily down to zero, then receive Q again. On average, half of Q is on the shelf.</li></ul>
+<div class="ctrl"><label>Order size Q</label><input type="range" id="q1" min="60" max="1200" step="10" value="600"><output id="q1o"></output></div>
+<div class="read"><div><span>Average inventory</span><strong id="r1a"></strong></div><div class="hl"><span>Carrying cost / yr</span><strong id="r1b"></strong></div></div></div>
+<div id="c1"></div></div>
+<p class="anchor">Inventory is cash sitting on a shelf.</p>`,
+ init:()=>{const f=()=>{const Q=+$('#q1').value;$('#q1o').textContent=fmt(Q);$('#r1a').textContent=fmt(Q/2);$('#r1b').textContent=$$(Q/2*40);$('#c1').innerHTML=sawtooth(Q)};$('#q1').oninput=f;f();}},
+{part:1,html:()=>`<div class="kicker">Costs · 3 of 3</div><h2>Ordering cost: the price of getting stock</h2>
+<div class="cols wide-right"><div><div class="formula">Ordering cost/yr = <span class="t1">D/Q</span> × <span class="t3">S</span></div>
+<ul class="clean"><li><b>D/Q</b> = how many orders a year. Count the teeth on the sawtooth.</li>
+<li><b>S</b> = $250 per order: paperwork, delivery scheduling, receiving, paying the invoice. Same cost for a small order or a big one.</li></ul>
+<div class="ctrl"><label>Order size Q</label><input type="range" id="q2" min="60" max="1200" step="10" value="600"><output id="q2o"></output></div>
+<div class="read"><div><span>Orders / yr</span><strong id="r2a"></strong></div><div class="hl"><span>Ordering cost / yr</span><strong id="r2b"></strong></div></div></div>
+<div id="c2"></div></div>
+<p class="anchor">Order more at a time, and you place fewer orders.</p>`,
+ init:()=>{const f=()=>{const Q=+$('#q2').value;$('#q2o').textContent=fmt(Q);$('#r2a').textContent=fmt(EX.D/Q,1);$('#r2b').textContent=$$(EX.D/Q*250);$('#c2').innerHTML=sawtooth(Q,{showAvg:false})};$('#q2').oninput=f;f();}},
+{part:2,html:()=>`<div class="kicker">EOQ · 1 of 3</div><h2>Find the bottom of the U</h2>
+<div class="cols wide-right"><div><p>Slide Q and watch the two costs move in opposite directions. The <b style="color:var(--green)">total</b> is lowest where they cross.</p>
+<div class="ctrl"><label>Order size Q</label><input type="range" id="q3" min="60" max="1200" step="1" value="200"><output id="q3o"></output></div>
+<div class="read"><div><span>Carrying</span><strong id="r3a"></strong></div><div><span>Ordering</span><strong id="r3b"></strong></div><div class="hl"><span>Total</span><strong id="r3c"></strong></div></div>
+<p class="note" id="r3m" style="margin-top:10px"></p></div>
+<div id="c3"></div></div>
+<p class="anchor">At the EOQ, the two costs are equal. That's the bottom of the U.</p>`,
+ init:()=>{const f=()=>{const Q=+$('#q3').value,c=costs(Q);$('#q3o').textContent=fmt(Q);$('#r3a').textContent=$$(c.c);$('#r3b').textContent=$$(c.o);$('#r3c').textContent=$$(c.t);
+  $('#r3m').textContent=Math.abs(c.c-c.o)<300?'Here the two costs are (almost) equal: you\'re at the EOQ.':(c.o>c.c?'Ordering cost is bigger: try a larger Q.':'Carrying cost is bigger: try a smaller Q.');$('#c3').innerHTML=uCurve(Q)};$('#q3').oninput=f;f();}},
+{part:2,html:()=>`<div class="kicker">EOQ · 2 of 3</div><h2>The EOQ formula, step by step</h2>
+<div class="formula">EOQ = √( 2 × <span class="t1">D</span> × <span class="t3">S</span> ÷ <span class="t2">H</span> )</div>
+<div class="steps" id="st5">
+<div class="st"><span class="n" style="color:var(--green)">Step 1</span><span>Holding cost per unit: <b style="color:var(--green)">H = 25% × $160 = $40</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Top of the fraction: 2 × <b>10,800</b> × <b style="color:var(--orange)">$250</b> = <b>5,400,000</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 3</span><span>Divide by H: 5,400,000 ÷ <b style="color:var(--green)">40</b> = <b>135,000</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Square root: √135,000 ≈ <b style="color:var(--orange)">367 units</b> per order</span></div>
+<div class="st"><span class="n" style="color:var(--red)">Check</span><span>Carrying = 367/2 × $40 ≈ <b>$7,348</b> · Ordering = 10,800/367 × $250 ≈ <b>$7,348</b> · Total ≈ <b>$14,697</b></span></div>
+</div><p class="reveal-hint">Press Next to reveal each step.</p>
+<p class="note" style="margin-top:8px">Common slips: forgetting the 2 (gives 260), or using the $160 unit cost instead of H = $40 (gives 184).</p>`,
+ steps:5},
+{part:2,html:()=>`<div class="kicker">EOQ · 3 of 3</div><h2>Try it: what moves the EOQ?</h2>
+<div class="cols wide-right"><div>
+<div class="ctrl"><label>Demand D / yr</label><input type="range" id="d4" min="2000" max="20000" step="100" value="10800"><output id="d4o"></output></div>
+<div class="ctrl"><label>Order cost S</label><input type="range" id="s4" min="25" max="600" step="5" value="250"><output id="s4o"></output></div>
+<div class="ctrl"><label>Holding cost H</label><input type="range" id="h4" min="5" max="100" step="1" value="40"><output id="h4o"></output></div>
+<div class="read"><div class="hl"><span>EOQ</span><strong id="r4a"></strong></div><div><span>Total cost at EOQ</span><strong id="r4b"></strong></div><div><span>Orders / yr</span><strong id="r4c"></strong></div></div>
+<ul class="clean" style="margin-top:12px"><li><b>S up</b> → orders are expensive → order bigger, less often.</li><li><b>H up</b> → holding is expensive → order smaller, more often.</li><li><b>Flat bottom:</b> being 20% off the EOQ raises total cost by only about 2%, so rough inputs still work.</li></ul></div>
+<div id="c4"></div></div>`,
+ init:()=>{const f=()=>{const D=+$('#d4').value,S=+$('#s4').value,H=+$('#h4').value,e=eoq(D,S,H),c=costs(e,{D,S,H});
+  $('#d4o').textContent=fmt(D);$('#s4o').textContent='$'+S;$('#h4o').textContent='$'+H;$('#r4a').textContent=fmt(e);$('#r4b').textContent=$$(c.t);$('#r4c').textContent=fmt(D/e,1);
+  $('#c4').innerHTML=uCurve(Math.min(1200,e),{D,S,H})};['#d4','#s4','#h4'].forEach(k=>$(k).oninput=f);f();}},
+{part:3,html:()=>`<div class="kicker">Q system · 1 of 5</div><h2>When to order: the reorder point</h2>
+<div class="cols wide-right"><div><p>In a <b>continuous review (Q) system</b>, you watch stock all the time. When it drops to the <b style="color:var(--red)">reorder point R</b>, you order the same Q (the EOQ) every time.</p>
+<div class="formula">R = <span class="t1">d</span> × <span class="t3">L</span></div>
+<ul class="clean"><li><b>d</b> = daily demand = 10,800 ÷ 360 = 30 units/day</li><li><b>L</b> = lead time (delivery wait)</li></ul>
+<div class="ctrl"><label>Lead time L (days)</label><input type="range" id="l5" min="1" max="12" step="1" value="6"><output id="l5o"></output></div>
+<div class="read"><div class="hl"><span>Reorder point R</span><strong id="r5a"></strong></div></div>
+<p class="note" style="margin-top:8px">The shaded strips are the delivery waits: the order goes in at R and arrives just as stock hits zero.</p></div>
+<div id="c5"></div></div>
+<p class="anchor">Reorder when what's left will last exactly as long as the delivery takes.</p>`,
+ init:()=>{const f=()=>{const L=+$('#l5').value,R=30*L;$('#l5o').textContent=L;$('#r5a').textContent=fmt(R)+' units';$('#c5').innerHTML=sawtooth(367,{R,L,showAvg:false,maxQ:400,days:60})};$('#l5').oninput=f;f();}},
+{part:3,html:()=>`<div class="kicker">Q system · 2 of 5</div><h2>What if demand varies?</h2>
+<p class="lead">Coffee pods: you reorder at <b>6</b>, and shipping takes <b>3 days</b>.</p>
+<table class="t" style="max-width:860px"><tr><th></th><th>Day 1</th><th>Day 2</th><th>Day 3</th><th>When the box arrives</th></tr>
+<tr><td><b>Normal week</b> (2 a day)</td><td>6 → 4</td><td>4 → 2</td><td>2 → 0</td><td>Just in time</td></tr>
+<tr class="hl"><td>Busy week (friends over)</td><td>6 → 4</td><td>4 → 1</td><td>1 → out</td><td>Out of coffee on Day 3</td></tr></table>
+<div class="box warm" style="margin-top:18px"><b>When demand varies, how do you protect yourself?</b><br>Keep a cushion: <b style="color:var(--orange)">safety stock</b>. &nbsp; R = average demand during the delivery wait + safety stock.</div>
+<p class="anchor">Safety stock is the cushion for the days that go worse than average.</p>`},
+{part:3,html:()=>`<div class="kicker">Q system · 3 of 5</div><h2>Safety stock, step by step</h2>
+<p class="lead">Valley Pharmacy sells <b>30</b> boxes of allergy medicine a day on average (σ = <b>5</b>/day). Delivery takes <b>4 days</b>. Target: <b>95%</b> service level (z = 1.65).</p>
+<div class="formula">R = <span class="t1">d̄ × L</span> + <span class="t3">z</span> × <span class="t2">σ<sub>dLT</sub></span></div>
+<div class="steps" id="st8">
+<div class="st"><span class="n" style="color:var(--navy)">Step 1</span><span>Average demand during the wait: <b>30 × 4 = 120</b></span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 2</span><span>Spread during the wait: σ<sub>dLT</sub> = 5 × √4 = <b style="color:var(--green)">10</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 3</span><span>Safety stock: 1.65 × 10 = 16.5 → <b style="color:var(--orange)">17</b> (round up)</span></div>
+<div class="st"><span class="n" style="color:var(--red)">Step 4</span><span>Reorder point: R = 120 + 17 = <b style="color:var(--red)">137 boxes</b></span></div>
+</div><p class="reveal-hint">Press Next to reveal each step.</p>
+<p class="note">Why √L? Busy days and slow days partly cancel out, so the spread grows more slowly than the wait.</p>
+<p class="anchor">120 covers a normal wait. 17 covers a bad one.</p>`,steps:4},
+{part:3,html:()=>`<div class="kicker">Q system · 4 of 5</div><h2>Play with the cushion</h2>
+<div class="cols wide-right"><div><p>Valley Pharmacy again (30 a day, 4-day delivery). Change how unpredictable demand is, and how much protection you want.</p>
+<div class="ctrl"><label>Demand spread σ (per day)</label><input type="range" id="sd9" min="0" max="15" step="1" value="5"><output id="sd9o"></output></div>
+<div class="ctrl"><label>Service level</label><input type="range" id="sl9" min="0" max="6" step="1" value="3"><output id="sl9o"></output></div>
+<div class="read"><div><span>Spread during wait σ<sub>dLT</sub></span><strong id="r9a"></strong></div><div class="hl"><span>Safety stock</span><strong id="r9b"></strong></div><div><span>Reorder point R</span><strong id="r9c"></strong></div><div><span>Stockouts</span><strong id="r9d"></strong></div></div></div>
+<div><div id="c9"></div><div id="b9"></div></div></div>
+<p class="anchor">Each extra percent of protection costs more cushion than the last.</p>`,
+ init:()=>{const f=()=>{const sd=+$('#sd9').value, sl=SLS[+$('#sl9').value], z=Z[sl], s=sd*2, ss=Math.ceil(z*s-1e-9);
+  $('#sd9o').textContent=sd;$('#sl9o').textContent=sl+'%';$('#r9a').textContent=fmt(s);$('#r9b').textContent=fmt(ss);$('#r9c').textContent=fmt(120+ss);
+  $('#r9d').textContent='1 in '+fmt(Math.round(100/(100-sl)));
+  $('#c9').innerHTML=sd>0?normalChart(120,s,z):'<p class="box" style="margin-top:40px">No uncertainty: demand is exactly 120 during every wait, so no safety stock is needed. R = 120.</p>';
+  $('#b9').innerHTML=sd>0?'<p class="note" style="text-align:center">Safety stock needed at each service level</p>'+bars(SLS.map(v=>({label:v+'%',v:Z[v]*s,hl:v===sl})),Math.max(1,Z[99.9]*s)*1.15):'';};
+  ['#sd9','#sl9'].forEach(k=>$(k).oninput=f);f();}},
+{part:3,html:()=>`<div class="kicker">Q system · 5 of 5</div><h2>When the delivery time varies too</h2>
+<div class="cols wide-right"><div><p>Same pharmacy (30 a day, σ<sub>d</sub> = 5, 4-day average delivery, 95%). Now the supplier is unreliable: delivery time varies by σ<sub>L</sub> days.</p>
+<div class="formula" style="font-size:22px">σ<sub>dLT</sub> = √( <span class="t2">L̄ × σ<sub>d</sub>²</span> + <span class="t4">d̄² × σ<sub>L</sub>²</span> )</div>
+<div class="ctrl"><label>Delivery spread σ<sub>L</sub> (days)</label><input type="range" id="sl10" min="0" max="2" step="0.1" value="0.8"><output id="sl10o"></output></div>
+<div class="read"><div><span>From demand</span><strong id="r10a" style="color:var(--green)"></strong></div><div><span>From the supplier</span><strong id="r10b" style="color:var(--purple)"></strong></div><div><span>σ<sub>dLT</sub></span><strong id="r10c"></strong></div><div class="hl"><span>Safety stock</span><strong id="r10d"></strong></div></div>
+<p class="note" style="margin-top:8px">At σ<sub>L</sub> = 0.8: 100 + 576 = 676 → √676 = 26 → safety stock 43, R = 163 (vs. 17 and 137 with a reliable supplier).</p></div>
+<div id="c10"></div></div>
+<p class="anchor">An unreliable supplier costs you inventory.</p>`,
+ init:()=>{const f=()=>{const sL=+$('#sl10').value, a=4*25, b=900*sL*sL, s=Math.sqrt(a+b), ss=Math.ceil(1.65*s-1e-9);
+  $('#sl10o').textContent=sL.toFixed(1);$('#r10a').textContent=fmt(a);$('#r10b').textContent=fmt(b);$('#r10c').textContent=fmt(s,1);$('#r10d').textContent=fmt(ss);
+  $('#c10').innerHTML=bars([{label:'Reliable supplier',v:17},{label:'This supplier',v:ss,hl:true}],Math.max(60,ss*1.2));};$('#sl10').oninput=f;f();}},
+{part:4,html:()=>`<div class="kicker">P system · 1 of 3</div><h2>Periodic review: check on a schedule</h2>
+<div class="cols"><div class="box"><b>Q system</b> (continuous)<ul class="clean"><li>Watch stock all the time</li><li>Order the <b>same amount</b> whenever stock hits R</li><li>Time between orders varies</li></ul></div>
+<div class="box warm"><b>P system</b> (periodic)<ul class="clean"><li>Check stock every <b>P</b> days, no matter what</li><li>Order enough to bring stock <b>up to a target T</b></li><li>Order size varies; timing is fixed</li></ul></div></div>
+<p class="lead" style="margin-top:16px">Coffee pods, P-system style: you check the drawer <b>every Sunday</b>, shipping takes 3 days, and you drink 2 a day. Your stock must last until the <i>next</i> order arrives: 7 + 3 = <b>10 days</b> → target 20 pods. Busy week, 6 left → order 14. Slow week, 14 left → order 6.</p>
+<p class="anchor">The order size changes every time. The target stays the same.</p>`},
+{part:4,html:()=>`<div class="kicker">P system · 2 of 3</div><h2>Target level, step by step</h2>
+<p class="lead">Valley Pharmacy now checks stock every <b>12 days</b> (P). Delivery: <b>4 days</b> (L). Same demand: 30 a day, σ = 5, 95% (z = 1.65).</p>
+<div class="formula">T = <span class="t1">d̄ × (P + L)</span> + <span class="t3">z × σ<sub>P+L</sub></span> &nbsp;&nbsp; Order = T − IP</div>
+<div class="steps" id="st12">
+<div class="st"><span class="n" style="color:var(--muted)">Step 1</span><span>Protection interval (how long stock must last): P + L = 12 + 4 = <b>16 days</b></span></div>
+<div class="st"><span class="n" style="color:var(--navy)">Step 2</span><span>Average demand over it: 30 × 16 = <b>480</b></span></div>
+<div class="st"><span class="n" style="color:var(--green)">Step 3</span><span>Spread over it: σ<sub>P+L</sub> = 5 × √16 = <b style="color:var(--green)">20</b></span></div>
+<div class="st"><span class="n" style="color:var(--orange)">Step 4</span><span>Safety stock 1.65 × 20 = 33 → target <b style="color:var(--orange)">T = 480 + 33 = 513</b></span></div>
+<div class="st"><span class="n" style="color:var(--red)">Step 5</span><span>Review day with 200 on hand (IP): order <b style="color:var(--red)">513 − 200 = 313</b></span></div>
+</div><p class="reveal-hint">Press Next to reveal each step.</p>`,steps:5},
+{part:4,html:()=>`<div class="kicker">P system · 3 of 3</div><h2>Watch the P system run</h2>
+<div class="cols wide-right"><div><p>Demand bounces around 30 a day. Every review, the pharmacy orders whatever it takes to get back up to T. Change the review period.</p>
+<div class="ctrl"><label>Review period P (days)</label><input type="range" id="p13" min="4" max="20" step="1" value="12"><output id="p13o"></output></div>
+<div class="read"><div><span>Protection interval</span><strong id="r13a"></strong></div><div class="hl"><span>Safety stock</span><strong id="r13b"></strong></div><div><span>Target T</span><strong id="r13c"></strong></div></div>
+<p class="note" style="margin-top:8px">Compare: the Q system needed only 17 boxes of safety stock for the same medicine.</p></div>
+<div id="c13"></div></div>
+<p class="anchor">The P system has to survive the review period too, so it needs a bigger cushion.</p>`,
+ init:()=>{const f=()=>{const P=+$('#p13').value, pl=P+4, s=5*Math.sqrt(pl), ss=Math.ceil(1.65*s-1e-9), T=30*pl+ss;
+  $('#p13o').textContent=P;$('#r13a').textContent=pl+' days';$('#r13b').textContent=fmt(ss);$('#r13c').textContent=fmt(T);$('#c13').innerHTML=pSaw(P,4,T)};$('#p13').oninput=f;f();}},
+{part:5,html:()=>`<div class="kicker">Summary · 1 of 2</div><h2>Q vs. P: same item, different cushion</h2>
+<table class="t"><tr><th></th><th>Q system (continuous)</th><th>P system (periodic)</th></tr>
+<tr><td><b>When you order</b></td><td>When stock hits R (137)</td><td>Every 12 days</td></tr>
+<tr><td><b>How much</b></td><td>Fixed Q (often the EOQ)</td><td>Varies: T − IP</td></tr>
+<tr><td><b>Cushion must cover</b></td><td>The delivery wait: 4 days</td><td>Review + delivery: 16 days</td></tr>
+<tr class="hl"><td>Safety stock (Valley Pharmacy)</td><td>17 boxes</td><td>33 boxes</td></tr>
+<tr><td><b>Best for</b></td><td>High-value, critical items</td><td>Many low-value items; one supplier, one order</td></tr></table>
+<p class="anchor">Same medicine, same demand, same 95%. The P system needs the bigger cushion.</p>`},
+{part:5,html:()=>`<div class="kicker">Summary · 2 of 2</div><h2>All the formulas in one place</h2>
+<div class="cols"><div class="box"><b>Costs and EOQ</b><ul class="clean">
+<li>H = holding % × unit cost</li><li>Carrying cost/yr = (Q/2) × H</li><li>Ordering cost/yr = (D/Q) × S</li><li>Total cost = (Q/2)H + (D/Q)S</li><li>EOQ = √(2DS ÷ H)</li></ul></div>
+<div class="box"><b>Q system</b><ul class="clean"><li>R = d × L (no uncertainty)</li><li>σ<sub>dLT</sub> = σ<sub>d</sub> × √L</li><li>Safety stock = z × σ<sub>dLT</sub></li><li>R = d̄ × L + safety stock</li><li>Lead time varies too: σ<sub>dLT</sub> = √(L̄σ<sub>d</sub>² + d̄²σ<sub>L</sub>²)</li></ul>
+<b style="display:block;margin-top:10px">P system</b><ul class="clean"><li>σ<sub>P+L</sub> = σ<sub>d</sub> × √(P + L)</li><li>T = d̄(P + L) + z × σ<sub>P+L</sub></li><li>Order = T − IP</li></ul></div></div>
+<p class="note" style="margin-top:12px">z values: 90% → 1.28 · 95% → 1.65 · 99% → 2.33</p>`}
+];
 
-  // ────────────────────────────────────────────
-  // SAWTOOTH INTERACTIVE (section 4)
-  // ────────────────────────────────────────────
-  const sawQ = document.getElementById('saw-q');
-  const sawGroup = document.getElementById('saw-group');
-  const avgLine = document.getElementById('avg-line');
-  const qLabel = document.getElementById('q-label');
-  const SAW_D = 1200; // annual demand fixed for illustration
-  function updateSawtooth() {
-    const Q = +sawQ.value;
-    const orders = SAW_D / Q;
-    const cycle = 365 / orders;
-    // SVG coordinates: x from 50 to 575 (width 525), y from 200 (bottom) to 20 (top)
-    const xStart = 50, xEnd = 575, yBottom = 200, yTop = 20;
-    const plotWidth = xEnd - xStart;
-    const plotHeight = yBottom - yTop;
-    // Q axis: max visible Q = 800
-    const Qmax = 800;
-    const yQ = yBottom - (Q / Qmax) * plotHeight;
-    const yAvg = yBottom - ((Q / 2) / Qmax) * plotHeight;
-
-    avgLine.setAttribute('y1', yAvg);
-    avgLine.setAttribute('y2', yAvg);
-    document.getElementById('avg-label').setAttribute('y', yAvg + 3);
-    qLabel.setAttribute('y', yQ - 4);
-    qLabel.textContent = 'Q = ' + Q;
-
-    // Draw sawtooth cycles
-    let paths = '';
-    for (let i = 0; i < orders; i++) {
-      const x1 = xStart + (i / orders) * plotWidth;
-      const x2 = xStart + ((i + 1) / orders) * plotWidth;
-      if (x2 > xEnd) break;
-      // Vertical line up (order arrives)
-      paths += `<line x1="${x1}" y1="${yBottom}" x2="${x1}" y2="${yQ}" stroke="#0e7490" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.5"/>`;
-      // Diagonal down
-      paths += `<line x1="${x1}" y1="${yQ}" x2="${x2}" y2="${yBottom}" stroke="#0e7490" stroke-width="2"/>`;
-      // Fill triangle
-      paths += `<polygon points="${x1},${yBottom} ${x1},${yQ} ${x2},${yBottom}" fill="url(#triFill)"/>`;
-    }
-    sawGroup.innerHTML = paths;
-
-    // Update readouts
-    document.getElementById('saw-q-val').textContent = Q;
-    document.getElementById('saw-orders').textContent = orders.toFixed(1);
-    document.getElementById('saw-avg').textContent = (Q / 2).toFixed(0);
-    document.getElementById('saw-cycle').textContent = cycle.toFixed(0);
-    document.getElementById('sawtooth-status').textContent = `D = ${SAW_D}/yr · Q = ${Q}`;
-  }
-  sawQ.addEventListener('input', updateSawtooth);
-  updateSawtooth();
-
-  // ────────────────────────────────────────────
-  // TAC INTERACTIVE (section 5)
-  // ────────────────────────────────────────────
-  // Hospital parameters
-  const TAC_D = 10800, TAC_S = 250, TAC_H = 40;
-  const TAC_EOQ = Math.sqrt(2 * TAC_D * TAC_S / TAC_H);
-  function holdC(Q) { return (Q / 2) * TAC_H; }
-  function orderC(Q) { return (TAC_D / Q) * TAC_S; }
-  function totalC(Q) { return holdC(Q) + orderC(Q); }
-
-  function updateTAC() {
-    const Q = +document.getElementById('tac-q').value;
-    // Plot area
-    const xStart = 60, xEnd = 580, yBottom = 260, yTop = 20;
-    const Qmin = 50, Qmax = 900;
-    const ymax = 30000; // annual cost cap for plotting
-
-    function xOf(q) { return xStart + ((q - Qmin) / (Qmax - Qmin)) * (xEnd - xStart); }
-    function yOf(c) { return yBottom - Math.min(c / ymax, 1) * (yBottom - yTop); }
-
-    // Build curves
-    let pHold = '', pOrder = '', pTac = '';
-    for (let q = Qmin; q <= Qmax; q += 8) {
-      const xp = xOf(q);
-      pHold += (q === Qmin ? 'M ' : 'L ') + xp + ' ' + yOf(holdC(q)) + ' ';
-      pOrder += (q === Qmin ? 'M ' : 'L ') + xp + ' ' + yOf(orderC(q)) + ' ';
-      pTac += (q === Qmin ? 'M ' : 'L ') + xp + ' ' + yOf(totalC(q)) + ' ';
-    }
-    document.getElementById('curve-hold').setAttribute('d', pHold);
-    document.getElementById('curve-order').setAttribute('d', pOrder);
-    document.getElementById('curve-tac').setAttribute('d', pTac);
-
-    // EOQ marker
-    const eoqX = xOf(TAC_EOQ);
-    const eoqY = yOf(totalC(TAC_EOQ));
-    const eoqV = document.getElementById('eoq-vline');
-    eoqV.setAttribute('x1', eoqX); eoqV.setAttribute('x2', eoqX);
-    eoqV.setAttribute('y1', eoqY); eoqV.setAttribute('y2', yBottom);
-    const eoqDot = document.getElementById('eoq-dot');
-    eoqDot.setAttribute('cx', eoqX); eoqDot.setAttribute('cy', eoqY);
-    const eoqText = document.getElementById('eoq-text');
-    eoqText.setAttribute('x', eoqX);
-    eoqText.textContent = 'EOQ ≈ ' + Math.round(TAC_EOQ);
-
-    // Current Q markers
-    const qX = xOf(Q);
-    const qVl = document.getElementById('q-vline');
-    qVl.setAttribute('x1', qX); qVl.setAttribute('x2', qX);
-    qVl.setAttribute('y1', yBottom); qVl.setAttribute('y2', yTop);
-    const qH = document.getElementById('q-dot-hold');
-    qH.setAttribute('cx', qX); qH.setAttribute('cy', yOf(holdC(Q)));
-    const qO = document.getElementById('q-dot-order');
-    qO.setAttribute('cx', qX); qO.setAttribute('cy', yOf(orderC(Q)));
-    const qT = document.getElementById('q-dot-tac');
-    qT.setAttribute('cx', qX); qT.setAttribute('cy', yOf(totalC(Q)));
-
-    // Readouts
-    document.getElementById('tac-q-val').textContent = Q;
-    document.getElementById('tac-hold').textContent = '$' + Math.round(holdC(Q)).toLocaleString();
-    document.getElementById('tac-order').textContent = '$' + Math.round(orderC(Q)).toLocaleString();
-    document.getElementById('tac-total').textContent = '$' + Math.round(totalC(Q)).toLocaleString();
-    document.getElementById('tac-eoq-label').textContent = 'EOQ ≈ ' + Math.round(TAC_EOQ);
-
-    // Highlight which cost is higher
-    const hCell = document.getElementById('tac-hold-cell');
-    const oCell = document.getElementById('tac-order-cell');
-    hCell.style.borderColor = '';
-    oCell.style.borderColor = '';
-    if (Q < TAC_EOQ) oCell.style.borderColor = '#059669';
-    else if (Q > TAC_EOQ) hCell.style.borderColor = '#b91c1c';
-  }
-  document.getElementById('tac-q').addEventListener('input', updateTAC);
-  updateTAC();
-
-  // ────────────────────────────────────────────
-  // INDUSTRY EXAMPLES (section 7)
-  // ────────────────────────────────────────────
-  const industries = {
-    hospital: {
-      title: "St. John's Hospital — Medical Supply",
-      context: "A regional hospital stocks a high-volume sterile supply (gloves, saline, sutures) used across every department. Stockouts risk patient safety.",
-      D: 10800, S: 250, C: 160, rate: 0.25, L: 6, unit: 'units',
-      insight: "Hospital inventory tends toward larger orders due to high unit cost and the catastrophic cost of stockouts. Safety stock is often generous."
-    },
-    cafe: {
-      title: "Morning Roast — Espresso Beans",
-      context: "A specialty café goes through premium espresso beans every day. Beans stale within ~4 weeks, so holding costs are high.",
-      D: 2400, S: 60, C: 12, rate: 0.30, L: 5, unit: 'lbs'
-      , insight: "A small café operates at small scale with high holding rate (freshness). EOQ here pushes toward smaller, more frequent orders — right in the sweet spot for perishable, direct-to-consumer businesses."
-    },
-    bike: {
-      title: "Crestline Cycles — Premium Road Tires",
-      context: "A local bike shop carries a specialty tire that sells steadily throughout the year. Orders come from a regional distributor.",
-      D: 1800, S: 30, C: 55, rate: 0.20, L: 7, unit: 'tires',
-      insight: "Specialty retail with modest demand. Low S means you can order more frequently without pain. Notice how much smaller EOQ is than the hospital — because D is much lower."
-    },
-    auto: {
-      title: "Metro Auto Parts — Brake Rotors",
-      context: "A regional auto parts distributor supplies repair shops throughout the metro area. High-volume, price-sensitive commodity item.",
-      D: 18000, S: 150, C: 48, rate: 0.22, L: 10, unit: 'rotors',
-      insight: "Distribution business with high D and moderate S. Larger orders make sense — and the 10-day lead time means a substantial reorder point on top of the EOQ."
-    },
-    ecom: {
-      title: "CaseHaus — Phone Cases (Amazon FBA)",
-      context: "A small e-commerce brand sells phone cases through FBA. Low unit cost, but very high turnover and moderate ordering overhead.",
-      D: 60000, S: 90, C: 4, rate: 0.35, L: 14, unit: 'cases',
-      insight: "E-commerce at scale with very low unit cost and high ICC rate (fast-fashion obsolescence). The large EOQ reflects the huge D — but also the long lead time for overseas manufacturing."
-    }
-  };
-
-  function renderIndustry(key) {
-    const d = industries[key];
-    const H = d.C * d.rate;
-    const EOQ = Math.sqrt(2 * d.D * d.S / H);
-    const orders = d.D / EOQ;
-    const cycle = 365 / orders;
-    const daily = d.D / 360;
-    const R = daily * d.L;
-    const holdCost = (EOQ / 2) * H;
-    const orderCost = (d.D / EOQ) * d.S;
-    const TAC = holdCost + orderCost;
-
-    document.getElementById('industry-title').textContent = d.title;
-    document.getElementById('industry-context').textContent = d.context;
-
-    document.getElementById('industry-given').innerHTML = `
-      <tr><td style="color:#94a3b8">Annual Demand (D)</td><td style="color:#7dd3fc;text-align:right">${d.D.toLocaleString()} ${d.unit}/yr</td></tr>
-      <tr><td style="color:#94a3b8">Unit Cost (C)</td><td style="color:#7dd3fc;text-align:right">$${d.C.toFixed(2)}</td></tr>
-      <tr><td style="color:#94a3b8">ICC Rate</td><td style="color:#7dd3fc;text-align:right">${(d.rate * 100).toFixed(0)}%</td></tr>
-      <tr><td style="color:#94a3b8">H = C × rate</td><td style="color:#fcd34d;text-align:right">$${H.toFixed(2)}/${d.unit}/yr</td></tr>
-      <tr><td style="color:#94a3b8">Ordering Cost (S)</td><td style="color:#7dd3fc;text-align:right">$${d.S}/order</td></tr>
-      <tr><td style="color:#94a3b8">Lead Time (L)</td><td style="color:#7dd3fc;text-align:right">${d.L} days</td></tr>
-    `;
-
-    document.getElementById('industry-calc').innerHTML = `
-      EOQ = √( 2 × ${d.D.toLocaleString()} × ${d.S} / ${H.toFixed(2)} )<br>
-      &nbsp;&nbsp;&nbsp;= √${((2 * d.D * d.S) / H).toFixed(0).toLocaleString()}<br>
-      <span class="big" style="color:#fcd34d;font-size:1.4rem">≈ ${Math.round(EOQ).toLocaleString()} ${d.unit}</span>
-      <div style="color:#94a3b8;font-size:.8rem;margin-top:6px">Orders/yr: ${orders.toFixed(1)} · Cycle: ${cycle.toFixed(1)} days</div>
-    `;
-
-    document.getElementById('industry-verify').innerHTML = `
-      Holding: (${Math.round(EOQ)}/2) × $${H.toFixed(2)} = <span style="color:#4ade80">$${Math.round(holdCost).toLocaleString()}</span><br>
-      Ordering: (${d.D.toLocaleString()}/${Math.round(EOQ)}) × $${d.S} = <span style="color:#4ade80">$${Math.round(orderCost).toLocaleString()}</span><br>
-      <span style="color:#94a3b8;font-size:.78rem">(equal at true EOQ ✓)</span><br>
-      <span style="color:#fcd34d">TAC ≈ $${Math.round(TAC).toLocaleString()}/yr</span><br>
-      <span style="color:#94a3b8;font-size:.78rem">ROP = ${daily.toFixed(1)}/day × ${d.L}d = ${Math.round(R)} ${d.unit}</span>
-    `;
-
-    document.getElementById('industry-insight-body').textContent = d.insight;
-  }
-
-  document.querySelectorAll('.industry-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      renderIndustry(btn.dataset.industry);
-    });
-  });
-  renderIndustry('hospital');
-
-  // ────────────────────────────────────────────
-  // ROP ANIMATION (section 9)
-  // ────────────────────────────────────────────
-  const playRop = document.getElementById('playRop');
-  const ropCursor = document.getElementById('rop-cursor');
-  const ropStatus = document.getElementById('rop-status');
-  // Path segments for sawtooth:
-  // (70,220) → (70,38) [vertical up, instant]
-  // (70,38) → (230,220) [diagonal down, cycle 1]
-  // (230,220) → (230,38) [vertical up, instant]
-  // (230,38) → (390,220) [diagonal down, cycle 2]
-  // (390,220) → (390,38) [vertical up, instant]
-  // (390,38) → (550,220) [diagonal down, cycle 3]
-  const segments = [
-    { type: 'diag', x1: 70, y1: 38, x2: 230, y2: 220, dur: 2500 },
-    { type: 'jump', x1: 230, y1: 220, x2: 230, y2: 38, dur: 200 },
-    { type: 'diag', x1: 230, y1: 38, x2: 390, y2: 220, dur: 2500 },
-    { type: 'jump', x1: 390, y1: 220, x2: 390, y2: 38, dur: 200 },
-    { type: 'diag', x1: 390, y1: 38, x2: 550, y2: 220, dur: 2500 }
-  ];
-  // y = 145 is ROP threshold
-  let ropAnimating = false;
-  let ropAnimId = null;
-
-  function animateRop() {
-    ropCursor.setAttribute('cx', 70);
-    ropCursor.setAttribute('cy', 38);
-    ropCursor.setAttribute('opacity', 1);
-    let segIdx = 0, segStart = performance.now();
-    function step(now) {
-      if (!ropAnimating) return;
-      const seg = segments[segIdx];
-      const t = Math.min((now - segStart) / seg.dur, 1);
-      const x = seg.x1 + (seg.x2 - seg.x1) * t;
-      const y = seg.y1 + (seg.y2 - seg.y1) * t;
-      ropCursor.setAttribute('cx', x);
-      ropCursor.setAttribute('cy', y);
-      // Status update
-      if (seg.type === 'diag') {
-        if (y >= 145 && y <= 148) {
-          ropStatus.textContent = '⚠ Inventory at R = 180 — ORDER PLACED';
-          ropStatus.setAttribute('fill', '#d97706');
-        } else if (y < 145) {
-          ropStatus.textContent = 'Inventory draining... above R';
-          ropStatus.setAttribute('fill', '#0e7490');
-        } else {
-          ropStatus.textContent = 'Waiting for order to arrive (lead time)';
-          ropStatus.setAttribute('fill', '#b45309');
-        }
-      } else {
-        ropStatus.textContent = '✓ Order received — back to Q = 367';
-        ropStatus.setAttribute('fill', '#059669');
-      }
-      if (t >= 1) {
-        segIdx++;
-        if (segIdx >= segments.length) {
-          ropAnimating = false;
-          playRop.classList.remove('playing');
-          playRop.textContent = '▶ Replay';
-          ropStatus.textContent = 'Q = 367 (cycle complete)';
-          ropStatus.setAttribute('fill', '#0e7490');
-          return;
-        }
-        segStart = now;
-      }
-      ropAnimId = requestAnimationFrame(step);
-    }
-    ropAnimId = requestAnimationFrame(step);
-  }
-  playRop.addEventListener('click', () => {
-    if (ropAnimating) {
-      ropAnimating = false;
-      cancelAnimationFrame(ropAnimId);
-      playRop.classList.remove('playing');
-      playRop.textContent = '▶ Play';
-      ropCursor.setAttribute('opacity', 0);
-      ropStatus.textContent = 'Q = 367';
-      ropStatus.setAttribute('fill', '#0e7490');
-    } else {
-      ropAnimating = true;
-      playRop.classList.add('playing');
-      playRop.textContent = '⏸ Pause';
-      animateRop();
-    }
-  });
-
+// ---------- engine ----------
+let cur=0, sub=0;
+const partsNav=$('#parts');
+PARTS.forEach((p,i)=>{const b=document.createElement('button');b.textContent=p;b.onclick=()=>{cur=slides.findIndex(s=>s.part===i);sub=0;render()};partsNav.appendChild(b)});
+function render(){
+  const s=slides[cur]; $('#slide').innerHTML=s.html(); if(s.init) s.init();
+  if(s.steps){document.querySelectorAll('.steps .st').forEach((el,i)=>el.classList.toggle('show',i<sub));}
+  $('#counter').textContent=(cur+1)+' / '+slides.length;
+  $('#bar').style.width=((cur+1)/slides.length*100)+'%';
+  [...partsNav.children].forEach((b,i)=>b.classList.toggle('on',i===s.part));
+  $('#prev').disabled=cur===0&&sub===0; $('#next').disabled=cur===slides.length-1&&(!s.steps||sub>=s.steps);
+  try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+}
+function next(){const s=slides[cur]; if(s.steps&&sub<s.steps){sub++;document.querySelectorAll('.steps .st').forEach((el,i)=>el.classList.toggle('show',i<sub));$('#next').disabled=cur===slides.length-1&&sub>=s.steps;$('#prev').disabled=false;return}
+  if(cur<slides.length-1){cur++;sub=0;render();window.scrollTo(0,0)}}
+function prev(){const s=slides[cur]; if(s.steps&&sub>0){sub--;document.querySelectorAll('.steps .st').forEach((el,i)=>el.classList.toggle('show',i<sub));$('#prev').disabled=cur===0&&sub===0;$('#next').disabled=false;return}
+  if(cur>0){cur--;const p=slides[cur];sub=p.steps||0;render();window.scrollTo(0,0)}}
+$('#next').onclick=next; $('#prev').onclick=prev;
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return; if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next()} if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}});
+const h=parseInt((location.hash||'').slice(1)); if(h>=1&&h<=slides.length) cur=h-1;
+render();
+})();
 </script>
 </body>
 </html>
