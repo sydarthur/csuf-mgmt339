@@ -8,7 +8,7 @@ updated: 2026-11-17
 ---
 ## Now
 - Module 3, inventory: costs + EOQ taught Nov 16; reorder point, safety stock, P system on Nov 18 (last inventory class)
-- EOQ walkthrough rebuilt as a 17-slide step-through matching the lecture flow and examples (not yet published to students)
+- EOQ walkthrough rebuilt as a 19-slide step-through matching the lecture flow and examples (not yet published to students)
 - Newsvendor "Morning Stand" game built (Sprint 1); its fixed demand sequence averages 57, which undercuts the low-margin debrief, and launch timing vs. the service-level debrief is unsettled (raised with Sid)
 - ICE 3.2 (project management, 20 pts) and ICE 3.3 (inventory costs + EOQ) built in Canvas
 

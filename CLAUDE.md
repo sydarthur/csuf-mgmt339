@@ -138,9 +138,9 @@ Design language: DM Sans + JetBrains Mono, navy (#1e3a5f) header, two-panel layo
 Static HTML step-through walkthrough for inventory management (rebuilt 2026-11-17 to match the Fall 26 lecture slides). The `build:eoq` script copies the whole folder.
 
 Current files:
-- `eoq-walkthrough.html` — 17 slides with Back/Next and arrow keys, grouped into Start / Costs / EOQ / Q system / P system / Summary. Formula slides reveal one step per click (`steps` field); interactive slides have sliders (`init` function). Deep-link with `#N`.
+- `eoq-walkthrough.html` — 19 slides with Back/Next and arrow keys, grouped into Start / Costs / EOQ / Q system / P system / Summary. Formula slides state each step in words before the numbers and reveal one step per click (`steps` field); interactive slides have sliders (`init` function). Deep-link with `#N`.
 
-Slides: two costs → carrying cost (sawtooth + Q/2 slider) → ordering cost (D/Q slider) → U-curve slider (costs equal at the EOQ) → EOQ step by step → EOQ sensitivity sliders (D, S, H; flat bottom) → reorder point R = d × L (lead-time slider) → coffee pods "what if demand varies" → safety stock step by step → cushion sliders (σ and service level, normal curve + safety stock by service level) → lead time varies too (σ_L slider) → P vs. Q concept + Sunday coffee pods → P target step by step → P system run (review-period slider) → Q vs. P table → formula sheet.
+Slides: two costs → carrying cost (cost-vs-Q graph + small sawtooth for Q/2) → ordering cost (cost-vs-Q graph) → U-curve slider (costs equal at the EOQ) → total annual cost step by step (Q = 600 → $16,500) → EOQ step by step → EOQ sensitivity sliders (D, S, H; flat bottom) → reorder point R = d × L (lead-time slider) → coffee pods "what if demand varies" → safety stock step by step → cushion sliders (σ and service level, normal curve + safety stock by service level) → lead time varies too (σ_L slider) → P vs. Q concept + Sunday coffee pods → how the P system works (steady-demand sawtooth, P + L bracket, basic T = 480) → P target step by step → P system run (review-period slider) → Q vs. P table → formula sheet.
 
 Examples (same numbers as the slides):
 - EOQ: D = 10,800/yr, $160, 25% → H = $40, S = $250 → EOQ = 367, total ≈ $14,697; d = 30/day (360 days), L = 6 → R = 180
